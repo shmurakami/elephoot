@@ -1,0 +1,20 @@
+{
+    "name": "shmurakami/spice",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "shaka",
+            "email": "shmurakami1104@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "ext-ast": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "shmurakami\\Spice\\": "src/"
+        }
+    }
+}
