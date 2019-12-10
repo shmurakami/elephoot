@@ -30,9 +30,4 @@ class ClientTest extends TestCase
             ],
             $client->callExtendApplication());
     }
-
-    public function ()
-    {
-        
-    }
 }
