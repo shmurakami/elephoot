@@ -1,0 +1,88 @@
+<?php
+
+namespace shmurakami\Spice\Stub;
+
+class Flag
+{
+    const NAME_FQ = 0;
+    const NAME_NOT_FQ = 1;
+    const NAME_RELATIVE = 2;
+    const MODIFIER_PUBLIC = 256;
+    const MODIFIER_PROTECTED = 512;
+    const MODIFIER_PRIVATE = 1024;
+    const MODIFIER_STATIC = 1;
+    const MODIFIER_ABSTRACT = 2;
+    const MODIFIER_FINAL = 4;
+    const RETURNS_REF = 67108864;
+    const FUNC_RETURNS_REF = 67108864;
+    const FUNC_GENERATOR = 8388608;
+    const ARRAY_ELEM_REF = 1;
+    const CLOSURE_USE_REF = 1;
+    const CLASS_ABSTRACT = 32;
+    const CLASS_FINAL = 4;
+    const CLASS_TRAIT = 128;
+    const CLASS_INTERFACE = 64;
+    const CLASS_ANONYMOUS = 256;
+    const PARAM_REF = 1;
+    const PARAM_VARIADIC = 2;
+    const TYPE_NULL = 1;
+    const TYPE_BOOL = 16;
+    const TYPE_LONG = 4;
+    const TYPE_DOUBLE = 5;
+    const TYPE_STRING = 6;
+    const TYPE_ARRAY = 7;
+    const TYPE_OBJECT = 8;
+    const TYPE_CALLABLE = 17;
+    const TYPE_VOID = 19;
+    const TYPE_ITERABLE = 18;
+    const UNARY_BOOL_NOT = 13;
+    const UNARY_BITWISE_NOT = 12;
+    const UNARY_SILENCE = 260;
+    const UNARY_PLUS = 261;
+    const UNARY_MINUS = 262;
+    const BINARY_BOOL_AND = 259;
+    const BINARY_BOOL_OR = 258;
+    const BINARY_BOOL_XOR = 14;
+    const BINARY_BITWISE_OR = 9;
+    const BINARY_BITWISE_AND = 10;
+    const BINARY_BITWISE_XOR = 11;
+    const BINARY_CONCAT = 8;
+    const BINARY_ADD = 1;
+    const BINARY_SUB = 2;
+    const BINARY_MUL = 3;
+    const BINARY_DIV = 4;
+    const BINARY_MOD = 5;
+    const BINARY_POW = 166;
+    const BINARY_SHIFT_LEFT = 6;
+    const BINARY_SHIFT_RIGHT = 7;
+    const BINARY_IS_IDENTICAL = 15;
+    const BINARY_IS_NOT_IDENTICAL = 16;
+    const BINARY_IS_EQUAL = 17;
+    const BINARY_IS_NOT_EQUAL = 18;
+    const BINARY_IS_SMALLER = 19;
+    const BINARY_IS_SMALLER_OR_EQUAL = 20;
+    const BINARY_IS_GREATER = 256;
+    const BINARY_IS_GREATER_OR_EQUAL = 257;
+    const BINARY_SPACESHIP = 170;
+    const BINARY_COALESCE = 260;
+    const EXEC_EVAL = 1;
+    const EXEC_INCLUDE = 2;
+    const EXEC_INCLUDE_ONCE = 4;
+    const EXEC_REQUIRE = 8;
+    const EXEC_REQUIRE_ONCE = 16;
+    const USE_NORMAL = 1;
+    const USE_FUNCTION = 2;
+    const USE_CONST = 4;
+    const MAGIC_LINE = 370;
+    const MAGIC_FILE = 371;
+    const MAGIC_DIR = 372;
+    const MAGIC_NAMESPACE = 389;
+    const MAGIC_FUNCTION = 376;
+    const MAGIC_METHOD = 375;
+    const MAGIC_CLASS = 373;
+    const MAGIC_TRAIT = 374;
+    const ARRAY_SYNTAX_LIST = 1;
+    const ARRAY_SYNTAX_LONG = 2;
+    const ARRAY_SYNTAX_SHORT = 3;
+
+}
