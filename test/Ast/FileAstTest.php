@@ -3,9 +3,9 @@
 namespace shmurakami\Spice\Test\Ast;
 
 use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassAst;
-use shmurakami\Spice\Ast\FileAst;
-use shmurakami\Spice\Ast\MethodAst;
+use shmurakami\Spice\Ast\Entity\ClassAst;
+use shmurakami\Spice\Ast\Entity\FileAst;
+use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Exception\MethodNotFoundException;

@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Ast;
+namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 

@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast;
 
 use ReflectionClass;
 use ReflectionException;
+use shmurakami\Spice\Ast\Entity\FileAst;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use function ast\parse_file;
 
