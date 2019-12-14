@@ -9,6 +9,10 @@ use shmurakami\Spice\Stub\Kind;
 class ClassAst
 {
     /**
+     * @var ClassProperty[]
+     */
+    private $properties = [];
+    /**
      * @var string
      */
     private $namespace;
@@ -29,6 +33,23 @@ class ClassAst
         $this->namespace = $namespace;
         $this->className = $className;
         $this->classRootNode = $classRootNode;
+
+        $this->parse($namespace, $className, $classRootNode);
+    }
+
+    private function parse(string $namespace, string $className, Node $classRootNode): void
+    {
+        $classStatements = $classRootNode->children['stmts'] ?? (object)['children' => []];
+
+        // TODO AST should has it? consider to make Ast Parser
+        foreach ($classStatements->children as $node) {
+            if ($node->kind === Kind::AST_PROP) {
+                $classProperty = new ClassProperty($namespace, $className, $node);
+                if ($classProperty->isCallable()) {
+                    $this->properties[] = $classProperty;
+                }
+            }
+        }
     }
 
     /**
@@ -46,10 +67,21 @@ class ClassAst
             if ($node->kind === Kind::AST_METHOD) {
                 $rootMethod = $node->children['name'];
                 if ($rootMethod === $method) {
-                    return new MethodAst($this->namespace, $this->className, $node);
+                    return new MethodAst($this->namespace, $this->className, $this->properties, $node);
                 }
             }
         }
         throw new MethodNotFoundException();
     }
+
+    /**
+     * TODO this method is required really?
+     *
+     * @return string
+     */
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
 }

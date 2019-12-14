@@ -11,23 +11,24 @@ use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Test\TestCase;
 
-class FileAstTest extends TestCase
+class AstTest extends TestCase
 {
     public function testAst()
     {
         $astLoader = new AstLoader();
-        $fileAst = $astLoader->loadByClass(Application::class);
-        $this->assertInstanceOf(FileAst::class, $fileAst);
+        $classAst = $astLoader->loadByClass(Application::class);
+        $this->assertInstanceOf(ClassAst::class, $classAst);
 
         // if namespace does not exist?
         // if doing declare(strict_types=1)?
-        $this->assertSame('shmurakami\Spice\Example', $fileAst->getNamespace());
-
-        $classAst = $fileAst->parseClass();
-        $this->assertInstanceOf(ClassAst::class, $classAst);
+        $this->assertSame('shmurakami\Spice\Example', $classAst->getNamespace());
 
         $methodAst = $classAst->parseMethod('sampleMethod');
+//        $methodAst = $classAst->parseMethod('callNest');
         $this->assertInstanceOf(MethodAst::class, $methodAst);
+
+        $methodCallNodes = $methodAst->methodCallNodes();
+        $this->assertEquals([], $methodCallNodes);
     }
 
     public function testClassNotFoundException()
@@ -39,9 +40,9 @@ class FileAstTest extends TestCase
     public function testMethodNotFoundException()
     {
         $this->expectException(MethodNotFoundException::class);
-        $fileAst = (new AstLoader())->loadByClass(Application::class);
-        $classAst = $fileAst->parseClass();
-        $classAst->parseMethod('notExistMethodName');
+        (new AstLoader())
+            ->loadByClass(Application::class)
+            ->parseMethod('notExistMethod');
     }
 
 }
