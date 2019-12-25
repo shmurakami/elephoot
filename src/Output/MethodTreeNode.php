@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class TreeNode
+class MethodTreeNode
 {
     /**
      * @var string

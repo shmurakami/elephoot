@@ -6,7 +6,7 @@ use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Output\MethodCallTree;
-use shmurakami\Spice\Output\TreeNode;
+use shmurakami\Spice\Output\MethodTreeNode;
 
 class Parser
 {
@@ -40,6 +40,12 @@ class Parser
 
         $methodCallTree = $this->_parse($methodAst);
         // TODO output from methodCallTree
+    }
+
+    public function parseClassRelation(string $classFqcn): void
+    {
+        $fileAst = (new AstLoader())->loadFileAst($classFqcn);
+
     }
 
     private function _parse(MethodAst $methodAst): MethodCallTree

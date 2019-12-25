@@ -32,7 +32,7 @@ class AstLoader
      * @return FileAst
      * @throws ReflectionException
      */
-    private function loadFileAst(string $className): FileAst
+    public function loadFileAst(string $className): FileAst
     {
         $reflector = new ReflectionClass($className);
         $fileName = $reflector->getFileName();

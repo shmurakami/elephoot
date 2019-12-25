@@ -3,7 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
-use shmurakami\Spice\Output\TreeNode;
+use shmurakami\Spice\Output\MethodTreeNode;
 
 class MethodAst
 {
@@ -61,11 +61,11 @@ class MethodAst
         return [];
     }
 
-    public function treeNode(): TreeNode
+    public function treeNode(): MethodTreeNode
     {
         $fqcn = $this->namespace . '\\' . $this->className;
         $methodName = $this->methodRootNode->children['name'];
-        return new TreeNode($fqcn, $methodName);
+        return new MethodTreeNode($fqcn, $methodName);
     }
 
 }

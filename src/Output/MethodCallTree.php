@@ -5,7 +5,7 @@ namespace shmurakami\Spice\Output;
 class MethodCallTree
 {
     /**
-     * @var TreeNode
+     * @var MethodTreeNode
      */
     private $rootNode;
 
@@ -16,9 +16,9 @@ class MethodCallTree
 
     /**
      * MethodCallTree constructor.
-     * @param TreeNode $rootNode
+     * @param MethodTreeNode $rootNode
      */
-    public function __construct(TreeNode $rootNode)
+    public function __construct(MethodTreeNode $rootNode)
     {
         $this->rootNode = $rootNode;
     }
