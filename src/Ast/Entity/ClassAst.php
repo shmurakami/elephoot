@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Exception\MethodNotFoundException;
+use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
@@ -82,6 +83,26 @@ class ClassAst
     public function getNamespace(): string
     {
         return $this->namespace;
+    }
+
+    /**
+     * @return ClassAst[]
+     */
+    public function relatedClasses(): array
+    {
+    }
+
+    public function treeNode(): ClassTreeNode
+    {
+        return new ClassTreeNode($this->fqcn());
+    }
+
+    /**
+     * @return string
+     */
+    public function fqcn(): string
+    {
+        return $this->namespace . '\\' . $this->className;
     }
 
 }

@@ -4,9 +4,13 @@ namespace shmurakami\Spice;
 
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
+use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
+use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
+use shmurakami\Spice\Ast\Resolver\FileAstResolver;
+use shmurakami\Spice\Output\ClassTree;
+use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Output\MethodCallTree;
-use shmurakami\Spice\Output\MethodTreeNode;
 
 class Parser
 {
@@ -42,10 +46,27 @@ class Parser
         // TODO output from methodCallTree
     }
 
-    public function parseClassRelation(string $classFqcn): void
+    public function parseClassRelation(string $classFqcn): ClassTree
     {
-        $fileAst = (new AstLoader())->loadFileAst($classFqcn);
+        $classAst = (new AstLoader())->loadByClass($classFqcn);
+        return $this->_parseClassRelation($classAst);
+    }
 
+    private function _parseClassRelation(ClassAst $classAst): ClassTree
+    {
+        $tree = new ClassTree($classAst->treeNode());
+
+        $resolver = FileAstResolver::getInstance();
+        $fileAst = $resolver->resolve($classAst->fqcn());
+        if (!$fileAst) {
+            return $tree;
+        }
+
+        $dependencies = $fileAst->dependentClassAstList();
+        foreach ($dependencies as $node) {
+            $tree->add($this->_parseClassRelation($node));
+        }
+        return $tree;
     }
 
     private function _parse(MethodAst $methodAst): MethodCallTree

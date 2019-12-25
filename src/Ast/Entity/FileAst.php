@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
 
@@ -73,4 +74,69 @@ class FileAst
         return $this->namespace;
     }
 
+    /**
+     * @return ClassAst[]
+     */
+    public function dependentClassAstList(): array
+    {
+        return array_merge($this->importedClasses(), $this->relatedClasses());
+    }
+
+    /**
+     * @return ClassAst[]
+     */
+    private function importedClasses(): array
+    {
+        $classAstResolver = ClassAstResolver::getInstance();
+
+        $imported = [];
+        foreach ($this->rootNode->children as $node) {
+            if ($node->kind === Kind::AST_USE) {
+                // support alias?
+                $className = $node->children[0]->children['name'];
+                $classAst = $classAstResolver->resolve($className);
+                if ($classAst) {
+                    $imported[$className] = $classAst;
+                }
+            }
+        }
+
+        return $imported;
+    }
+
+    /**
+     * @return ClassAst[]
+     */
+    private function relatedClasses(): array
+    {
+        /*
+         * seek use statement
+         * check property
+         *  constructor argument
+         *  type hinting
+         *  anyway required statement parser
+         * see method call
+         * see static method call
+         *
+         * to see method calls
+         * parse class statement to get property, constructor, methods, parent class
+         * dig each methods
+         *   to see method call. no need property class call => it has to be detected by property
+         *   check static method call
+         *
+         * ... and classes which dependent this target
+         * once need to dig all files?
+         */
+        return [];
+        $importedClasses = [];
+        foreach ($this->classRootNode->children as $childNode) {
+            // TODO support GROUP_USE use, TRAIT
+            if ($childNode->kind === Kind::AST_USE) {
+                $useStatement = $childNode;
+            }
+        }
+
+        $dependentClasses = [];
+        return [];
+    }
 }

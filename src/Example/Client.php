@@ -2,6 +2,8 @@
 
 namespace shmurakami\Spice\Example;
 
+use shmurakami\Spice\Example\Application;
+
 class Client
 {
     /**

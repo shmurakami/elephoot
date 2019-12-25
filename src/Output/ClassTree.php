@@ -7,7 +7,7 @@ class ClassTree
     /**
      * @var ClassTreeNode
      */
-    private $rootNod;
+    private $rootNode;
     /**
      * @var ClassTree[]
      */
@@ -16,13 +16,29 @@ class ClassTree
     /**
      * ClassTree constructor.
      */
-    public function __construct(ClassTreeNode $rootNod)
+    public function __construct(ClassTreeNode $rootNode)
     {
-        $this->rootNod = $rootNod;
+        $this->rootNode = $rootNode;
     }
 
-    public function add(ClassTreeNode $node)
+    public function add(ClassTree $classTree)
     {
-        $this->childTree[] = $node;
+        $this->childTree[] = $classTree;
+    }
+
+    /**
+     * @TODO delete it. this is just for test
+     * @return string[]
+     */
+    public function toArray(array $nodes = []): array
+    {
+        $childNodes = [];
+        foreach ($this->childTree as $childNode) {
+            $childNodes[] = $childNode->toArray($nodes);
+        }
+        return [
+            'className'  => $this->rootNode->getClassName(),
+            'childNodes' => $childNodes,
+        ];
     }
 }
