@@ -81,7 +81,7 @@ class MethodNode
             }
         }
 
-        return $dependencyClassFqcnList;
+        return array_unique($dependencyClassFqcnList);
     }
 
 }
