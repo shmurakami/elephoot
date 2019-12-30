@@ -6,9 +6,6 @@ use shmurakami\Spice\Example\Application;
 
 class Client
 {
-    /**
-     * @var Application
-     */
     private $application;
 
     /**

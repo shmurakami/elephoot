@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Stub\Kind;
@@ -44,11 +45,8 @@ class ClassAst
 
         // TODO AST should has it? consider to make Ast Parser
         foreach ($classStatements->children as $node) {
-            if ($node->kind === Kind::AST_PROP) {
-                $classProperty = new ClassProperty($namespace, $className, $node);
-                if ($classProperty->isCallable()) {
-                    $this->properties[] = $classProperty;
-                }
+            if ($node->kind === Kind::AST_PROP_GROUP) {
+                $this->properties[] = new ClassProperty($namespace, $className, $node);
             }
         }
     }
@@ -90,6 +88,49 @@ class ClassAst
      */
     public function relatedClasses(): array
     {
+        /*
+         * check property
+         *  constructor argument
+         *  type hinting
+         *  anyway required statement parser
+         * see method call
+         * see static method call
+         *
+         * to see method calls
+         * parse class statement to get property, constructor, methods, parent class
+         * dig each methods
+         *   to see method call. no need property class call => it has to be detected by property
+         *   check static method call
+         *
+         * ... and classes which dependent this target
+         * once need to dig all files?
+         */
+        $dependencies = [];
+
+        $classAstResolver = ClassAstResolver::getInstance();
+
+        // property, only need to parse doc comment
+        foreach ($this->properties as $classProperty) {
+            $classFqcnList = $classProperty->classFqcnListFromDocComment();
+            if ($classFqcnList) {
+                foreach ($classFqcnList as $classFqcn) {
+                    $classAst = $classAstResolver->resolve($classFqcn);
+                    if ($classAst) {
+                        $dependencies[$classFqcn] = $classAst;
+                    }
+                }
+            }
+        }
+
+        // method argument
+
+        // return type
+
+        // new statement
+
+        // method call
+
+        return [];
     }
 
     public function treeNode(): ClassTreeNode

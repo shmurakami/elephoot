@@ -6,10 +6,8 @@ use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
 use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Output\MethodCallTree;
 
 class Parser

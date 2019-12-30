@@ -105,38 +105,13 @@ class FileAst
     }
 
     /**
+     * if this works perfectly, import statement is not necessary. it's just redundant
+     *
      * @return ClassAst[]
+     * @throws ClassNotFoundException
      */
     private function relatedClasses(): array
     {
-        /*
-         * seek use statement
-         * check property
-         *  constructor argument
-         *  type hinting
-         *  anyway required statement parser
-         * see method call
-         * see static method call
-         *
-         * to see method calls
-         * parse class statement to get property, constructor, methods, parent class
-         * dig each methods
-         *   to see method call. no need property class call => it has to be detected by property
-         *   check static method call
-         *
-         * ... and classes which dependent this target
-         * once need to dig all files?
-         */
-        return [];
-        $importedClasses = [];
-        foreach ($this->classRootNode->children as $childNode) {
-            // TODO support GROUP_USE use, TRAIT
-            if ($childNode->kind === Kind::AST_USE) {
-                $useStatement = $childNode;
-            }
-        }
-
-        $dependentClasses = [];
-        return [];
+        return $this->parse()->relatedClasses();
     }
 }
