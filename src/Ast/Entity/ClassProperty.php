@@ -74,6 +74,8 @@ class ClassProperty
         }
 
         $classFqcnListInComment = $this->parseDocComment($this->docComment, '@var');
-        return $this->parseType($this->namespace, $classFqcnListInComment);
+        return array_map(function (string $fqcn) {
+            return $this->parseType($this->namespace, $fqcn);
+        }, $classFqcnListInComment);
     }
 }

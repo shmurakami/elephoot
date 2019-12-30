@@ -5,6 +5,7 @@ namespace shmurakami\Spice\Ast\Entity\Node;
 use ast\Node;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Ast\Parser\TypeParser;
+use shmurakami\Spice\Stub\Kind;
 
 class MethodNode
 {
@@ -31,28 +32,48 @@ class MethodNode
      */
     public function parse()
     {
-        $classFqcn = [];
+        $dependencyClassFqcnList = [];
 
         // doc comment
         $doComment = $this->node->children['docComment'] ?? '';
-        $classFqcnList = $this->parseDocComment($doComment, '@param');
-        $methodDocCommentDependencies = $this->parseType($this->namespace, $classFqcnList);
-        foreach ($methodDocCommentDependencies as $dependency) {
-            $classFqcn[] = $dependency;
+        $typeNames = $this->parseDocComment($doComment, '@param');
+        foreach ($typeNames as $typeName) {
+            $classFqcn = $this->parseType($this->namespace, $typeName);
+            if ($classFqcn) {
+                $dependencyClassFqcnList[] = $classFqcn;
+            }
         }
 
         // type hinting
+        // consider nullable type?
         $argumentNodes = $this->node->children['params']->children ?? [];
-        $retrieveFromTypeHinting = array_map(function (Node $node) {
+        $typeNames = array_map(function (Node $node) {
             return $node->children['type']->children['name'] ?? '';
         }, $argumentNodes);
-        $classFqcnListIntypeHinting = $this->parseType($this->namespace, $retrieveFromTypeHinting);
-        foreach ($classFqcnListIntypeHinting as $fqcn) {
-            $classFqcn[] = $fqcn;
+        foreach ($typeNames as $typeName) {
+            $classFqcn = $this->parseType($this->namespace, $typeName);
+            if ($classFqcn) {
+                $dependencyClassFqcnList[] = $classFqcn;
+            }
         }
 
+        // return statement
         // return type
-        return $classFqcn;
+        $returnTypeNode = $this->node->children['returnType'] ?? null;
+        if ($returnTypeNode
+            && ($returnTypeNode->kind === Kind::AST_TYPE || $returnTypeNode->kind === Kind::AST_NULLABLE_TYPE)
+        ) {
+            $type = $returnTypeNode->children['type']->children['name'] ?? '';
+            $classFqcn = $this->parseType($this->namespace, $type);
+            if ($classFqcn) {
+                $dependencyClassFqcnList[] = $classFqcn;
+            }
+        }
+
+        // return type in doc comment
+        // redundant to parse doc comment again
+
+        return $dependencyClassFqcnList;
     }
 
 }

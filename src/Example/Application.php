@@ -41,6 +41,18 @@ class Application
     {
     }
 
+    private function byReturn(): ?\shmurakami\Spice\Example\ReturnType\ReturnType
+    {
+        return null;
+    }
+
+    /**
+     * @return \shmurakami\Spice\Example\ReturnType\ReturnInDocComment|null
+     */
+    private function byReturnDocComment()
+    {
+    }
+
     private function internalMethod(): string
     {
         return 'Hello';

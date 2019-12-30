@@ -7,6 +7,8 @@ use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\Import\ByImport;
 use shmurakami\Spice\Example\Method\DocComment;
 use shmurakami\Spice\Example\Method\TypeHinting;
+use shmurakami\Spice\Example\ReturnType\ReturnInDocComment;
+use shmurakami\Spice\Example\ReturnType\ReturnType;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Parser;
@@ -71,6 +73,10 @@ class ParserTest extends TestCase
         $applicationTree->add($methodDocCommentTree);
         $applicationTree->add($methodTypeHintingTree);
 
+        $returnTypeTree = new ClassTree(new ClassTreeNode(ReturnType::class));
+//        $returnInDocCommentTree = new ClassTree(new ClassTreeNode(ReturnInDocComment::class));
+        $applicationTree->add($returnTypeTree);
+//        $applicationTree->add($returnInDocCommentTree);
 
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
