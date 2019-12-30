@@ -71,7 +71,15 @@ class MethodNode
         }
 
         // return type in doc comment
-        // redundant to parse doc comment again
+        // redundant to parse doc comment again?
+        $doComment = $this->node->children['docComment'] ?? '';
+        $typeNames = $this->parseDocComment($doComment, '@return');
+        foreach ($typeNames as $typeName) {
+            $classFqcn = $this->parseType($this->namespace, $typeName);
+            if ($classFqcn) {
+                $dependencyClassFqcnList[] = $classFqcn;
+            }
+        }
 
         return $dependencyClassFqcnList;
     }

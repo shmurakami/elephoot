@@ -74,9 +74,9 @@ class ParserTest extends TestCase
         $applicationTree->add($methodTypeHintingTree);
 
         $returnTypeTree = new ClassTree(new ClassTreeNode(ReturnType::class));
-//        $returnInDocCommentTree = new ClassTree(new ClassTreeNode(ReturnInDocComment::class));
+        $returnInDocCommentTree = new ClassTree(new ClassTreeNode(ReturnInDocComment::class));
         $applicationTree->add($returnTypeTree);
-//        $applicationTree->add($returnInDocCommentTree);
+        $applicationTree->add($returnInDocCommentTree);
 
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
