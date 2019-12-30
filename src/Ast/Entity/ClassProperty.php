@@ -4,9 +4,11 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
+use shmurakami\Spice\Ast\Parser\TypeParser;
 
 class ClassProperty
 {
+    use TypeParser;
     use DocCommentParser;
 
     /**
@@ -71,6 +73,7 @@ class ClassProperty
             return [];
         }
 
-        return $this->parseDocComment($this->namespace, $this->docComment, '@var');
+        $classFqcnListInComment = $this->parseDocComment($this->docComment, '@var');
+        return $this->parseType($this->namespace, $classFqcnListInComment);
     }
 }

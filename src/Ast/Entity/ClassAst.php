@@ -4,7 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use Generator;
-use shmurakami\Spice\Ast\Parser\DocCommentParser;
+use shmurakami\Spice\Ast\Entity\Node\MethodNode;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
@@ -12,8 +12,6 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
-    use DocCommentParser;
-
     /**
      * @var ClassProperty[]
      */
@@ -175,28 +173,24 @@ class ClassAst
      */
     private function extractClassFqcnFromMethodNodes(): array
     {
+        /** @var MethodNode[] $methodNodes */
         $methodNodes = [];
 
         // extract method nodes
         $classStatementNodes = $this->classRootNode->children['stmts']->children ?? [];
         foreach ($classStatementNodes as $node) {
             if ($node->kind === Kind::AST_METHOD)  {
-                $methodNodes[] = $node;
+                $methodNodes[] = new MethodNode($this->namespace, $node);
             }
         }
 
         // retrieve class fqcn from method node
         $classFqcn = [];
         foreach ($methodNodes as $methodNode) {
-            // doc comment
-            $doComment = $methodNode->children['docComment'] ?? '';
-            $methodDocCommentDependencies = $this->parseDocComment($this->namespace, $doComment, '@param');
-            foreach ($methodDocCommentDependencies as $dependency) {
-                $classFqcn[] = $dependency;
+            $fqcnList = $methodNode->parse();
+            foreach ($fqcnList as $fqcn) {
+                $classFqcn[] = $fqcn;
             }
-
-            // type hinting
-            // return type
         }
         return array_unique($classFqcn);
     }
