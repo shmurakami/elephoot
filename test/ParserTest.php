@@ -4,7 +4,9 @@ namespace shmurakami\Spice\Test;
 
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
-use shmurakami\Spice\Example\Nest\NestClass;
+use shmurakami\Spice\Example\Import\ByImport;
+use shmurakami\Spice\Example\Method\DocComment;
+use shmurakami\Spice\Example\Method\TypeHinting;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Parser;
@@ -13,9 +15,9 @@ class ParserTest extends TestCase
 {
     public function testClassTreeNode()
     {
-        $nestClassTree = new ClassTree(new ClassTreeNode(NestClass::class));
+        $importClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
-        $applicationTree->add($nestClassTree);
+        $applicationTree->add($importClassTree);
 
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
         $clientTree->add($applicationTree);
@@ -27,7 +29,7 @@ class ParserTest extends TestCase
                     'className'  => Application::class,
                     'childNodes' => [
                         [
-                            'className'  => NestClass::class,
+                            'className'  => ByImport::class,
                             'childNodes' => [],
                         ],
                     ],
@@ -40,9 +42,9 @@ class ParserTest extends TestCase
 
     public function testParseClassRelation()
     {
-//        $nestClassTree = new ClassTree(new ClassTreeNode(NestClass::class));
+        $importClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
-//        $applicationTree->add($nestClassTree);
+        $applicationTree->add($importClassTree);
 
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
         $clientTree->add($applicationTree);
@@ -59,10 +61,20 @@ class ParserTest extends TestCase
         $parser = new Parser();
         $actual = $parser->parseClassRelation(Client::class);
 
-        $nestClassTree = new ClassTree(new ClassTreeNode(NestClass::class));
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
-        $applicationTree->add($nestClassTree);
 
+        $importedClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
+        $applicationTree->add($importedClassTree);
+
+        $methodDocCommentTree = new ClassTree(new ClassTreeNode(DocComment::class));
+//        $methodTypeHintingTree = new ClassTree(new ClassTreeNode(TypeHinting::class));
+        $applicationTree->add($methodDocCommentTree);
+//        $applicationTree->add($methodTypeHintingTree);
+
+
+
+
+        // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
         $clientTree->add($applicationTree);
 

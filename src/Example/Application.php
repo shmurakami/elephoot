@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Example;
 
-use shmurakami\Spice\Example\Nest\NestClass;
+use shmurakami\Spice\Example\Import\ByImport;
 
 class Application
 {
@@ -22,12 +22,23 @@ class Application
 
     public function callNest(): string
     {
-        return $this->createNestInstance()->nest();
+        return $this->createForImportedClassInstance()->nest();
     }
 
-    private function createNestInstance()
+    private function createForImportedClassInstance()
     {
-        return new NestClass();
+        return new ByImport();
+    }
+
+    /**
+     * @param \shmurakami\Spice\Example\Method\DocComment $docComment
+     */
+    private function byDocComment($docComment): void
+    {
+    }
+
+    private function byTypeHinting(\shmurakami\Spice\Example\Method\TypeHinting $typeHinting): void
+    {
     }
 
     private function internalMethod(): string

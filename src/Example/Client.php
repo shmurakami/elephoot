@@ -2,10 +2,11 @@
 
 namespace shmurakami\Spice\Example;
 
-use shmurakami\Spice\Example\Application;
-
 class Client
 {
+    /**
+     * @var \shmurakami\Spice\Example\Application
+     */
     private $application;
 
     /**

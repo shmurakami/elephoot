@@ -3,6 +3,8 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use Generator;
+use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
@@ -10,6 +12,8 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
+    use DocCommentParser;
+
     /**
      * @var ClassProperty[]
      */
@@ -36,15 +40,14 @@ class ClassAst
         $this->className = $className;
         $this->classRootNode = $classRootNode;
 
-        $this->parse($namespace, $className, $classRootNode);
+        $this->parseProperties($namespace, $className, $classRootNode);
     }
 
-    private function parse(string $namespace, string $className, Node $classRootNode): void
+    private function parseProperties(string $namespace, string $className, Node $classRootNode): void
     {
-        $classStatements = $classRootNode->children['stmts'] ?? (object)['children' => []];
+        $classStatementNodes = $classRootNode->children['stmts']->children ?? [];
 
-        // TODO AST should has it? consider to make Ast Parser
-        foreach ($classStatements->children as $node) {
+        foreach ($classStatementNodes as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
                 $this->properties[] = new ClassProperty($namespace, $className, $node);
             }
@@ -105,24 +108,28 @@ class ClassAst
          * ... and classes which dependent this target
          * once need to dig all files?
          */
-        $dependencies = [];
-
-        $classAstResolver = ClassAstResolver::getInstance();
+        $dependentClassAstResolver = $this->dependentClassAstResolver();
 
         // property, only need to parse doc comment
         foreach ($this->properties as $classProperty) {
             $classFqcnList = $classProperty->classFqcnListFromDocComment();
             if ($classFqcnList) {
                 foreach ($classFqcnList as $classFqcn) {
-                    $classAst = $classAstResolver->resolve($classFqcn);
-                    if ($classAst) {
-                        $dependencies[$classFqcn] = $classAst;
-                    }
+                    $dependentClassAstResolver->send($classFqcn);
                 }
             }
         }
 
+        // annoying to call some methods and loop for every of them...
+
+        $methodDependentClassFqcnList = $this->extractClassFqcnFromMethodNodes();
+        foreach ($methodDependentClassFqcnList as $classFqcn) {
+            $dependentClassAstResolver->send($classFqcn);
+        }
+
+
         // method argument
+        // constructor, child method
 
         // return type
 
@@ -130,7 +137,68 @@ class ClassAst
 
         // method call
 
-        return [];
+        // send null to call generator return
+        $dependentClassAstResolver->next();
+        return $dependentClassAstResolver->getReturn();
+    }
+
+    /**
+     * @return Generator|array
+     */
+    private function dependentClassAstResolver(): Generator
+    {
+        // in case wrong class name is passed some times
+        $resolved = [];
+        $dependencies = [];
+        $classAstResolver = ClassAstResolver::getInstance();
+
+        while (true) {
+            $classFqcn = yield;
+            if ($classFqcn === null) {
+                return $dependencies;
+            }
+
+            if (isset($resolved[$classFqcn])) {
+                continue;
+            }
+
+            $classAst = $classAstResolver->resolve($classFqcn);
+            if ($classAst) {
+                $dependencies[$classFqcn] = $classAst;
+            }
+            $resolved[$classFqcn] = true;
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function extractClassFqcnFromMethodNodes(): array
+    {
+        $methodNodes = [];
+
+        // extract method nodes
+        $classStatementNodes = $this->classRootNode->children['stmts']->children ?? [];
+        foreach ($classStatementNodes as $node) {
+            if ($node->kind === Kind::AST_METHOD)  {
+                $methodNodes[] = $node;
+            }
+        }
+
+        // retrieve class fqcn from method node
+        $classFqcn = [];
+        foreach ($methodNodes as $methodNode) {
+            // doc comment
+            $doComment = $methodNode->children['docComment'] ?? '';
+            $methodDocCommentDependencies = $this->parseDocComment($this->namespace, $doComment, '@param');
+            foreach ($methodDocCommentDependencies as $dependency) {
+                $classFqcn[] = $dependency;
+            }
+
+            // type hinting
+            // return type
+        }
+        return array_unique($classFqcn);
     }
 
     public function treeNode(): ClassTreeNode

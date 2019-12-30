@@ -1,8 +1,8 @@
 <?php
 
-namespace shmurakami\Spice\Example\Nest;
+namespace shmurakami\Spice\Example\Import;
 
-class NestClass
+class ByImport
 {
     public function nest()
     {
