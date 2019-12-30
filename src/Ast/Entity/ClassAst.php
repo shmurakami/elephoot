@@ -89,23 +89,6 @@ class ClassAst
      */
     public function relatedClasses(): array
     {
-        /*
-         * check property
-         *  constructor argument
-         *  type hinting
-         *  anyway required statement parser
-         * see method call
-         * see static method call
-         *
-         * to see method calls
-         * parse class statement to get property, constructor, methods, parent class
-         * dig each methods
-         *   to see method call. no need property class call => it has to be detected by property
-         *   check static method call
-         *
-         * ... and classes which dependent this target
-         * once need to dig all files?
-         */
         $dependentClassAstResolver = $this->dependentClassAstResolver();
 
         // property, only need to parse doc comment
@@ -125,15 +108,7 @@ class ClassAst
             $dependentClassAstResolver->send($classFqcn);
         }
 
-
-        // method argument
-        // constructor, child method
-
-        // return type
-
         // new statement
-
-        // method call
 
         // send null to call generator return
         $dependentClassAstResolver->next();
