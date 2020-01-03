@@ -53,6 +53,19 @@ class Application
     {
     }
 
+    private function byNewStatement()
+    {
+        new \shmurakami\Spice\Example\NewStatement\SimplyNew();
+        (function () {
+            new \shmurakami\Spice\Example\NewStatement\NewInClosure();
+        });
+
+        $foo = new \shmurakami\Spice\Example\NewStatement\NewStatement();
+        return $foo->foo(new \shmurakami\Spice\Example\NewStatement\NewStatementArgument(
+            new \shmurakami\Spice\Example\NewStatement\NewStatementArgumentArgument()
+        ));
+    }
+
     private function internalMethod(): string
     {
         return 'Hello';

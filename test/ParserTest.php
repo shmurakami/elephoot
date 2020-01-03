@@ -7,6 +7,11 @@ use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\Import\ByImport;
 use shmurakami\Spice\Example\Method\DocComment;
 use shmurakami\Spice\Example\Method\TypeHinting;
+use shmurakami\Spice\Example\NewStatement\NewInClosure;
+use shmurakami\Spice\Example\NewStatement\NewStatement;
+use shmurakami\Spice\Example\NewStatement\NewStatementArgument;
+use shmurakami\Spice\Example\NewStatement\NewStatementArgumentArgument;
+use shmurakami\Spice\Example\NewStatement\SimplyNew;
 use shmurakami\Spice\Example\ReturnType\ReturnInDocComment;
 use shmurakami\Spice\Example\ReturnType\ReturnType;
 use shmurakami\Spice\Output\ClassTree;
@@ -77,6 +82,24 @@ class ParserTest extends TestCase
         $returnInDocCommentTree = new ClassTree(new ClassTreeNode(ReturnInDocComment::class));
         $applicationTree->add($returnTypeTree);
         $applicationTree->add($returnInDocCommentTree);
+
+
+        $simplyNewTree = new ClassTree(new ClassTreeNode(SimplyNew::class));
+        $applicationTree->add($simplyNewTree);
+
+        $newInClosureTree = new ClassTree(new ClassTreeNode(NewInClosure::class));
+        $applicationTree->add($newInClosureTree);
+
+        // new statement has nested dependencies
+        $newStatementTree = new ClassTree(new ClassTreeNode(NewStatement::class));
+        $newStatementArgumentTree = new ClassTree(new ClassTreeNode(NewStatementArgument::class));
+        $newStatementArgumentArgumentTree = new ClassTree(new ClassTreeNode(NewStatementArgumentArgument::class));
+        $newStatementArgumentTree->add($newStatementArgumentArgumentTree);
+        $newStatementTree->add($newStatementArgumentTree);
+
+        $applicationTree->add($newStatementTree);
+        $applicationTree->add($newStatementArgumentTree);
+        $applicationTree->add($newStatementArgumentArgumentTree);
 
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));

@@ -109,6 +109,14 @@ class ClassAst
         }
 
         // new statement
+        $newStatementFqcnList = $this->extractNewStatementFqcnList($this->classRootNode);
+        foreach ($newStatementFqcnList as $classFqcn) {
+            $dependentClassAstResolver->send($classFqcn);
+        }
+
+        // static method call
+
+        // inherit class
 
         // send null to call generator return
         $dependentClassAstResolver->next();
@@ -135,6 +143,13 @@ class ClassAst
                 continue;
             }
 
+            // fqcn is same with current target class, skip to avoid infinite loop
+            if ($this->fqcn() === $classFqcn) {
+                $resolved[$classFqcn] = true;
+                continue;
+            }
+
+            // TODO sometime fqcn is null or broken. check it
             $classAst = $classAstResolver->resolve($classFqcn);
             if ($classAst) {
                 $dependencies[$classFqcn] = $classAst;
@@ -154,7 +169,7 @@ class ClassAst
         // extract method nodes
         $classStatementNodes = $this->classRootNode->children['stmts']->children ?? [];
         foreach ($classStatementNodes as $node) {
-            if ($node->kind === Kind::AST_METHOD)  {
+            if ($node->kind === Kind::AST_METHOD) {
                 $methodNodes[] = new MethodNode($this->namespace, $node);
             }
         }
@@ -168,6 +183,100 @@ class ClassAst
             }
         }
         return array_unique($classFqcn);
+    }
+
+    /**
+     * TODO refactoring
+     *
+     * @return string[]
+     */
+    private function extractNewStatementFqcnList(Node $rootNode, $fqcnList = []): array
+    {
+        $kind = $rootNode->kind;
+
+        // has child statements
+        if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
+            $statementNodes = $rootNode->children['stmts']->children ?? [];
+            foreach ($statementNodes as $statementNode) {
+                $fqcnList = $this->extractNewStatementFqcnList($statementNode, $fqcnList);
+            }
+            return $fqcnList;
+        }
+
+        // see right statement
+        if (in_array($kind, [Kind::AST_ASSIGN, Kind::AST_RETURN])) {
+            $rightStatementNode = $rootNode->children['expr'];
+            if (!($rightStatementNode instanceof Node)) {
+                return $fqcnList;
+            }
+            if ($rightStatementNode->kind === Kind::AST_NEW) {
+                $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
+                foreach ($list as $f) {
+                    $fqcnList[] = $f;
+                }
+                return $fqcnList;
+            }
+
+            if ($kind === Kind::AST_RETURN) {
+                return $this->extractNewStatementFqcnList($rightStatementNode, $fqcnList);
+            }
+        }
+
+        // method call
+        if ($kind === Kind::AST_METHOD_CALL) {
+            // if call method without variable assigning? like (new hogehoge())->foobar()
+            // need expr? if so, call self recursively
+            $exprNode = $rootNode->children['expr'];
+            // to make method tree
+            $method = $rootNode->children['method'];
+            $argumentNodes = $rootNode->children['args']->children ?? [];
+            foreach ($argumentNodes as $argumentNode) {
+                if ($argumentNode instanceof Node) {
+                    $list = $this->extractNewStatementFqcnList($argumentNode, $fqcnList);
+                    foreach ($list as $fqcn) {
+                        $fqcnList[] = $fqcn;
+                    }
+                    return $fqcnList;
+                }
+            }
+        }
+
+        // not assigning new, e.g. in argument
+        if ($kind === Kind::AST_NEW) {
+            $list = $this->parseNewStatementFqcnList($rootNode, []);
+            foreach ($list as $f) {
+                $fqcnList[] = $f;
+            }
+            return $fqcnList;
+        }
+
+        // nothing to do
+        if (in_array($kind, [Kind::AST_PROP_GROUP])) {
+            return $fqcnList;
+        }
+
+        return $fqcnList;
+    }
+
+    /**
+     * new statement(constructor) argument can be another new statement
+     * and it's nestable
+     */
+    private function parseNewStatementFqcnList(Node $node, array $list = []): array
+    {
+        // if class name by assigned to variable?
+        $newClassName = $node->children['class']->children['name'];
+        $list[] = $newClassName;
+
+        $arguments = $node->children['args']->children ?? [];
+        foreach ($arguments as $argumentNode) {
+            if ($argumentNode->kind === Kind::AST_NEW) {
+                array_map(function (string $fqcn) use (&$list) {
+                    $list[] = $fqcn;
+                }, $this->parseNewStatementFqcnList($argumentNode, $list));
+            }
+        }
+        return $list;
     }
 
     public function treeNode(): ClassTreeNode
