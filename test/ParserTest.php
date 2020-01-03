@@ -14,6 +14,8 @@ use shmurakami\Spice\Example\NewStatement\NewStatementArgumentArgument;
 use shmurakami\Spice\Example\NewStatement\SimplyNew;
 use shmurakami\Spice\Example\ReturnType\ReturnInDocComment;
 use shmurakami\Spice\Example\ReturnType\ReturnType;
+use shmurakami\Spice\Example\StaticMethod\StaticMethodCall;
+use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Parser;
@@ -101,9 +103,17 @@ class ParserTest extends TestCase
         $applicationTree->add($newStatementArgumentTree);
         $applicationTree->add($newStatementArgumentArgumentTree);
 
+        // static method call
+        $staticMethodCallTree = new ClassTree(new ClassTreeNode(StaticMethodCall::class));
+        $staticMethodCallArgumentTree = new ClassTree(new ClassTreeNode(StaticMethodCallArgument::class));
+        $staticMethodCallTree->add($staticMethodCallArgumentTree);
+        $applicationTree->add($staticMethodCallTree);
+        $applicationTree->add($staticMethodCallArgumentTree);
+
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
         $clientTree->add($applicationTree);
+
 
         $expect = $clientTree;
 

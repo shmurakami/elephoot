@@ -66,6 +66,11 @@ class Application
         ));
     }
 
+    private function byStaticMethodCall()
+    {
+        \shmurakami\Spice\Example\StaticMethod\StaticMethodCall::byStaticMethodCall(new \shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument());
+    }
+
     private function internalMethod(): string
     {
         return 'Hello';

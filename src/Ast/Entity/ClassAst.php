@@ -108,13 +108,11 @@ class ClassAst
             $dependentClassAstResolver->send($classFqcn);
         }
 
-        // new statement
-        $newStatementFqcnList = $this->extractNewStatementFqcnList($this->classRootNode);
+        // parse statements
+        $newStatementFqcnList = $this->parseNode($this->classRootNode);
         foreach ($newStatementFqcnList as $classFqcn) {
             $dependentClassAstResolver->send($classFqcn);
         }
-
-        // static method call
 
         // inherit class
 
@@ -186,11 +184,12 @@ class ClassAst
     }
 
     /**
+     * digging class statement
      * TODO refactoring
      *
      * @return string[]
      */
-    private function extractNewStatementFqcnList(Node $rootNode, $fqcnList = []): array
+    private function parseNode(Node $rootNode, $fqcnList = []): array
     {
         $kind = $rootNode->kind;
 
@@ -198,7 +197,7 @@ class ClassAst
         if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
             $statementNodes = $rootNode->children['stmts']->children ?? [];
             foreach ($statementNodes as $statementNode) {
-                $fqcnList = $this->extractNewStatementFqcnList($statementNode, $fqcnList);
+                $fqcnList = $this->parseNode($statementNode, $fqcnList);
             }
             return $fqcnList;
         }
@@ -218,21 +217,28 @@ class ClassAst
             }
 
             if ($kind === Kind::AST_RETURN) {
-                return $this->extractNewStatementFqcnList($rightStatementNode, $fqcnList);
+                return $this->parseNode($rightStatementNode, $fqcnList);
             }
         }
 
         // method call
-        if ($kind === Kind::AST_METHOD_CALL) {
+        if (in_array($kind, [Kind::AST_METHOD_CALL, Kind::AST_STATIC_CALL])) {
             // if call method without variable assigning? like (new hogehoge())->foobar()
-            // need expr? if so, call self recursively
-            $exprNode = $rootNode->children['expr'];
+            // need expr for call instance method? if so, call self recursively
+            $exprNode = $rootNode->children['expr'] ?? null;
             // to make method tree
             $method = $rootNode->children['method'];
+            // for static method call
+            $staticMethodClassNode = $rootNode->children['class'] ?? null;
+            if ($staticMethodClassNode) {
+                $newClassName = $staticMethodClassNode->children['name'];
+                $fqcnList[] = $newClassName;
+            }
+
             $argumentNodes = $rootNode->children['args']->children ?? [];
             foreach ($argumentNodes as $argumentNode) {
                 if ($argumentNode instanceof Node) {
-                    $list = $this->extractNewStatementFqcnList($argumentNode, $fqcnList);
+                    $list = $this->parseNode($argumentNode, $fqcnList);
                     foreach ($list as $fqcn) {
                         $fqcnList[] = $fqcn;
                     }
@@ -277,6 +283,11 @@ class ClassAst
             }
         }
         return $list;
+    }
+
+    private function extractStaticMethodCallFqcnList(): array
+    {
+
     }
 
     public function treeNode(): ClassTreeNode
