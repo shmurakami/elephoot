@@ -29,7 +29,7 @@ class Parser
      * @throws ReflectionException
      * @throws Exception\MethodNotFoundException
      */
-    public function parse(string $classFqcn, string $methodName): void
+    public function parseByMethod(string $classFqcn, string $methodName): void
     {
         /*
          * parse AST for Class and method
@@ -40,17 +40,31 @@ class Parser
         $classAst = (new AstLoader())->loadByClass($classFqcn);
         $methodAst = $classAst->parseMethod($methodName);
 
-        $methodCallTree = $this->_parse($methodAst);
+        $methodCallTree = $this->buildMethodCallTree($methodAst);
         // TODO output from methodCallTree
     }
 
-    public function parseClassRelation(string $classFqcn): ClassTree
+    public function parseByClass(string $classFqcn): void
     {
-        $classAst = (new AstLoader())->loadByClass($classFqcn);
-        return $this->_parseClassRelation($classAst);
+        $classTree = $this->_parseByClass($classFqcn);
+        // TODO output tree as drawing
     }
 
-    private function _parseClassRelation(ClassAst $classAst): ClassTree
+    /**
+     * public for test
+     *
+     * @param string $classFqcn
+     * @return ClassTree
+     * @throws Exception\ClassNotFoundException
+     * @throws ReflectionException
+     */
+    public function _parseByClass(string $classFqcn): ClassTree
+    {
+        $classAst = (new AstLoader())->loadByClass($classFqcn);
+        return $this->buildClassTree($classAst);
+    }
+
+    private function buildClassTree(ClassAst $classAst): ClassTree
     {
         $tree = new ClassTree($classAst->treeNode());
 
@@ -62,17 +76,17 @@ class Parser
 
         $dependencies = $fileAst->dependentClassAstList();
         foreach ($dependencies as $node) {
-            $tree->add($this->_parseClassRelation($node));
+            $tree->add($this->buildClassTree($node));
         }
         return $tree;
     }
 
-    private function _parse(MethodAst $methodAst): MethodCallTree
+    private function buildMethodCallTree(MethodAst $methodAst): MethodCallTree
     {
         $tree = new MethodCallTree($methodAst->treeNode());
 
         foreach ($methodAst->methodCallNodes() as $methodCallAstNode) {
-            $methodCallTree = $this->_parse($methodCallAstNode);
+            $methodCallTree = $this->buildMethodCallTree($methodCallAstNode);
             $tree->add($methodCallTree);
         }
         return $tree;

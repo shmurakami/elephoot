@@ -114,8 +114,6 @@ class ClassAst
             $dependentClassAstResolver->send($classFqcn);
         }
 
-        // inherit class
-
         // send null to call generator return
         $dependentClassAstResolver->next();
         return $dependentClassAstResolver->getReturn();

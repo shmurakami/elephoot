@@ -53,26 +53,10 @@ class ParserTest extends TestCase
         $this->assertEquals($expect, $clientTree->toArray());
     }
 
-    public function testParseClassRelation()
-    {
-        $importClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
-        $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
-        $applicationTree->add($importClassTree);
-
-        $clientTree = new ClassTree(new ClassTreeNode(Client::class));
-        $clientTree->add($applicationTree);
-
-        $expect = $clientTree;
-
-        $parser = new Parser();
-        $actual = $parser->parseClassRelation(Client::class);
-        $this->assertEquals($expect, $actual);
-    }
-
     public function testStepByStep()
     {
         $parser = new Parser();
-        $actual = $parser->parseClassRelation(Client::class);
+        $actual = $parser->_parseByClass(Client::class);
 
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
 
