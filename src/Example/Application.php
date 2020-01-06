@@ -4,7 +4,10 @@ namespace shmurakami\Spice\Example;
 
 use shmurakami\Spice\Example\Import\ByImport;
 
-class Application
+class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
+    implements
+    \shmurakami\Spice\Example\Interfaces\Implement1,
+    \shmurakami\Spice\Example\Interfaces\Implement2
 {
 
     /**

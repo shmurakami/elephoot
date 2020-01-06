@@ -19,8 +19,8 @@ class AstLoader
     public function loadByClass(string $className): ClassAst
     {
         // class path must be enabled to load
-        if (!class_exists($className)) {
-            throw new ClassNotFoundException("class $className not found");
+        if (!class_exists($className) && !interface_exists($className)) {
+            throw new ClassNotFoundException("class or interface $className not found");
         }
 
         $fileAst = $this->loadFileAst($className);

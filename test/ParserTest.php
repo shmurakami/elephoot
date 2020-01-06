@@ -5,6 +5,9 @@ namespace shmurakami\Spice\Test;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\Import\ByImport;
+use shmurakami\Spice\Example\Inherit\InheritClass;
+use shmurakami\Spice\Example\Interfaces\Implement1;
+use shmurakami\Spice\Example\Interfaces\Implement2;
 use shmurakami\Spice\Example\Method\DocComment;
 use shmurakami\Spice\Example\Method\TypeHinting;
 use shmurakami\Spice\Example\NewStatement\NewInClosure;
@@ -74,6 +77,14 @@ class ParserTest extends TestCase
 
         $importedClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
         $applicationTree->add($importedClassTree);
+
+        $inheritClassTree = new ClassTree(new ClassTreeNode(InheritClass::class));
+        $applicationTree->add($inheritClassTree);
+
+        $interfaceClassTree = new ClassTree(new ClassTreeNode(Implement1::class));
+        $interfaceClassTree2 = new ClassTree(new ClassTreeNode(Implement2::class));
+        $applicationTree->add($interfaceClassTree);
+        $applicationTree->add($interfaceClassTree2);
 
         $methodDocCommentTree = new ClassTree(new ClassTreeNode(DocComment::class));
         $methodTypeHintingTree = new ClassTree(new ClassTreeNode(TypeHinting::class));

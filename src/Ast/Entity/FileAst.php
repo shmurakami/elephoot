@@ -79,7 +79,10 @@ class FileAst
      */
     public function dependentClassAstList(): array
     {
-        return array_merge($this->importedClasses(), $this->relatedClasses());
+        return array_merge(
+            $this->importedClasses(),
+            $this->extendClasses(),
+            $this->relatedClasses());
     }
 
     /**
@@ -102,6 +105,45 @@ class FileAst
         }
 
         return $imported;
+    }
+
+    /**
+     * @return ClassAst[]
+     */
+    private function extendClasses(): array
+    {
+        $classAstResolver = ClassAstResolver::getInstance();
+        // extend and implements
+        $extends = [];
+
+        $classNode = null;
+        foreach ($this->rootNode->children as $node) {
+            if ($node->kind === Kind::AST_CLASS) {
+                $classNode = $node;
+                break;
+            }
+        }
+
+        if ($classNode) {
+            $extendClassName = $classNode->children['extends']->children['name'] ?? '';
+            $implementClassNames = array_map(function (Node $implementNode) {
+                return $implementNode->children['name'];
+            }, $classNode->children['implements']->children ?? []);
+
+            if ($extendClassName) {
+                $classAst = $classAstResolver->resolve($extendClassName);
+                if ($classAst) {
+                    $extends[$extendClassName] = $classAst;
+                }
+            }
+            foreach ($implementClassNames as $className) {
+                $classAst = $classAstResolver->resolve($className);
+                if ($classAst) {
+                    $extends[$className] = $classAst;
+                }
+            }
+        }
+        return $extends;
     }
 
     /**
