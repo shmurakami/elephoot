@@ -19,6 +19,7 @@ use shmurakami\Spice\Example\ReturnType\ReturnInDocComment;
 use shmurakami\Spice\Example\ReturnType\ReturnType;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCall;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
+use shmurakami\Spice\Example\Traits\UsingTrait;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\ClassTreeNode;
 use shmurakami\Spice\Parser;
@@ -85,6 +86,9 @@ class ParserTest extends TestCase
         $interfaceClassTree2 = new ClassTree(new ClassTreeNode(Implement2::class));
         $applicationTree->add($interfaceClassTree);
         $applicationTree->add($interfaceClassTree2);
+
+        $traitClassTree = new ClassTree(new ClassTreeNode(UsingTrait::class));
+        $applicationTree->add($traitClassTree);
 
         $methodDocCommentTree = new ClassTree(new ClassTreeNode(DocComment::class));
         $methodTypeHintingTree = new ClassTree(new ClassTreeNode(TypeHinting::class));

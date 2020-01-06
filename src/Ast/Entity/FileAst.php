@@ -126,16 +126,16 @@ class FileAst
 
         if ($classNode) {
             $extendClassName = $classNode->children['extends']->children['name'] ?? '';
-            $implementClassNames = array_map(function (Node $implementNode) {
-                return $implementNode->children['name'];
-            }, $classNode->children['implements']->children ?? []);
-
             if ($extendClassName) {
                 $classAst = $classAstResolver->resolve($extendClassName);
                 if ($classAst) {
                     $extends[$extendClassName] = $classAst;
                 }
             }
+
+            $implementClassNames = array_map(function (Node $implementNode) {
+                return $implementNode->children['name'];
+            }, $classNode->children['implements']->children ?? []);
             foreach ($implementClassNames as $className) {
                 $classAst = $classAstResolver->resolve($className);
                 if ($classAst) {

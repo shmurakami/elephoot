@@ -10,6 +10,8 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
     \shmurakami\Spice\Example\Interfaces\Implement2
 {
 
+    use \shmurakami\Spice\Example\Traits\UsingTrait;
+
     /**
      * Application constructor.
      */

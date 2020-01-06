@@ -38,14 +38,12 @@ class ClassAst
         $this->className = $className;
         $this->classRootNode = $classRootNode;
 
-        $this->parseProperties($namespace, $className, $classRootNode);
+        $this->parseProperties($namespace, $className);
     }
 
-    private function parseProperties(string $namespace, string $className, Node $classRootNode): void
+    private function parseProperties(string $namespace, string $className): void
     {
-        $classStatementNodes = $classRootNode->children['stmts']->children ?? [];
-
-        foreach ($classStatementNodes as $node) {
+        foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
                 $this->properties[] = new ClassProperty($namespace, $className, $node);
             }
@@ -59,11 +57,7 @@ class ClassAst
      */
     public function parseMethod(string $method): MethodAst
     {
-        /** @var Node $statementNode */
-        $statementNode = $this->classRootNode->children['stmts'];
-        assert($statementNode->kind === Kind::AST_STMT_LIST, 'unexpected node kind');
-
-        foreach ($statementNode->children as $node) {
+        foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
                 $rootMethod = $node->children['name'];
                 if ($rootMethod === $method) {
@@ -90,6 +84,12 @@ class ClassAst
     public function relatedClasses(): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver();
+
+        // using trait
+        $usingTraitClassFqcnList = $this->extractUsingTrait();
+        foreach ($usingTraitClassFqcnList as $classFqcn) {
+            $dependentClassAstResolver->send($classFqcn);
+        }
 
         // property, only need to parse doc comment
         foreach ($this->properties as $classProperty) {
@@ -165,8 +165,7 @@ class ClassAst
         $methodNodes = [];
 
         // extract method nodes
-        $classStatementNodes = $this->classRootNode->children['stmts']->children ?? [];
-        foreach ($classStatementNodes as $node) {
+        foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
                 $methodNodes[] = new MethodNode($this->namespace, $node);
             }
@@ -195,7 +194,7 @@ class ClassAst
 
         // has child statements
         if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
-            $statementNodes = $rootNode->children['stmts']->children ?? [];
+            $statementNodes = $this->statementNodes($rootNode);
             foreach ($statementNodes as $statementNode) {
                 $fqcnList = $this->parseNode($statementNode, $fqcnList);
             }
@@ -285,9 +284,24 @@ class ClassAst
         return $list;
     }
 
-    private function extractStaticMethodCallFqcnList(): array
-    {
 
+    /**
+     * @return string[]
+     */
+    private function extractUsingTrait(): array
+    {
+        $traits = [];
+        foreach ($this->statementNodes() as $statementNode) {
+            if ($statementNode->kind === Kind::AST_USE_TRAIT) {
+                $traitNames = array_map(function (Node $traitNode) {
+                    return $traitNode->children['name'];
+                }, $statementNode->children['traits']->children ?? []);
+                foreach ($traitNames as $traitName) {
+                    $traits[] = $traitName;
+                }
+            }
+        }
+        return $traits;
     }
 
     public function treeNode(): ClassTreeNode
@@ -301,6 +315,17 @@ class ClassAst
     public function fqcn(): string
     {
         return $this->namespace . '\\' . $this->className;
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function statementNodes(Node $rootNode = null)
+    {
+        if (!$rootNode) {
+            $rootNode = $this->classRootNode;
+        }
+        return $rootNode->children['stmts']->children ?? [];
     }
 
 }
