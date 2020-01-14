@@ -79,8 +79,8 @@ class Parser
         }
 
         $dependencies = $fileAst->dependentClassAstList();
-        foreach ($dependencies as $node) {
-            $tree->add($this->buildClassTree($node));
+        foreach ($dependencies as $dependentClassAst) {
+            $tree->add($this->buildClassTree($dependentClassAst));
         }
         return $tree;
     }

@@ -6,6 +6,7 @@ use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
+use shmurakami\Spice\Example\ExtendApplication;
 use shmurakami\Spice\Example\Import\ByImport;
 use shmurakami\Spice\Example\Inherit\InheritClass;
 use shmurakami\Spice\Example\Inherit\InheritDependency;
@@ -45,8 +46,8 @@ class ParserTest extends TestCase
 
         $inheritClassTree = new ClassTree(new ClassTreeNode(InheritClass::class));
         // depended class also has own tree
-//        $inheritDependencyClassTree = new ClassTree(new ClassTreeNode(InheritDependency::class));
-//        $inheritClassTree->add($inheritDependencyClassTree);
+        $inheritDependencyClassTree = new ClassTree(new ClassTreeNode(InheritDependency::class));
+        $inheritClassTree->add($inheritDependencyClassTree);
         $applicationTree->add($inheritClassTree);
 
         $interfaceClassTree = new ClassTree(new ClassTreeNode(Implement1::class));
@@ -96,6 +97,9 @@ class ParserTest extends TestCase
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));
         $clientTree->add($applicationTree);
 
+        // client has other dependency
+        $extendApplicationTree = new ClassTree(new ClassTreeNode(ExtendApplication::class));
+        $clientTree->add($extendApplicationTree);
 
         $expect = $clientTree;
 

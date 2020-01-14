@@ -5,6 +5,7 @@ namespace shmurakami\Spice\Ast\Entity;
 use ast\Node;
 use Generator;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
+use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
@@ -12,6 +13,8 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
+    use TypeParser;
+
     /**
      * @var ClassProperty[]
      */
@@ -124,15 +127,22 @@ class ClassAst
      */
     private function dependentClassAstResolver(): Generator
     {
-        // in case wrong class name is passed some times
+        // to not search same wrong name class is given sometime
         $resolved = [];
         $dependencies = [];
         $classAstResolver = ClassAstResolver::getInstance();
 
         while (true) {
             $classFqcn = yield;
+            // give null to finish
             if ($classFqcn === null) {
                 return $dependencies;
+            }
+
+            $classFqcn = $this->parseType($this->namespace, $classFqcn);
+            if ($classFqcn === null) {
+                $resolved[$classFqcn] = true;
+                continue;
             }
 
             if (isset($resolved[$classFqcn])) {
