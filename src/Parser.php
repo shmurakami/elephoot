@@ -61,27 +61,14 @@ class Parser
 
     public function parseByClass(string $classFqcn): void
     {
-        $classTree = $this->_parseByClass($classFqcn);
+        $classAst = (new AstLoader())->loadByClass($classFqcn);
+        $classTree = $this->buildClassTree($classAst);
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);
         $filepath = $drawer->draw($classTree);
     }
 
-    /**
-     * public for test
-     *
-     * @param string $classFqcn
-     * @return ClassTree
-     * @throws Exception\ClassNotFoundException
-     * @throws ReflectionException
-     */
-    public function _parseByClass(string $classFqcn): ClassTree
-    {
-        $classAst = (new AstLoader())->loadByClass($classFqcn);
-        return $this->buildClassTree($classAst);
-    }
-
-    private function buildClassTree(ClassAst $classAst): ClassTree
+    public function buildClassTree(ClassAst $classAst): ClassTree
     {
         $tree = new ClassTree($classAst->treeNode());
 

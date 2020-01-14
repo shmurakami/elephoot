@@ -2,11 +2,13 @@
 
 namespace shmurakami\Spice\Test;
 
+use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\Import\ByImport;
 use shmurakami\Spice\Example\Inherit\InheritClass;
+use shmurakami\Spice\Example\Inherit\InheritDependency;
 use shmurakami\Spice\Example\Interfaces\Implement1;
 use shmurakami\Spice\Example\Interfaces\Implement2;
 use shmurakami\Spice\Example\Method\DocComment;
@@ -32,7 +34,9 @@ class ParserTest extends TestCase
     {
         $request = new Request(Request::MODE_CLASS, Client::class, '', '');
         $parser = new Parser($request);
-        $actual = $parser->_parseByClass(Client::class);
+
+        $classAst = (new AstLoader())->loadByClass(Client::class);
+        $actual = $parser->buildClassTree($classAst);
 
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
 
@@ -40,6 +44,9 @@ class ParserTest extends TestCase
         $applicationTree->add($importedClassTree);
 
         $inheritClassTree = new ClassTree(new ClassTreeNode(InheritClass::class));
+        // depended class also has own tree
+//        $inheritDependencyClassTree = new ClassTree(new ClassTreeNode(InheritDependency::class));
+//        $inheritClassTree->add($inheritDependencyClassTree);
         $applicationTree->add($inheritClassTree);
 
         $interfaceClassTree = new ClassTree(new ClassTreeNode(Implement1::class));
