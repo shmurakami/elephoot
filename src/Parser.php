@@ -28,7 +28,7 @@ class Parser
 
     public function parse()
     {
-        [$classFqcn, $method] = $this->request->getTarget();
+        ['class' => $classFqcn, 'method' => $method] = $this->request->getTarget();
 
         if ($this->request->isClassMode()) {
             $this->parseByClass($classFqcn);

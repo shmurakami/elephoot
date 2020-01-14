@@ -64,7 +64,7 @@ class Request
         $parts = explode('@', $target);
         $class = $parts[0];
         $method = $parts[1] ?? '';
-        return [$class, $method];
+        return ['class' => $class, 'method' => $method];
     }
 
     public function isClassMode(): bool
@@ -87,7 +87,7 @@ class Request
     public function isValid()
     {
         $output = $this->getOutputDirectory();
-        $targetClass = $this->getTarget()[0] ?? '';
+        $targetClass = $this->getTarget()['class'] ?? '';
         return ($output !== '' && $output !== null)
             && ($targetClass !== '' && $targetClass !== null)
             ;

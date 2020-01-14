@@ -21,27 +21,27 @@ class RequestTest extends TestCase
     {
         $targetClass = Request::class;
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
-        $this->assertEquals([$targetClass, ''], $request->getTarget());
+        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
 
         // option is prioritized
         $request = new Request(Request::MODE_CLASS, $targetClass, '', __DIR__ . '/resource/config.json');
-        $this->assertEquals([$targetClass, ''], $request->getTarget());
+        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
     }
 
     public function testGetTargetByMethod()
     {
         $targetClass = Request::class;
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals([$targetClass, 'sample'], $request->getTarget());
+        $this->assertEquals(['class' => $targetClass, 'method' => 'sample'], $request->getTarget());
 
         // option is prioritized
         $target = "$targetClass@sample";
         $request = new Request(Request::MODE_CLASS, $target, '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals([$targetClass, 'sample'], $request->getTarget());
+        $this->assertEquals(['class' => $targetClass, 'method' => 'sample'], $request->getTarget());
 
         // even combined, prior argument
         $request = new Request(Request::MODE_CLASS, $targetClass, '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals([$targetClass, ''], $request->getTarget());
+        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
     }
 
     /**
