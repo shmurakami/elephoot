@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=7.1",
-        "ext-ast": "*"
+        "ext-ast": "*",
+        "graphp/graphviz": "^0.2.2"
     },
     "autoload": {
         "psr-4": {

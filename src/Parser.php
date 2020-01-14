@@ -7,7 +7,10 @@ use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
+use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
+use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
 use shmurakami\Spice\Output\ClassTree;
+use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Output\MethodCallTree;
 
 class Parser
@@ -47,7 +50,10 @@ class Parser
     public function parseByClass(string $classFqcn): void
     {
         $classTree = $this->_parseByClass($classFqcn);
-        // TODO output tree as drawing
+        $drawer = new Drawer(new GraphpAdaptor(new AdaptorConfig([])));
+        $filepath = $drawer->draw($classTree);
+        // TODO should not do
+        echo $filepath . "\n";
     }
 
     /**
