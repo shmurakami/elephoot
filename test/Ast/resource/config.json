@@ -1,0 +1,5 @@
+{
+  "mode": "class",
+  "target": "shmurakami\\Spice\\Ast\\Request",
+  "output": "/tmp/foobar"
+}

@@ -5,27 +5,20 @@ namespace shmurakami\Spice\Output\Adaptor;
 class AdaptorConfig
 {
     /**
-     * @var array
+     * @var string
      */
-    private $config;
+    private $outputDirectory;
 
     /**
      * AdaptorConfig constructor.
      */
-    public function __construct(array $config = [])
+    public function __construct(string $outputDirectory)
     {
-        $this->config = $config;
-    }
-
-    private function default(): array
-    {
-        return [
-            // TODO decicde something
-        ];
+        $this->outputDirectory = $outputDirectory;
     }
 
     public function getOutputDirectory(): string
     {
-        return sys_get_temp_dir();
+        return $this->outputDirectory;
     }
 }
