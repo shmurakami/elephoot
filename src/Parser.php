@@ -65,8 +65,6 @@ class Parser
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);
         $filepath = $drawer->draw($classTree);
-        // TODO should not do
-        echo $filepath . "\n";
     }
 
     /**
