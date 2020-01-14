@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+use shmurakami\Spice\Runner\Runner;
+
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    $autoload = __DIR__ . '/../vendor/autoload.php';
+} else {
+    $autoload = __DIR__ . '/vendor/autoload.php';
+}
+require_once $autoload;
+
+$runner = new Runner();
+$runner->run();
