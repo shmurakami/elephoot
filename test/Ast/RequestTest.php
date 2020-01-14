@@ -65,4 +65,19 @@ class RequestTest extends TestCase
         ];
     }
 
+    public function testIsValid()
+    {
+        $request = new Request(Request::MODE_CLASS, 'target', 'output', '');
+        $this->assertTrue($request->isValid());
+
+        $request = new Request(Request::MODE_CLASS, '', '', '');
+        $this->assertFalse($request->isValid());
+
+
+        $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
+        $this->assertTrue($request->isValid());
+
+        $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config_not_enough.json');
+        $this->assertFalse($request->isValid());
+    }
 }

@@ -13,23 +13,42 @@ class Runner
          * how to use
          * ./spice -c /path/to/config_path -o /path/to/check_file_path
          */
-        $args = getopt('m:t:c::o::', ['mode:', 'target:', 'configure::', 'output::']);
+        $args = getopt('m:t:c::o::h::', ['mode:', 'target:', 'configure::', 'output::', 'help::']);
 
         $mode = $args['m'] ?? $args['mode'] ?? Request::MODE_CLASS;
         $target = $args['t'] ?? $args['target'] ?? '';
         $configure = $args['c'] ?? $args['configure'] ?? '';
         $output = $args['o'] ?? $args['output'] ?? '';
+        $help = (bool)($args['h'] ?? $args['help'] ?? false);
+        if ($help) {
+            $this->showHelp();
+            return;
+        }
 
         $request = new Request($mode, $target, $output, $configure);
-
-        // make config instance to parse file
-        // and another option? needs to parse arguments
-        // ah no no, config should treat them all.
-
-        // prior command option than config file
+        if (!$request->isValid()) {
+            $this->showHelp();
+            return;
+        }
 
         $parser = new Parser($request);
         $parser->parse();
+    }
+
+    private function showHelp()
+    {
+        $currentMethod = __METHOD__;
+
+        $usage = <<<EOF
+Usage:
+
+-m Mode: Parse mode. Value can be "class" or "method".
+-t Target class or method name. Class name must be FQCN. Use @ as separator to specify method name like "${currentMethod}".
+-o Output directory path. If not passed, use system temporary directory.
+-c Configuration file path. JSON format is supported. See README for more detail.
+-h Show this message.
+EOF;
+        echo $usage . PHP_EOL;
     }
 
 }

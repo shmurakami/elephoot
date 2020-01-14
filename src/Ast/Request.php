@@ -84,4 +84,13 @@ class Request
         return [];
     }
 
+    public function isValid()
+    {
+        $output = $this->getOutputDirectory();
+        $targetClass = $this->getTarget()[0] ?? '';
+        return ($output !== '' && $output !== null)
+            && ($targetClass !== '' && $targetClass !== null)
+            ;
+    }
+
 }
