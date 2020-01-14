@@ -27,10 +27,10 @@ class GraphpAdaptor implements Adaptor
     public function createDest(ClassTree $classTree): string
     {
         $filepath = $this->convert($classTree);
-        $outputDirectory = $this->adaptorConfig->getOutputDirectory();
-        $created = copy($filepath, $outputDirectory);
+        $destPath = $this->adaptorConfig->getOutputDirectory() . '/spice.png';
+        $created = @copy($filepath, $destPath);
         if (!$created) {
-            throw new FileNotCreatedException("failed to copy image to $outputDirectory");
+            throw new FileNotCreatedException("failed to copy image to $destPath");
         }
         return $filepath;
     }
@@ -53,7 +53,7 @@ class GraphpAdaptor implements Adaptor
     private function createNodeAndEdge(Graph $graph, ClassTree $classTree, Vertex $parentNode = null): Graph
     {
         $className = $classTree->getRootNodeClassName();
-        $graphNode = $graph->createVertex($className);
+        $graphNode = $this->retrieveNode($graph, $className);
 
         if ($parentNode) {
             // connect parent to self
@@ -64,6 +64,14 @@ class GraphpAdaptor implements Adaptor
             $graph = $this->createNodeAndEdge($graph, $childTree, $graphNode);
         }
         return $graph;
+    }
+
+    private function retrieveNode(Graph $graph, string $className): Vertex
+    {
+        if ($graph->hasVertex($className)) {
+            return $graph->getVertex($className);
+        }
+        return $graph->createVertex($className);
     }
 
 }
