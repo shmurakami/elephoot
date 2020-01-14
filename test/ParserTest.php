@@ -28,7 +28,7 @@ use shmurakami\Spice\Parser;
 class ParserTest extends TestCase
 {
 
-    public function testStepByStep()
+    public function testBuildClassTree()
     {
         $request = new Request(Request::MODE_CLASS, Client::class, '', '');
         $parser = new Parser($request);

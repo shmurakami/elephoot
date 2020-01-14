@@ -30,7 +30,7 @@ class GraphpAdaptorTest extends TestCase
         $parentTree->add($child1);
         $parentTree->add($child2);
 
-        $adaptor = new GraphpAdaptor(new AdaptorConfig([]));
+        $adaptor = new GraphpAdaptor(new AdaptorConfig(''));
         $graph = $adaptor->buildGraph($parentTree);
 
         // sum of parent, child, grandchild
