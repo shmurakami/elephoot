@@ -37,8 +37,8 @@ class GraphpAdaptor implements Adaptor
 
     private function convert(ClassTree $classTree): string
     {
-        $graphviz = new GraphViz();
-        $graphviz->display($this->buildGraph($classTree));
+//        $graphviz = new GraphViz();
+//        $graphviz->display($this->buildGraph($classTree));
         return (new GraphViz())->createImageFile($this->buildGraph($classTree));
     }
 
