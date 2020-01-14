@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Test;
 
+use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\Import\ByImport;
@@ -26,36 +27,11 @@ use shmurakami\Spice\Parser;
 
 class ParserTest extends TestCase
 {
-    public function testClassTreeNode()
-    {
-        $importClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
-        $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
-        $applicationTree->add($importClassTree);
-
-        $clientTree = new ClassTree(new ClassTreeNode(Client::class));
-        $clientTree->add($applicationTree);
-
-        $expect = [
-            'className'  => Client::class,
-            'childNodes' => [
-                [
-                    'className'  => Application::class,
-                    'childNodes' => [
-                        [
-                            'className'  => ByImport::class,
-                            'childNodes' => [],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertEquals($expect, $clientTree->toArray());
-    }
 
     public function testStepByStep()
     {
-        $parser = new Parser();
+        $request = new Request(Request::MODE_CLASS, Client::class, '', '');
+        $parser = new Parser($request);
         $actual = $parser->_parseByClass(Client::class);
 
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));

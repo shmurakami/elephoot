@@ -53,20 +53,4 @@ class ClassTree
     {
         return $this->childTree;
     }
-
-    /**
-     * @TODO delete it. this is just for test
-     * @return string[]
-     */
-    public function toArray(array $nodes = []): array
-    {
-        $childNodes = [];
-        foreach ($this->childTree as $childNode) {
-            $childNodes[] = $childNode->toArray($nodes);
-        }
-        return [
-            'className'  => $this->rootNode->getClassName(),
-            'childNodes' => $childNodes,
-        ];
-    }
 }
