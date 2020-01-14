@@ -13,7 +13,7 @@ class Runner
          * how to use
          * ./spice -c /path/to/config_path -o /path/to/check_file_path
          */
-        $args = getopt('m:t:c::o::h::', ['mode:', 'target:', 'configure::', 'output::', 'help::']);
+        $args = getopt('m:t:c:o:h::', ['mode:', 'target:', 'configure:', 'output:', 'help::']);
 
         $mode = $args['m'] ?? $args['mode'] ?? Request::MODE_CLASS;
         $target = $args['t'] ?? $args['target'] ?? '';
