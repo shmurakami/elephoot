@@ -72,16 +72,6 @@ class ClassAst
     }
 
     /**
-     * TODO this method is required really?
-     *
-     * @return string
-     */
-    public function getNamespace(): string
-    {
-        return $this->namespace;
-    }
-
-    /**
      * @return ClassAst[]
      */
     public function relatedClasses(ClassAstResolver $classAstResolver): array

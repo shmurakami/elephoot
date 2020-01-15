@@ -49,19 +49,6 @@ class ClassProperty
     }
 
     /**
-     * TODO check it's callable
-     */
-    public function parse(): ?ClassAst
-    {
-
-    }
-
-    public function isCallable(): bool
-    {
-        return true;
-    }
-
-    /**
      * parse doc comment
      * return AstEntity if this property is class instance
      *

@@ -18,10 +18,6 @@ class AstTest extends TestCase
         $classAst = $astLoader->loadByClass(Application::class);
         $this->assertInstanceOf(ClassAst::class, $classAst);
 
-        // if namespace does not exist?
-        // if doing declare(strict_types=1)?
-        $this->assertSame('shmurakami\Spice\Example', $classAst->getNamespace());
-
         $methodAst = $classAst->parseMethod('sampleMethod');
 //        $methodAst = $classAst->parseMethod('callNest');
         $this->assertInstanceOf(MethodAst::class, $methodAst);
