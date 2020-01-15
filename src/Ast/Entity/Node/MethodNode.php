@@ -51,9 +51,11 @@ class MethodNode
             return $node->children['type']->children['name'] ?? '';
         }, $argumentNodes);
         foreach ($typeNames as $typeName) {
-            $classFqcn = $this->parseType($this->namespace, $typeName);
-            if ($classFqcn) {
-                $dependencyClassFqcnList[] = $classFqcn;
+            if ($typeName) {
+                $classFqcn = $this->parseType($this->namespace, $typeName);
+                if ($classFqcn) {
+                    $dependencyClassFqcnList[] = $classFqcn;
+                }
             }
         }
 
@@ -64,9 +66,11 @@ class MethodNode
             && ($returnTypeNode->kind === Kind::AST_TYPE || $returnTypeNode->kind === Kind::AST_NULLABLE_TYPE)
         ) {
             $type = $returnTypeNode->children['type']->children['name'] ?? '';
-            $classFqcn = $this->parseType($this->namespace, $type);
-            if ($classFqcn) {
-                $dependencyClassFqcnList[] = $classFqcn;
+            if ($type) {
+                $classFqcn = $this->parseType($this->namespace, $type);
+                if ($classFqcn) {
+                    $dependencyClassFqcnList[] = $classFqcn;
+                }
             }
         }
 
