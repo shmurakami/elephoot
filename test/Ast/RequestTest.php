@@ -2,6 +2,8 @@
 
 namespace shmurakami\Spice\Test\Ast;
 
+use BreakingPsr;
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Test\TestCase;
 
@@ -79,5 +81,15 @@ class RequestTest extends TestCase
 
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config_not_enough.json');
         $this->assertFalse($request->isValid());
+    }
+
+    public function testGetClassMap()
+    {
+        // argument is not supported
+        $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
+        $expect = new ClassMap([
+            BreakingPsr::class => '/path/to/src/Example/other/BreakingPsr.php',
+        ]);
+        $this->assertEquals($expect, $request->getClassMap());
     }
 }

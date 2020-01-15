@@ -1,4 +1,7 @@
 {
   "mode": "class",
-  "target": "shmurakami\\Spice\\Example\\Client"
+  "target": "shmurakami\\Spice\\Example\\Client",
+  "classMap": {
+
+  }
 }

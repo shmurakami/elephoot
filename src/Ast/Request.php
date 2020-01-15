@@ -93,4 +93,9 @@ class Request
             ;
     }
 
+    public function getClassMap(): ClassMap
+    {
+        return new ClassMap($this->configure['classMap'] ?? []);
+    }
+
 }

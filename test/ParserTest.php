@@ -2,7 +2,9 @@
 
 namespace shmurakami\Spice\Test;
 
+use BreakingPsr;
 use shmurakami\Spice\Ast\AstLoader;
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
@@ -36,8 +38,12 @@ class ParserTest extends TestCase
         $request = new Request(Request::MODE_CLASS, Client::class, '', '');
         $parser = new Parser($request);
 
-        $classAst = (new AstLoader())->loadByClass(Client::class);
-        $actual = $parser->buildClassTree($classAst);
+        $classMap = new ClassMap([
+            BreakingPsr::class => __DIR__ . '/../src/Example/other/BreakingPsr.php',
+        ]);
+
+        $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
+        $actual = $parser->buildClassTree($classAst, $classMap);
 
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
 
@@ -92,6 +98,10 @@ class ParserTest extends TestCase
         $staticMethodCallTree->add($staticMethodCallArgumentTree);
         $applicationTree->add($staticMethodCallTree);
         $applicationTree->add($staticMethodCallArgumentTree);
+
+        // breaking PSR-4 rule class
+        $breakingPsrClassTree = new ClassTree(new ClassTreeNode(BreakingPsr::class));
+        $applicationTree->add($breakingPsrClassTree);
 
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(Client::class));

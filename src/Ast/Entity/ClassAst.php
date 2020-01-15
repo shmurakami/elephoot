@@ -84,9 +84,9 @@ class ClassAst
     /**
      * @return ClassAst[]
      */
-    public function relatedClasses(): array
+    public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
-        $dependentClassAstResolver = $this->dependentClassAstResolver();
+        $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
 
         // using trait
         $usingTraitClassFqcnList = $this->extractUsingTrait();
@@ -103,8 +103,6 @@ class ClassAst
                 }
             }
         }
-
-        // annoying to call some methods and loop for every of them...
 
         $methodDependentClassFqcnList = $this->extractClassFqcnFromMethodNodes();
         foreach ($methodDependentClassFqcnList as $classFqcn) {
@@ -125,12 +123,11 @@ class ClassAst
     /**
      * @return Generator|array
      */
-    private function dependentClassAstResolver(): Generator
+    private function dependentClassAstResolver(ClassAstResolver $classAstResolver): Generator
     {
         // to not search same wrong name class is given sometime
         $resolved = [];
         $dependencies = [];
-        $classAstResolver = ClassAstResolver::getInstance();
 
         while (true) {
             $classFqcn = yield;
@@ -139,6 +136,7 @@ class ClassAst
                 return $dependencies;
             }
 
+            $originalFqcn = $classFqcn;
             $classFqcn = $this->parseType($this->namespace, $classFqcn);
             if ($classFqcn === null) {
                 $resolved[$classFqcn] = true;
@@ -155,11 +153,20 @@ class ClassAst
                 continue;
             }
 
-            // TODO sometime fqcn is null or broken. check it
             $classAst = $classAstResolver->resolve($classFqcn);
             if ($classAst) {
                 $dependencies[$classFqcn] = $classAst;
+            } else {
+                // search global scope class from namespaced class
+                $isFqcnCompleted = $classFqcn !== $originalFqcn;
+                if ($isFqcnCompleted) {
+                    $classAst = $classAstResolver->resolve($originalFqcn);
+                    if ($classAst) {
+                        $dependencies[$originalFqcn] = $classAst;
+                    }
+                }
             }
+
             $resolved[$classFqcn] = true;
         }
     }
@@ -268,7 +275,7 @@ class ClassAst
             return $fqcnList;
         }
 
-        return $fqcnList;
+        return array_unique($fqcnList);
     }
 
     /**
@@ -322,7 +329,10 @@ class ClassAst
      */
     public function fqcn(): string
     {
-        return $this->namespace . '\\' . $this->className;
+        if ($this->namespace) {
+            return $this->namespace . '\\' . $this->className;
+        }
+        return $this->className;
     }
 
     /**

@@ -76,6 +76,11 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
         \shmurakami\Spice\Example\StaticMethod\StaticMethodCall::byStaticMethodCall(new \shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument());
     }
 
+    private function breakingPsr()
+    {
+        return new \BreakingPsr();
+    }
+
     private function internalMethod(): string
     {
         return 'Hello';

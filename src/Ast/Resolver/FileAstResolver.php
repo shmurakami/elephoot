@@ -4,16 +4,27 @@ namespace shmurakami\Spice\Ast\Resolver;
 
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Entity\FileAst;
 
 class FileAstResolver
 {
-    use Resolver;
-
     /**
      * @var FileAst[]
      */
     private $resolved = [];
+    /**
+     * @var ClassMap
+     */
+    private $classMap;
+
+    /**
+     * FileAstResolver constructor.
+     */
+    public function __construct(ClassMap $classMap)
+    {
+        $this->classMap = $classMap;
+    }
 
     public function resolve(string $className): FileAst
     {
@@ -23,7 +34,7 @@ class FileAstResolver
         }
 
         try {
-            $fileAst = (new AstLoader())->loadFileAst($className);
+            $fileAst = (new AstLoader($this->classMap))->loadFileAst($className);
         } catch (ReflectionException $e) {
             // should log error anyway
             $fileAst = null;

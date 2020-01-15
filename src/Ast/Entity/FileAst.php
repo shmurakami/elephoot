@@ -26,7 +26,7 @@ class FileAst
     {
         $this->rootNode = $rootNode;
         // file may not have class so weird to require
-        $this->classFqcn = $classFqcn;
+        $this->classFqcn = trim($classFqcn, '\\');
     }
 
     /**
@@ -38,6 +38,7 @@ class FileAst
     {
         $rootNode = $rootNode ?? $this->rootNode;
 
+        $namespace = $this->getNamespace();
         foreach ($rootNode->children as $node) {
             if ($node->kind === Kind::AST_STMT_LIST) {
                 // may stmt exist in this time?
@@ -46,7 +47,10 @@ class FileAst
 
             if ($node->kind === Kind::AST_CLASS) {
                 $nodeClassName =  $node->children['name'];
-                $nodeClassFqcn = $this->getNamespace() . '\\' . $nodeClassName;
+                $nodeClassFqcn = $nodeClassName;
+                if ($namespace) {
+                    $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
+                }
                 if ($nodeClassFqcn === $this->classFqcn) {
                     return new ClassAst($this->getNamespace(), $nodeClassName, $node);
                 }
@@ -77,21 +81,19 @@ class FileAst
     /**
      * @return ClassAst[]
      */
-    public function dependentClassAstList(): array
+    public function dependentClassAstList(ClassAstResolver $classAstResolver): array
     {
         return array_merge(
-            $this->importedClasses(),
-            $this->extendClasses(),
-            $this->relatedClasses());
+            $this->importedClasses($classAstResolver),
+            $this->extendClasses($classAstResolver),
+            $this->relatedClasses($classAstResolver));
     }
 
     /**
      * @return ClassAst[]
      */
-    private function importedClasses(): array
+    private function importedClasses(ClassAstResolver $classAstResolver): array
     {
-        $classAstResolver = ClassAstResolver::getInstance();
-
         $imported = [];
         foreach ($this->rootNode->children as $node) {
             if ($node->kind === Kind::AST_USE) {
@@ -110,9 +112,8 @@ class FileAst
     /**
      * @return ClassAst[]
      */
-    private function extendClasses(): array
+    private function extendClasses(ClassAstResolver $classAstResolver): array
     {
-        $classAstResolver = ClassAstResolver::getInstance();
         // extend and implements
         $extends = [];
 
@@ -152,8 +153,8 @@ class FileAst
      * @return ClassAst[]
      * @throws ClassNotFoundException
      */
-    private function relatedClasses(): array
+    private function relatedClasses(ClassAstResolver $classAstResolver): array
     {
-        return $this->parse()->relatedClasses();
+        return $this->parse()->relatedClasses($classAstResolver);
     }
 }

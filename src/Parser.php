@@ -4,9 +4,11 @@ namespace shmurakami\Spice;
 
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Request;
+use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
 use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
 use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
@@ -61,26 +63,28 @@ class Parser
 
     public function parseByClass(string $classFqcn): void
     {
-        $classAst = (new AstLoader())->loadByClass($classFqcn);
-        $classTree = $this->buildClassTree($classAst);
+        $classMap = $this->request->getClassMap();
+        $classAst = (new AstLoader($classMap))->loadByClass($classFqcn);
+        $classTree = $this->buildClassTree($classAst, $classMap);
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);
         $filepath = $drawer->draw($classTree);
     }
 
-    public function buildClassTree(ClassAst $classAst): ClassTree
+    public function buildClassTree(ClassAst $classAst, ClassMap $classMap): ClassTree
     {
         $tree = new ClassTree($classAst->treeNode());
 
-        $resolver = FileAstResolver::getInstance();
+        $resolver = new FileAstResolver($classMap);
         $fileAst = $resolver->resolve($classAst->fqcn());
         if (!$fileAst) {
             return $tree;
         }
 
-        $dependencies = $fileAst->dependentClassAstList();
+        $classAstResolver = new ClassAstResolver($classMap);
+        $dependencies = $fileAst->dependentClassAstList($classAstResolver);
         foreach ($dependencies as $dependentClassAst) {
-            $tree->add($this->buildClassTree($dependentClassAst));
+            $tree->add($this->buildClassTree($dependentClassAst, $classMap));
         }
         return $tree;
     }

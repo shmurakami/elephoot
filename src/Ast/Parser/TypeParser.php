@@ -6,26 +6,31 @@ trait TypeParser
 {
     /**
      * @param string $namespace
-     * @param string $classFqcn
+     * @param string $className
      * @return string|null
      */
-    private function parseType(string $namespace, $classFqcn)
+    private function parseType(string $namespace, $className)
     {
-        $classFqcn = trim($classFqcn);
+        $className = trim($className);
 
-        if ($this->isNotSupportedPhpBaseType($classFqcn)) {
+        if ($this->isNotSupportedPhpBaseType($className)) {
             return null;
         }
 
+        // if namespace is blank, namespaced dependencies must have fqcn
+        if ($namespace === '') {
+            return $className;
+        }
+
         // if \ is included it means fqcn. no need to touch
-        if (strpos($classFqcn, '\\') === false) {
+        if (strpos($className, '\\') === false) {
             // global space or same namespace instance
             // if class has namespace, assume as same namespace
             // otherwise assume as global namespace
             $baseNamespace = $namespace ?? '';
-            $classFqcn = $baseNamespace . '\\' . $classFqcn;
+            $className = $baseNamespace . '\\' . $className;
         }
-        return $classFqcn;
+        return $className;
     }
 
     private function isNotSupportedPhpBaseType(string $classType): bool
@@ -43,6 +48,7 @@ trait TypeParser
             'mixed',
             'number',
             'void',
+            'null',
         ], true);
     }
 }
