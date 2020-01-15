@@ -87,33 +87,25 @@ class ClassAst
     public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
+        $resolver = function(array $fqcnList) use ($dependentClassAstResolver) {
+            foreach ($fqcnList as $classFqcn) {
+                $dependentClassAstResolver->send($classFqcn);
+            }
+        };
 
         // using trait
-        $usingTraitClassFqcnList = $this->extractUsingTrait();
-        foreach ($usingTraitClassFqcnList as $classFqcn) {
-            $dependentClassAstResolver->send($classFqcn);
-        }
+        $resolver($this->extractUsingTrait());
 
         // property, only need to parse doc comment
         foreach ($this->properties as $classProperty) {
-            $classFqcnList = $classProperty->classFqcnListFromDocComment();
-            if ($classFqcnList) {
-                foreach ($classFqcnList as $classFqcn) {
-                    $dependentClassAstResolver->send($classFqcn);
-                }
-            }
+            $resolver($classProperty->classFqcnListFromDocComment());
         }
 
-        $methodDependentClassFqcnList = $this->extractClassFqcnFromMethodNodes();
-        foreach ($methodDependentClassFqcnList as $classFqcn) {
-            $dependentClassAstResolver->send($classFqcn);
-        }
+        // parse method
+        $resolver($this->extractClassFqcnFromMethodNodes());
 
-        // parse statements
-        $newStatementFqcnList = $this->parseNode($this->classRootNode);
-        foreach ($newStatementFqcnList as $classFqcn) {
-            $dependentClassAstResolver->send($classFqcn);
-        }
+        // parse new statements
+        $resolver($this->parseNewStatement($this->classRootNode));
 
         // send null to call generator return
         $dependentClassAstResolver->next();
@@ -203,7 +195,7 @@ class ClassAst
      *
      * @return string[]
      */
-    private function parseNode(Node $rootNode, $fqcnList = []): array
+    private function parseNewStatement(Node $rootNode, $fqcnList = []): array
     {
         $kind = $rootNode->kind;
 
@@ -211,7 +203,7 @@ class ClassAst
         if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
             $statementNodes = $this->statementNodes($rootNode);
             foreach ($statementNodes as $statementNode) {
-                $fqcnList = $this->parseNode($statementNode, $fqcnList);
+                $fqcnList = $this->parseNewStatement($statementNode, $fqcnList);
             }
             return $fqcnList;
         }
@@ -231,7 +223,7 @@ class ClassAst
             }
 
             if ($kind === Kind::AST_RETURN) {
-                return $this->parseNode($rightStatementNode, $fqcnList);
+                return $this->parseNewStatement($rightStatementNode, $fqcnList);
             }
         }
 
@@ -252,7 +244,7 @@ class ClassAst
             $argumentNodes = $rootNode->children['args']->children ?? [];
             foreach ($argumentNodes as $argumentNode) {
                 if ($argumentNode instanceof Node) {
-                    $list = $this->parseNode($argumentNode, $fqcnList);
+                    $list = $this->parseNewStatement($argumentNode, $fqcnList);
                     foreach ($list as $fqcn) {
                         $fqcnList[] = $fqcn;
                     }
