@@ -37,4 +37,9 @@ class Client
 
         return $calls;
     }
+
+    public function endpoint()
+    {
+
+    }
 }

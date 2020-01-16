@@ -131,10 +131,11 @@ class ParserTest extends TestCase
 
         $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
         $methodAst = $classAst->parseMethod($method);
-        $actual = $parser->buildMethodTree($methodAst, $classMap);
 
-        $sample = new MethodTree(new MethodTreeNode(Client::class, 'endpoint'));
-        $this->assertEquals($sample, $parser->buildMethodTree());
+        $clientTree = new MethodTree(new MethodTreeNode(Client::class, 'endpoint'));
+
+        $expect = $clientTree;
+        $this->assertEquals($expect, $parser->buildMethodTree($methodAst, $classMap));
     }
 
 }
