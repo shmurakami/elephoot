@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class MethodTreeNode
+class MethodTreeNode implements Node
 {
     /**
      * @var string
@@ -19,19 +19,8 @@ class MethodTreeNode
         $this->methodName = $methodName;
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName(): string
+    public function getName(): string
     {
-        return $this->className;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMethodName()
-    {
-        return $this->methodName;
+        return $this->className . '@' . $this->methodName;
     }
 }

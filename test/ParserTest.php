@@ -28,6 +28,8 @@ use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
 use shmurakami\Spice\Example\Traits\UsingTrait;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\ClassTreeNode;
+use shmurakami\Spice\Output\MethodTree;
+use shmurakami\Spice\Output\MethodTreeNode;
 use shmurakami\Spice\Parser;
 
 class ParserTest extends TestCase
@@ -115,4 +117,24 @@ class ParserTest extends TestCase
 
         $this->assertEquals($expect, $actual);
     }
+
+    public function testBuildMethodTree()
+    {
+        $class = Client::class;
+        $method = 'endpoint';
+        $request = new Request(Request::MODE_METHOD, "$class@$method", '', '');
+        $parser = new Parser($request);
+
+        $classMap = new ClassMap([
+            BreakingPsr::class => __DIR__ . '/../src/Example/other/BreakingPsr.php',
+        ]);
+
+        $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
+        $methodAst = $classAst->parseMethod($method);
+        $actual = $parser->buildMethodTree($methodAst, $classMap);
+
+        $sample = new MethodTree(new MethodTreeNode(Client::class, 'endpoint'));
+        $this->assertEquals($sample, $parser->buildMethodTree());
+    }
+
 }

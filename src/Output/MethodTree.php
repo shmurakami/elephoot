@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class MethodCallTree
+class MethodTree implements Tree
 {
     /**
      * @var MethodTreeNode
@@ -10,7 +10,7 @@ class MethodCallTree
     private $rootNode;
 
     /**
-     * @var MethodCallTree[]
+     * @var MethodTree[]
      */
     private $childTree = [];
 
@@ -23,8 +23,21 @@ class MethodCallTree
         $this->rootNode = $rootNode;
     }
 
-    public function add(MethodCallTree $tree)
+    public function add(MethodTree $tree)
     {
         $this->childTree[] = $tree;
+    }
+
+    public function getRootNodeName(): string
+    {
+        return $this->rootNode->getName();
+    }
+
+    /**
+     * @return MethodTree[]
+     */
+    public function getChildTrees(): array
+    {
+        return $this->childTree;
     }
 }

@@ -1,0 +1,6 @@
+{
+  "mode": "method",
+  "target": "shmurakami\\Spice\\Example\\Client@endpoint",
+  "classMap": {
+  }
+}

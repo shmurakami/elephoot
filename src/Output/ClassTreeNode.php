@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class ClassTreeNode
+class ClassTreeNode implements Node
 {
     /**
      * @var string
@@ -17,10 +17,7 @@ class ClassTreeNode
         $this->className = $className;
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName(): string
+    public function getName(): string
     {
         return $this->className;
     }

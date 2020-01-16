@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class ClassTree
+class ClassTree implements Tree
 {
     /**
      * @var ClassTreeNode
@@ -26,24 +26,9 @@ class ClassTree
         $this->childTree[] = $classTree;
     }
 
-    public function getRootNode(): ClassTreeNode
+    public function getRootNodeName(): string
     {
-        return $this->rootNode;
-    }
-
-    public function getRootNodeClassName(): string
-    {
-        return $this->rootNode->getClassName();
-    }
-
-    /**
-     * @return ClassTreeNode[]
-     */
-    public function getChildNodes(): array
-    {
-        return array_map(function (ClassTree $classTree) {
-            return $classTree->getRootNode();
-        }, $this->childTree);
+        return $this->rootNode->getName();
     }
 
     /**

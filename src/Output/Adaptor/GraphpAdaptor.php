@@ -52,7 +52,7 @@ class GraphpAdaptor implements Adaptor
 
     private function createNodeAndEdge(Graph $graph, ClassTree $classTree, Vertex $parentNode = null): Graph
     {
-        $className = $classTree->getRootNodeClassName();
+        $className = $classTree->getRootNodeName();
         $graphNode = $this->retrieveNode($graph, $className);
 
         if ($parentNode) {

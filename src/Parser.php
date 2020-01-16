@@ -14,7 +14,7 @@ use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
 use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\Drawer;
-use shmurakami\Spice\Output\MethodCallTree;
+use shmurakami\Spice\Output\MethodTree;
 
 class Parser
 {
@@ -48,16 +48,14 @@ class Parser
      */
     public function parseByMethod(string $classFqcn, string $methodName): void
     {
-        /*
-         * parse AST for Class and method
-         * pool to buffer
-         *
-         * output graph
-         */
-        $classAst = (new AstLoader())->loadByClass($classFqcn);
+        $classMap = $this->request->getClassMap();
+        $classAst = (new AstLoader($classMap))->loadByClass($classFqcn);
         $methodAst = $classAst->parseMethod($methodName);
 
-        $methodCallTree = $this->buildMethodCallTree($methodAst);
+        $methodTree = $this->buildMethodTree($methodAst, $classMap);
+        $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
+        $drawer = new Drawer($graphpAdaptor);
+        $filepath = $drawer->draw($methodTree);
         // TODO output from methodCallTree
     }
 
@@ -89,12 +87,12 @@ class Parser
         return $tree;
     }
 
-    private function buildMethodCallTree(MethodAst $methodAst): MethodCallTree
+    public function buildMethodTree(MethodAst $methodAst, ClassMap $classMap): MethodTree
     {
-        $tree = new MethodCallTree($methodAst->treeNode());
+        $tree = new MethodTree($methodAst->treeNode());
 
         foreach ($methodAst->methodCallNodes() as $methodCallAstNode) {
-            $methodCallTree = $this->buildMethodCallTree($methodCallAstNode);
+            $methodCallTree = $this->buildMethodTree($methodCallAstNode, $classMap);
             $tree->add($methodCallTree);
         }
         return $tree;
