@@ -14,8 +14,8 @@ class Drawer
         $this->adaptor = $adaptor;
     }
 
-    public function draw(ClassTree $classTree): string
+    public function draw(Tree $tree): string
     {
-        return $this->adaptor->createDest($classTree);
+        return $this->adaptor->createDest($tree);
     }
 }

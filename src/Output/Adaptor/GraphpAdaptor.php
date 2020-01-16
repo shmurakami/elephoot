@@ -7,7 +7,7 @@ use Fhaculty\Graph\Vertex;
 use Graphp\GraphViz\GraphViz;
 use shmurakami\Spice\Exception\FileNotCreatedException;
 use shmurakami\Spice\Output\Adaptor;
-use shmurakami\Spice\Output\ClassTree;
+use shmurakami\Spice\Output\Tree;
 
 class GraphpAdaptor implements Adaptor
 {
@@ -24,9 +24,9 @@ class GraphpAdaptor implements Adaptor
     /**
      * @inheritDoc
      */
-    public function createDest(ClassTree $classTree): string
+    public function createDest(Tree $tree): string
     {
-        $filepath = $this->convert($classTree);
+        $filepath = $this->convert($tree);
         $destPath = $this->adaptorConfig->getOutputDirectory() . '/spice.png';
         $created = @copy($filepath, $destPath);
         if (!$created) {
@@ -35,43 +35,43 @@ class GraphpAdaptor implements Adaptor
         return $filepath;
     }
 
-    private function convert(ClassTree $classTree): string
+    private function convert(Tree $tree): string
     {
 //        $graphviz = new GraphViz();
 //        $graphviz->display($this->buildGraph($classTree));
-        return (new GraphViz())->createImageFile($this->buildGraph($classTree));
+        return (new GraphViz())->createImageFile($this->buildGraph($tree));
     }
 
-    public function buildGraph(ClassTree $classTree): Graph
+    public function buildGraph(Tree $tree): Graph
     {
         $graph = new Graph();
         $graph->setAttribute('graphviz.node.shape', 'rectangle');
 
-        return $this->createNodeAndEdge($graph, $classTree);
+        return $this->createNodeAndEdge($graph, $tree);
     }
 
-    private function createNodeAndEdge(Graph $graph, ClassTree $classTree, Vertex $parentNode = null): Graph
+    private function createNodeAndEdge(Graph $graph, Tree $tree, Vertex $parentNode = null): Graph
     {
-        $className = $classTree->getRootNodeName();
-        $graphNode = $this->retrieveNode($graph, $className);
+        $nodeName = $tree->getRootNodeName();
+        $graphNode = $this->retrieveNode($graph, $nodeName);
 
         if ($parentNode) {
             // connect parent to self
             $parentNode->createEdgeTo($graphNode);
         }
 
-        foreach ($classTree->getChildTrees() as $childTree) {
+        foreach ($tree->getChildTrees() as $childTree) {
             $graph = $this->createNodeAndEdge($graph, $childTree, $graphNode);
         }
         return $graph;
     }
 
-    private function retrieveNode(Graph $graph, string $className): Vertex
+    private function retrieveNode(Graph $graph, string $nodeName): Vertex
     {
-        if ($graph->hasVertex($className)) {
-            return $graph->getVertex($className);
+        if ($graph->hasVertex($nodeName)) {
+            return $graph->getVertex($nodeName);
         }
-        return $graph->createVertex($className);
+        return $graph->createVertex($nodeName);
     }
 
 }

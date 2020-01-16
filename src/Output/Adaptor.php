@@ -5,9 +5,9 @@ namespace shmurakami\Spice\Output;
 interface Adaptor
 {
     /**
-     * @param ClassTree $classTree
+     * @param Tree $tree
      * @return string
      */
-    public function createDest(ClassTree $classTree): string;
+    public function createDest(Tree $tree): string;
 
 }
