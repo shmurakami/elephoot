@@ -27,6 +27,7 @@ class ClassAstResolver
         $this->classMap = $classMap;
     }
 
+    // TODO use context instead string
     public function resolve(string $className): ?ClassAst
     {
         // null if parse failed

@@ -3,42 +3,32 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
+use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
+use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\MethodTreeNode;
+use shmurakami\Spice\Stub\Kind;
+use const ast\AST_STATIC_CALL;
 
 class MethodAst
 {
     /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var string
-     */
-    private $className;
-    /**
-     * @var ClassProperty[]
-     */
-    private $classProperties;
-    /**
      * @var Node
      */
-    private $methodRootNode;
+    private $rootNode;
     /**
-     * @var array
+     * @var MethodContext
      */
-    private $variables = [];
+    private $methodContext;
 
     /**
      * MethodAst constructor.
-     * @param Node $classNode
-     * @param Node $methodRootNode
      */
-    public function __construct(string $namespace, string $className, array $classProperties, Node $methodRootNode)
+    public function __construct(MethodContext $methodContext, Node $rootNode)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
-        $this->classProperties = $classProperties;
-        $this->methodRootNode = $methodRootNode;
+        $this->methodContext = $methodContext;
+        $this->rootNode = $rootNode;
     }
 
     public function parse()
@@ -56,16 +46,81 @@ class MethodAst
     /**
      * @return MethodAst[]
      */
-    public function methodCallNodes(): array
+    public function methodAstNodes(ClassAstResolver $classAstResolver): array
     {
-        return [];
+        /**
+         * - this method
+         * - self static method
+         * - external static method
+         * - argument instance method
+         * - method chain
+         * - new instance
+         * - in closure, this
+         * - in closure use statement
+         * - generator
+         * - recursive method call
+         * - property class method
+         *
+         * - function call?
+         */
+        $statementNodes = $this->rootNode->children['stmts']->children ?? [];
+
+        $methodAstNodes = [];
+        foreach ($statementNodes as $statementNode) {
+            $statementMethodCallAstNodes = $this->methodCallAstNodes($classAstResolver, $statementNode);
+            foreach ($statementMethodCallAstNodes as $statementMethodCallAstNode) {
+                $methodAstNodes[] = $statementMethodCallAstNode;
+            }
+        }
+
+        return $methodAstNodes;
     }
 
     public function treeNode(): MethodTreeNode
     {
-        $fqcn = $this->namespace . '\\' . $this->className;
-        $methodName = $this->methodRootNode->children['name'];
+        $fqcn = $this->methodContext->fqcn();
+        $methodName = $this->rootNode->children['name'];
         return new MethodTreeNode($fqcn, $methodName);
     }
 
+    /**
+     * @return MethodAst[]
+     */
+    private function methodCallAstNodes(ClassAstResolver $classAstResolver, Node $node, array $nodes = []): array
+    {
+        if ($node->kind === Kind::AST_METHOD_CALL) {
+            $leftStatementNode = $node->children['expr'];
+            $methodOwner = $leftStatementNode->children['name'] ?? '';
+            $argumentNodes = $node->children['args']->children ?? [];
+            foreach ($argumentNodes as $argumentNode) {
+                $nodes = $this->methodCallAstNodes($classAstResolver, $argumentNode, $nodes);
+            }
+
+            $ownerContext = $this->retrieveClassContext($methodOwner);
+            $classAst = $classAstResolver->resolve($ownerContext->fqcn());
+            if (!$classAst) {
+                return $nodes;
+            }
+            $methodName = $node->children['method'];
+            try {
+                $nodes[] = $classAst->parseMethod($methodName);
+            } catch (MethodNotFoundException $e) {
+                return $nodes;
+            }
+        }
+
+        if ($node->kind === Kind::AST_STATIC_CALL) {
+
+        }
+
+        return $nodes;
+    }
+
+    private function retrieveClassContext(string $variableName): Context
+    {
+        if ($variableName === 'this') {
+            return $this->methodContext->classContext();
+        }
+
+    }
 }

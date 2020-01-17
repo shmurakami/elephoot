@@ -4,6 +4,8 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use Generator;
+use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
 use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
@@ -54,17 +56,19 @@ class ClassAst
     }
 
     /**
-     * @param string $method
+     * @param string $methodName
      * @return MethodAst
      * @throws MethodNotFoundException
      */
-    public function parseMethod(string $method): MethodAst
+    public function parseMethod(string $methodName): MethodAst
     {
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $rootMethod = $node->children['name'];
-                if ($rootMethod === $method) {
-                    return new MethodAst($this->namespace, $this->className, $this->properties, $node);
+                $nodeMethodName = $node->children['name'];
+                if ($nodeMethodName === $methodName) {
+                    $argumentNodes = $this->rootNode->children['params']->children ?? [];
+                    $methodContext = new MethodContext(new Context($this->namespace, $this->className), $this->properties, $nodeMethodName, $argumentNodes);
+                    return new MethodAst($methodContext, $node);
                 }
             }
         }

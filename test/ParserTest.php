@@ -134,6 +134,23 @@ class ParserTest extends TestCase
 
         $clientTree = new MethodTree(new MethodTreeNode(Client::class, 'endpoint'));
 
+        $thisMethodCallTree = new MethodTree(new MethodTreeNode(Client::class, 'thisMethodCall'));
+        $clientTree->add($thisMethodCallTree);
+
+        /**
+         * Check
+         * - this method
+         * - self static method
+         * - external static method
+         * - argument instance method
+         * - method chain
+         * - new instance
+         * - in closure, this
+         * - in closure use statement
+         * - generator
+         * - recursive method call
+         */
+
         $expect = $clientTree;
         $this->assertEquals($expect, $parser->buildMethodTree($methodAst, $classMap));
     }
