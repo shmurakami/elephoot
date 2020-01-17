@@ -48,21 +48,6 @@ class MethodAst
      */
     public function methodAstNodes(ClassAstResolver $classAstResolver): array
     {
-        /**
-         * - this method
-         * - self static method
-         * - external static method
-         * - argument instance method
-         * - method chain
-         * - new instance
-         * - in closure, this
-         * - in closure use statement
-         * - generator
-         * - recursive method call
-         * - property class method
-         *
-         * - function call?
-         */
         $statementNodes = $this->rootNode->children['stmts']->children ?? [];
 
         $methodAstNodes = [];

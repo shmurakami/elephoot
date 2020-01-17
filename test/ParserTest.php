@@ -142,8 +142,6 @@ class ParserTest extends TestCase
 
         /**
          * Check
-         * - this method
-         * - self static method
          * - external static method
          * - argument instance method
          * - method chain
@@ -152,6 +150,9 @@ class ParserTest extends TestCase
          * - in closure use statement
          * - generator
          * - recursive method call
+         * - property method call
+         *
+         * - function call
          */
 
         $expect = $clientTree;
