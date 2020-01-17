@@ -137,6 +137,9 @@ class ParserTest extends TestCase
         $thisMethodCallTree = new MethodTree(new MethodTreeNode(Client::class, 'thisMethodCall'));
         $clientTree->add($thisMethodCallTree);
 
+        $selfStaticMethodCallTree = new MethodTree(new MethodTreeNode(Client::class, 'selfStaticMethodCall'));
+        $clientTree->add($selfStaticMethodCallTree);
+
         /**
          * Check
          * - this method

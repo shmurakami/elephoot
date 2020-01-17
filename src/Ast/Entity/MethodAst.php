@@ -88,8 +88,13 @@ class MethodAst
      */
     private function methodCallAstNodes(ClassAstResolver $classAstResolver, Node $node, array $nodes = []): array
     {
-        if ($node->kind === Kind::AST_METHOD_CALL) {
-            $leftStatementNode = $node->children['expr'];
+        if (in_array($node->kind, [Kind::AST_METHOD_CALL, Kind::AST_STATIC_CALL], true)) {
+            if ($node->kind === Kind::AST_METHOD_CALL) {
+                $leftStatementNode = $node->children['expr'];
+            } else {
+                $leftStatementNode = $node->children['class'];
+            }
+
             $methodOwner = $leftStatementNode->children['name'] ?? '';
             $argumentNodes = $node->children['args']->children ?? [];
             foreach ($argumentNodes as $argumentNode) {
@@ -109,18 +114,15 @@ class MethodAst
             }
         }
 
-        if ($node->kind === Kind::AST_STATIC_CALL) {
-
-        }
-
         return $nodes;
     }
 
     private function retrieveClassContext(string $variableName): Context
     {
-        if ($variableName === 'this') {
+        // TODO if variable name is self, will be bug
+        if (in_array($variableName, ['this', 'self'], true)) {
             return $this->methodContext->classContext();
         }
-
+        return null;
     }
 }

@@ -41,6 +41,7 @@ class Client
     public function endpoint(string $a = '')
     {
         $this->thisMethodCall();
+        self::selfStaticMethodCall();
     }
 
     private function thisMethodCall()
