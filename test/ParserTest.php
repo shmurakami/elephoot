@@ -148,13 +148,14 @@ class ParserTest extends TestCase
         $staticMethodCallTree = new MethodTree(new MethodTreeNode(StaticMethodCall::class, 'byStaticMethodCall'));
         $clientTree->add($staticMethodCallTree);
 
+        $staticMethodCallTree = new MethodTree(new MethodTreeNode(StaticMethodCall::class, 'byStaticMethodCall'));
+        $clientTree->add($staticMethodCallTree);
 
         /**
          * Check
-         * - external static method
          * - argument instance method
          * - method chain
-         * - new instance
+         * - new statement i.e. constructor
          * - in closure, this
          * - in closure use statement
          * - generator
@@ -162,7 +163,6 @@ class ParserTest extends TestCase
          * - property method call
          * - trait method
          * - parent method
-         * - new statement i.e. constructor
          *
          * - function call
          */

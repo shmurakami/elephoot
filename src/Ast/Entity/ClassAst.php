@@ -41,14 +41,14 @@ class ClassAst
     /**
      * ClassAst constructor.
      */
-    public function __construct(string $namespace, string $className, Node $classRootNode)
+    public function __construct(string $namespace, string $className, Imports $imports, Node $classRootNode)
     {
         $this->namespace = $namespace;
         $this->className = $className;
         $this->classRootNode = $classRootNode;
+        $this->imports = $imports;
 
         $this->parseProperties($namespace, $className);
-        $this->parseImports($classRootNode);
     }
 
     private function parseProperties(string $namespace, string $className): void
@@ -58,18 +58,6 @@ class ClassAst
                 $this->properties[] = new ClassProperty($namespace, $className, $node);
             }
         }
-    }
-
-    private function parseImports(Node $classRootNode)
-    {
-        $imports = [];
-        foreach ($this->statementNodes() as $node) {
-            if ($node->kind === Kind::AST_USE) {
-                $className = $node->children[0]->children['name'];
-                $imports[] = new Import($className);
-            }
-        }
-        $this->imports = new Imports($imports);
     }
 
     /**
@@ -84,8 +72,8 @@ class ClassAst
                 $nodeMethodName = $node->children['name'];
                 if ($nodeMethodName === $methodName) {
                     $argumentNodes = $this->rootNode->children['params']->children ?? [];
-                    $context = new Context($this->namespace, $this->className, $this->imports);
-                    $methodContext = new MethodContext($context, $this->properties, $nodeMethodName, $argumentNodes);
+                    $context = new Context($this->namespace, $this->className);
+                    $methodContext = new MethodContext($context, $this->properties, $nodeMethodName, $this->imports, $argumentNodes);
                     return new MethodAst($methodContext, $node);
                 }
             }

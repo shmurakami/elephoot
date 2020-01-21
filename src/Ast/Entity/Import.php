@@ -18,4 +18,9 @@ class Import
         $this->importName = $importName;
         $this->alias = $alias;
     }
+
+    public function className(): string
+    {
+        return $this->importName;
+    }
 }

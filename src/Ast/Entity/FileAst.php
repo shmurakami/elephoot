@@ -22,13 +22,32 @@ class FileAst
      * @var string
      */
     private $namespace;
+    /**
+     * @var Imports
+     */
+    private $imports;
 
     public function __construct(Node $rootNode, string $classFqcn)
     {
         $this->rootNode = $rootNode;
         // file may not have class so weird to require
         $this->classFqcn = trim($classFqcn, '\\');
+
+        $this->parseImports($rootNode);
     }
+
+    private function parseImports(Node $classRootNode)
+    {
+        $imports = [];
+        foreach ($classRootNode->children as $node) {
+            if ($node->kind === Kind::AST_USE) {
+                $className = $node->children[0]->children['name'];
+                $imports[] = new Import($className);
+            }
+        }
+        $this->imports = new Imports($imports);
+    }
+
 
     /**
      * @param Node|null $rootNode
@@ -53,7 +72,7 @@ class FileAst
                     $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 }
                 if ($nodeClassFqcn === $this->classFqcn) {
-                    return new ClassAst($this->getNamespace(), $nodeClassName, $node);
+                    return new ClassAst($this->getNamespace(), $nodeClassName, $this->imports, $node);
                 }
             }
         }
@@ -102,14 +121,11 @@ class FileAst
     private function importedClasses(ClassAstResolver $classAstResolver): array
     {
         $imported = [];
-        foreach ($this->rootNode->children as $node) {
-            if ($node->kind === Kind::AST_USE) {
-                // support alias?
-                $className = $node->children[0]->children['name'];
-                $classAst = $classAstResolver->resolve($className);
-                if ($classAst) {
-                    $imported[$className] = $classAst;
-                }
+        foreach ($this->imports->values() as $import) {
+            $className = $import->className();
+            $classAst = $classAstResolver->resolve($className);
+            if ($classAst) {
+                $imported[$className] = $classAst;
             }
         }
 

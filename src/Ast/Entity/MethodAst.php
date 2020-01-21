@@ -51,6 +51,18 @@ class MethodAst
 
         $methodAstNodes = [];
         foreach ($statementNodes as $statementNode) {
+            if ($statementNode->kind === Kind::AST_ASSIGN) {
+                // TODO update variable map
+//                $name = $statementNode->children['var']->children['name'];
+//                $rightStatementNode = $statementNode->children['expr'];
+//                // new statement
+//                if ($rightStatementNode->kind === Kind::AST_NEW) {
+//                    $astNodes = $this->parseNewStatement($rightStatementNode);
+//                    foreach ($astNodes as $node) {
+//                        $methodAstNodes[] = $node;
+//                    }
+//                }
+            }
             if ($statementNode->kind === Kind::AST_METHOD_CALL) {
                 $statementMethodCallAstNodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
             } else if ($statementNode->kind === Kind::AST_STATIC_CALL) {
@@ -64,6 +76,28 @@ class MethodAst
         }
 
         return $methodAstNodes;
+    }
+
+    /**
+     * @param Node $node
+     * @param Context[] $list
+     * @return Context[]
+     */
+    private function parseNewStatement(Node $node, $list = []): array
+    {
+        // if class name by assigned to variable?
+        $newClassName = $node->children['class']->children['name'];
+        $list[] = $newClassName;
+
+        $arguments = $node->children['args']->children ?? [];
+        foreach ($arguments as $argumentNode) {
+            if ($argumentNode->kind === Kind::AST_NEW) {
+                array_map(function (string $fqcn) use (&$list) {
+                    $list[] = $fqcn;
+                }, $this->parseNewStatement($argumentNode, $list));
+            }
+        }
+        return $list;
     }
 
     public function treeNode(): MethodTreeNode
@@ -147,38 +181,20 @@ class MethodAst
             // too long and nullable
             return $fileAstResolver->resolve($this->methodContext->fqcn())->parseMethod($methodName);
         }
-        if ($this->isFqcn($variableName)) {
-            return $fileAstResolver->resolve($variableName)->parseMethod($methodName);
+
+        // resolve by FQCN or imported list
+        $context = $this->methodContext->resolveContextByClassName($variableName);
+        if ($context) {
+            return $fileAstResolver->resolve($context->fqcn())->parseMethod($methodName);
         }
-//        return $fileAstResolver->resolve($this->methodContext->classContext())->parseMethod($methodName);
+
+        // TODO same namespace class
+
+        return null;
     }
 
     private function isFqcn(string $className): bool
     {
         return strpos($className, '\\') !== false;
-    }
-
-    private function resolveContext(string $classNameVariable): Context
-    {
-        if ($this->isFqcn($classNameVariable)) {
-            // remove \ prefix
-            $parts = explode('\\', trim($classNameVariable, '\\'));
-
-            [$namespace, $className] = ['', ''];
-            for ($i = 0, $count = count($parts); $i < $count; $i++) {
-                $str = $parts[$i];
-                // end
-                if ($i === $count - 1) {
-                    $className = $str;
-                    break;
-                }
-                $namespace .= '\\' . $str;
-            }
-            $namespace = trim($namespace, '\\');
-            return new Context($namespace, $className);
-        }
-
-        // whats to do
-        // resolve class from variable name?
     }
 }
