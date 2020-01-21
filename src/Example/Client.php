@@ -38,18 +38,4 @@ class Client
         return $calls;
     }
 
-    public function endpoint(string $a = '')
-    {
-        $this->thisMethodCall();
-        self::selfStaticMethodCall();
-    }
-
-    private function thisMethodCall()
-    {
-    }
-
-    private static function selfStaticMethodCall()
-    {
-    }
-
 }

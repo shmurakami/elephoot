@@ -6,9 +6,11 @@ use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
+use shmurakami\Spice\Ast\Resolver\FileAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\MethodTreeNode;
 use shmurakami\Spice\Stub\Kind;
+use const ast\AST_METHOD_CALL;
 use const ast\AST_STATIC_CALL;
 
 class MethodAst
@@ -46,13 +48,19 @@ class MethodAst
     /**
      * @return MethodAst[]
      */
-    public function methodAstNodes(ClassAstResolver $classAstResolver): array
+    public function methodAstNodes(FileAstResolver $fileAstResolver, ClassAstResolver $classAstResolver): array
     {
         $statementNodes = $this->rootNode->children['stmts']->children ?? [];
 
         $methodAstNodes = [];
         foreach ($statementNodes as $statementNode) {
-            $statementMethodCallAstNodes = $this->methodCallAstNodes($classAstResolver, $statementNode);
+            if ($statementNode->kind === AST_METHOD_CALL) {
+                $statementMethodCallAstNodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
+            } else if ($statementNode->kind === AST_STATIC_CALL) {
+                $statementMethodCallAstNodes = $this->methodCStaticCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
+            } else {
+                continue;
+            }
             foreach ($statementMethodCallAstNodes as $statementMethodCallAstNode) {
                 $methodAstNodes[] = $statementMethodCallAstNode;
             }
@@ -71,43 +79,105 @@ class MethodAst
     /**
      * @return MethodAst[]
      */
-    private function methodCallAstNodes(ClassAstResolver $classAstResolver, Node $node, array $nodes = []): array
+    private function methodCallAstNodes(FileAstResolver $fileAstResolver, ClassAstResolver $classAstResolver, Node $node, array $nodes = []): array
     {
-        if (in_array($node->kind, [Kind::AST_METHOD_CALL, Kind::AST_STATIC_CALL], true)) {
-            if ($node->kind === Kind::AST_METHOD_CALL) {
-                $leftStatementNode = $node->children['expr'];
-            } else {
-                $leftStatementNode = $node->children['class'];
-            }
+        if ($node->kind !== Kind::AST_METHOD_CALL) {
+            return $nodes;
+        }
+        $leftStatementNode = $node->children['expr'];
 
-            $methodOwner = $leftStatementNode->children['name'] ?? '';
-            $argumentNodes = $node->children['args']->children ?? [];
-            foreach ($argumentNodes as $argumentNode) {
-                $nodes = $this->methodCallAstNodes($classAstResolver, $argumentNode, $nodes);
-            }
-
-            $ownerContext = $this->retrieveClassContext($methodOwner);
-            $classAst = $classAstResolver->resolve($ownerContext->fqcn());
-            if (!$classAst) {
-                return $nodes;
-            }
-            $methodName = $node->children['method'];
-            try {
-                $nodes[] = $classAst->parseMethod($methodName);
-            } catch (MethodNotFoundException $e) {
-                return $nodes;
-            }
+        $methodOwner = $leftStatementNode->children['name'] ?? '';
+        $argumentNodes = $node->children['args']->children ?? [];
+        foreach ($argumentNodes as $argumentNode) {
+            $nodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $argumentNode, $nodes);
         }
 
-        return $nodes;
+        // TODO extract node is method call or static call and call parser
+
+        $methodName = $node->children['method'];
+
+        try {
+            $methodAst = $this->resolveCallMethodAst($fileAstResolver, $methodOwner, $methodName);
+            if ($methodAst) {
+                $nodes[] = $methodAst;
+            }
+        } finally {
+            return $nodes;
+        }
     }
 
-    private function retrieveClassContext(string $variableName): Context
+    private function methodCStaticCallAstNodes(FileAstResolver $fileAstResolver, ClassAstResolver $classAstResolver, Node $node, array $nodes = [])
     {
-        // TODO if variable name is self, will be bug
-        if (in_array($variableName, ['this', 'self'], true)) {
-            return $this->methodContext->classContext();
+        if ($node->kind !== Kind::AST_STATIC_CALL) {
+            return $nodes;
         }
+        $leftStatementNode = $node->children['class'];
+
+        $methodOwner = $leftStatementNode->children['name'] ?? '';
+        $argumentNodes = $node->children['args']->children ?? [];
+        foreach ($argumentNodes as $argumentNode) {
+            $nodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $argumentNode, $nodes);
+        }
+
+        $methodName = $node->children['method'];
+        try {
+            $methodAst = $this->resolveStaticCallMethodAst($fileAstResolver, $methodOwner, $methodName);
+            if ($methodAst) {
+                $nodes[] = $methodAst;
+            }
+        } finally {
+            return $nodes;
+        }
+    }
+
+    private function resolveCallMethodAst(FileAstResolver $fileAstResolver, string $variableName, string $methodName): ?MethodAst
+    {
+        if ($variableName === 'this') {
+            return $fileAstResolver->resolve($this->methodContext->fqcn())->parse()->parseMethod($methodName);
+        }
+
+        // how fqcn happens if instance method?
+        if ($this->isFqcn($variableName)) {
+            return $fileAst->parse()->parseMethod($methodName);
+        }
+
         return null;
+    }
+
+    private function resolveStaticCallMethodAst(FileAstResolver $fileAstResolver, string $variableName, string $methodName): ?MethodAst
+    {
+        if ($variableName === 'self') {
+            // too long and nullable
+            return $fileAstResolver->resolve($this->methodContext->fqcn())->parse()->parseMethod($methodName);
+        }
+    }
+
+    private function isFqcn(string $className): bool
+    {
+        return strpos($className, '\\') !== false;
+    }
+
+    private function resolveContext(string $classNameVariable): Context
+    {
+        if ($this->isFqcn($classNameVariable)) {
+            // remove \ prefix
+            $parts = explode('\\', trim($classNameVariable, '\\'));
+
+            [$namespace, $className] = ['', ''];
+            for ($i = 0, $count = count($parts); $i < $count; $i++) {
+                $str = $parts[$i];
+                // end
+                if ($i === $count - 1) {
+                    $className = $str;
+                    break;
+                }
+                $namespace .= '\\' . $str;
+            }
+            $namespace = trim($namespace, '\\');
+            return new Context($namespace, $className);
+        }
+
+        // whats to do
+        // resolve class from variable name?
     }
 }

@@ -16,6 +16,7 @@ use shmurakami\Spice\Example\Interfaces\Implement1;
 use shmurakami\Spice\Example\Interfaces\Implement2;
 use shmurakami\Spice\Example\Method\DocComment;
 use shmurakami\Spice\Example\Method\TypeHinting;
+use shmurakami\Spice\Example\MethodCallClient;
 use shmurakami\Spice\Example\NewStatement\NewInClosure;
 use shmurakami\Spice\Example\NewStatement\NewStatement;
 use shmurakami\Spice\Example\NewStatement\NewStatementArgument;
@@ -120,7 +121,7 @@ class ParserTest extends TestCase
 
     public function testBuildMethodTree()
     {
-        $class = Client::class;
+        $class = MethodCallClient::class;
         $method = 'endpoint';
         $request = new Request(Request::MODE_METHOD, "$class@$method", '', '');
         $parser = new Parser($request);
@@ -129,15 +130,15 @@ class ParserTest extends TestCase
             BreakingPsr::class => __DIR__ . '/../src/Example/other/BreakingPsr.php',
         ]);
 
-        $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
+        $classAst = (new AstLoader($classMap))->loadByClass($class);
         $methodAst = $classAst->parseMethod($method);
 
-        $clientTree = new MethodTree(new MethodTreeNode(Client::class, 'endpoint'));
+        $clientTree = new MethodTree(new MethodTreeNode($class, $method));
 
-        $thisMethodCallTree = new MethodTree(new MethodTreeNode(Client::class, 'thisMethodCall'));
+        $thisMethodCallTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'thisMethodCall'));
         $clientTree->add($thisMethodCallTree);
 
-        $selfStaticMethodCallTree = new MethodTree(new MethodTreeNode(Client::class, 'selfStaticMethodCall'));
+        $selfStaticMethodCallTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'selfStaticMethodCall'));
         $clientTree->add($selfStaticMethodCallTree);
 
         /**
@@ -151,6 +152,9 @@ class ParserTest extends TestCase
          * - generator
          * - recursive method call
          * - property method call
+         * - trait method
+         * - parent method
+         * - new statement i.e. constructor
          *
          * - function call
          */
