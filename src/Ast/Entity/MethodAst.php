@@ -7,11 +7,8 @@ use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
-use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\MethodTreeNode;
 use shmurakami\Spice\Stub\Kind;
-use const ast\AST_METHOD_CALL;
-use const ast\AST_STATIC_CALL;
 
 class MethodAst
 {
@@ -54,9 +51,9 @@ class MethodAst
 
         $methodAstNodes = [];
         foreach ($statementNodes as $statementNode) {
-            if ($statementNode->kind === AST_METHOD_CALL) {
+            if ($statementNode->kind === Kind::AST_METHOD_CALL) {
                 $statementMethodCallAstNodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
-            } else if ($statementNode->kind === AST_STATIC_CALL) {
+            } else if ($statementNode->kind === Kind::AST_STATIC_CALL) {
                 $statementMethodCallAstNodes = $this->methodCStaticCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
             } else {
                 continue;
@@ -148,8 +145,12 @@ class MethodAst
     {
         if ($variableName === 'self') {
             // too long and nullable
-            return $fileAstResolver->resolve($this->methodContext->fqcn())->parse()->parseMethod($methodName);
+            return $fileAstResolver->resolve($this->methodContext->fqcn())->parseMethod($methodName);
         }
+        if ($this->isFqcn($variableName)) {
+            return $fileAstResolver->resolve($variableName)->parseMethod($methodName);
+        }
+//        return $fileAstResolver->resolve($this->methodContext->classContext())->parseMethod($methodName);
     }
 
     private function isFqcn(string $className): bool

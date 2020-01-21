@@ -141,6 +141,14 @@ class ParserTest extends TestCase
         $selfStaticMethodCallTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'selfStaticMethodCall'));
         $clientTree->add($selfStaticMethodCallTree);
 
+        // TODO support constructor
+//        $staticMethodCallArgumentTree = new MethodTree(new MethodTreeNode(StaticMethodCallArgument::class, '__construct'));
+//        $clientTree->add($staticMethodCallArgumentTree);
+
+        $staticMethodCallTree = new MethodTree(new MethodTreeNode(StaticMethodCall::class, 'byStaticMethodCall'));
+        $clientTree->add($staticMethodCallTree);
+
+
         /**
          * Check
          * - external static method

@@ -14,8 +14,11 @@ class MethodCallClient extends Client
         // self class method call
         self::selfStaticMethodCall();
 
-        // external static method call
-//        StaticMethodCall::byStaticMethodCall(new StaticMethodCallArgument());
+        // external static method call with FQCN
+        $staticArgument = new StaticMethodCallArgument();
+        \shmurakami\Spice\Example\StaticMethod\StaticMethodCall::byStaticMethodCall($staticArgument);
+        // with alias
+        StaticMethodCall::byStaticMethodCall($staticArgument);
     }
 
     private function thisMethodCall()

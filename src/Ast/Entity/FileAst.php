@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use Prophecy\Exception\Doubler\MethodNotFoundException;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
@@ -57,6 +58,12 @@ class FileAst
             }
         }
         throw new ClassNotFoundException();
+    }
+
+    public function parseMethod(string $methodName): MethodAst
+    {
+        // catch exceptions?
+        return $this->parse()->parseMethod($methodName);
     }
 
     /**
