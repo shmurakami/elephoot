@@ -73,11 +73,12 @@ class ClassAst
                 if ($nodeMethodName === $methodName) {
                     $argumentNodes = $this->rootNode->children['params']->children ?? [];
                     $context = new Context($this->namespace, $this->className);
-                    $methodContext = new MethodContext($context, $nodeMethodName, $argumentNodes);
+                    $methodContext = new MethodContext($context, $methodName, $argumentNodes);
                     return new MethodAst($methodContext, $node);
                 }
             }
         }
+        // TODO support parent method
         throw new MethodNotFoundException();
     }
 

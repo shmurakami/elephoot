@@ -96,24 +96,29 @@ class MethodAst
     {
         // if class name by assigned to variable?
         $newClassName = $node->children['class']->children['name'];
-        $contexts[] = $methodAstResolver->resolveContext($newClassName);
+        $methodAsts = [];
 
+        // arguments may have method call
         $arguments = $node->children['args']->children ?? [];
         foreach ($arguments as $argumentNode) {
             if ($argumentNode->kind === Kind::AST_NEW) {
-                array_map(function (string $className) use ($methodAstResolver, &$contexts) {
-                    $contexts[] = $methodAstResolver->resolveContext($className);
-                }, $this->parseNewStatement($methodAstResolver, $argumentNode, $contexts));
+                foreach ($this->parseNewStatement($methodAstResolver, $argumentNode, $contexts) as $methodAst) {
+                    $methodAsts[] = $methodAst;
+                }
             }
             // method call
-            if (false) {
-                // TODO
+            if ($argumentNode->kind === Kind::AST_METHOD_CALL) {
+                $methodAsts[] = $this->methodCallAstNodes($methodAstResolver, $argumentNode);
+            }
+            if ($argumentNode->kind === Kind::AST_STATIC_CALL) {
+                $methodAsts[] = $this->methodCStaticCallAstNodes($methodAstResolver, $argumentNode);
             }
         }
 
+        $contexts[] = $methodAstResolver->resolveContext($newClassName);
+
         // remove null
         $contexts = array_values($contexts);
-        $methodAsts = [];
         foreach ($contexts as $context) {
             // new statement calls constructor
             try {

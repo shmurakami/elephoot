@@ -14,6 +14,8 @@ use shmurakami\Spice\Example\Inherit\InheritClass;
 use shmurakami\Spice\Example\Inherit\InheritDependency;
 use shmurakami\Spice\Example\Interfaces\Implement1;
 use shmurakami\Spice\Example\Interfaces\Implement2;
+use shmurakami\Spice\Example\MagicMethod\Constructor;
+use shmurakami\Spice\Example\MagicMethod\ConstructorArgument;
 use shmurakami\Spice\Example\Method\DocComment;
 use shmurakami\Spice\Example\Method\TypeHinting;
 use shmurakami\Spice\Example\MethodCallClient;
@@ -151,18 +153,25 @@ class ParserTest extends TestCase
         $staticMethodCallTree = new MethodTree(new MethodTreeNode(StaticMethodCall::class, 'byStaticMethodCall'));
         $clientTree->add($staticMethodCallTree);
 
+        $constructorArgumentCallTree = new MethodTree(new MethodTreeNode(ConstructorArgument::class, '__construct'));
+        $clientTree->add($constructorArgumentCallTree);
+        $constructorCallTree = new MethodTree(new MethodTreeNode(Constructor::class, '__construct'));
+        $clientTree->add($constructorCallTree);
+
         /**
          * Check
-         * - argument instance method
-         * - method chain
-         * - new statement i.e. constructor
          * - in closure, this
-         * - in closure use statement
-         * - generator
-         * - recursive method call
          * - property method call
          * - trait method
          * - parent method
+         *
+         * - argument instance method
+         * - method chain
+         * - in closure use statement
+         * - generator
+         * - recursive method call
+         *
+         * - not written constructor
          *
          * - function call
          */

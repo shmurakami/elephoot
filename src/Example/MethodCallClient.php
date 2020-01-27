@@ -2,6 +2,8 @@
 
 namespace shmurakami\Spice\Example;
 
+use shmurakami\Spice\Example\MagicMethod\Constructor;
+use shmurakami\Spice\Example\MagicMethod\ConstructorArgument;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCall;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
 
@@ -19,6 +21,8 @@ class MethodCallClient extends Client
         \shmurakami\Spice\Example\StaticMethod\StaticMethodCall::byStaticMethodCall($staticArgument);
         // with alias
         StaticMethodCall::byStaticMethodCall($staticArgument);
+
+        $constructor = new Constructor(new ConstructorArgument());
     }
 
     private function thisMethodCall()
