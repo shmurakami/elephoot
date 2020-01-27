@@ -3,10 +3,12 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use Generator;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
+use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\MethodTreeNode;
 use shmurakami\Spice\Stub\Kind;
 
@@ -43,6 +45,8 @@ class MethodAst
     }
 
     /**
+     *
+     *
      * @return MethodAst[]
      */
     public function methodAstNodes(FileAstResolver $fileAstResolver, ClassAstResolver $classAstResolver): array
@@ -53,15 +57,15 @@ class MethodAst
         foreach ($statementNodes as $statementNode) {
             if ($statementNode->kind === Kind::AST_ASSIGN) {
                 // TODO update variable map
-//                $name = $statementNode->children['var']->children['name'];
-//                $rightStatementNode = $statementNode->children['expr'];
-//                // new statement
-//                if ($rightStatementNode->kind === Kind::AST_NEW) {
-//                    $astNodes = $this->parseNewStatement($rightStatementNode);
-//                    foreach ($astNodes as $node) {
-//                        $methodAstNodes[] = $node;
-//                    }
-//                }
+                $name = $statementNode->children['var']->children['name'];
+                $rightStatementNode = $statementNode->children['expr'];
+                // new statement
+                if ($rightStatementNode->kind === Kind::AST_NEW) {
+                    $astNodes = $this->parseNewStatement($fileAstResolver, $rightStatementNode);
+                    foreach ($astNodes as $node) {
+                        $methodAstNodes[] = $node;
+                    }
+                }
             }
             if ($statementNode->kind === Kind::AST_METHOD_CALL) {
                 $statementMethodCallAstNodes = $this->methodCallAstNodes($fileAstResolver, $classAstResolver, $statementNode);
@@ -79,25 +83,45 @@ class MethodAst
     }
 
     /**
+     * @param FileAstResolver $fileAstResolver
      * @param Node $node
-     * @param Context[] $list
-     * @return Context[]
+     * @param Context[] $contexts
+     * @return MethodAst[]
      */
-    private function parseNewStatement(Node $node, $list = []): array
+    private function parseNewStatement(FileAstResolver $fileAstResolver, Node $node, $contexts = []): array
     {
         // if class name by assigned to variable?
         $newClassName = $node->children['class']->children['name'];
-        $list[] = $newClassName;
+        $contexts[] = $this->methodContext->resolveContextByClassName($newClassName);
 
         $arguments = $node->children['args']->children ?? [];
         foreach ($arguments as $argumentNode) {
             if ($argumentNode->kind === Kind::AST_NEW) {
-                array_map(function (string $fqcn) use (&$list) {
-                    $list[] = $fqcn;
-                }, $this->parseNewStatement($argumentNode, $list));
+                array_map(function (string $className) use (&$contexts) {
+                    $contexts[] = $this->methodContext->resolveContextByClassName($className);
+                }, $this->parseNewStatement($fileAstResolver, $argumentNode, $contexts));
+            }
+            // method call
+            if (false) {
+                // TODO
             }
         }
-        return $list;
+
+        // remove null
+        $contexts = array_values($contexts);
+        $methodAsts = [];
+        foreach ($contexts as $context) {
+            // new statement calls constructor
+            try {
+                $methodAst = $fileAstResolver->resolve($context->fqcn())->parseMethod('__construct');
+                if ($methodAst) {
+                    $methodAsts[] = $methodAst;
+                }
+            } catch (MethodNotFoundException $exception) {
+                continue;
+            }
+        }
+        return $methodAsts;
     }
 
     public function treeNode(): MethodTreeNode
@@ -169,9 +193,13 @@ class MethodAst
 
         // how fqcn happens if instance method?
         if ($this->isFqcn($variableName)) {
-            return $fileAst->parse()->parseMethod($methodName);
+            return $fileAstResolver->resolve($variableName)->parseMethod($methodName);
         }
 
+        $context = $this->methodContext->resolveContextByClassName($variableName);
+        if ($context) {
+            return $fileAstResolver->resolve($context->fqcn())->parseMethod($methodName);
+        }
         return null;
     }
 
