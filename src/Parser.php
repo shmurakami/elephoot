@@ -10,6 +10,7 @@ use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
+use shmurakami\Spice\Ast\Resolver\MethodAstResolver;
 use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
 use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
 use shmurakami\Spice\Output\ClassTree;
@@ -92,8 +93,9 @@ class Parser
         $tree = new MethodTree($methodAst->treeNode());
 
         $fileAstResolver = new FileAstResolver($classMap);
-        $classAstResolver = new ClassAstResolver($classMap);
-        foreach ($methodAst->methodAstNodes($fileAstResolver, $classAstResolver) as $methodAstNode) {
+        $methodAstResolver = new MethodAstResolver($classMap, $fileAstResolver->resolveImports($methodAst->fqcn()));
+
+        foreach ($methodAst->methodAstNodes($methodAstResolver) as $methodAstNode) {
             $methodCallTree = $this->buildMethodTree($methodAstNode, $classMap);
             $tree->add($methodCallTree);
         }

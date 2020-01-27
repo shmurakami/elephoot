@@ -180,4 +180,12 @@ class FileAst
     {
         return $this->parse()->relatedClasses($classAstResolver);
     }
+
+    /**
+     * @return Imports
+     */
+    public function getImports(): Imports
+    {
+        return $this->imports;
+    }
 }

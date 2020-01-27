@@ -23,4 +23,9 @@ trait FqcnParser
         return new Context($namespace, $className);
     }
 
+    private function isFqcn(string $className): bool
+    {
+        return strpos($className, '\\') !== false;
+    }
+
 }

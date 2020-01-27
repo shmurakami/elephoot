@@ -6,6 +6,7 @@ use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Entity\FileAst;
+use shmurakami\Spice\Ast\Entity\Imports;
 
 class FileAstResolver
 {
@@ -42,6 +43,11 @@ class FileAstResolver
 
         $this->resolved[$className] = $fileAst;
         return $fileAst;
+    }
+
+    public function resolveImports(string $className): Imports
+    {
+        return $fileAst = $this->resolve($className)->getImports();
     }
 
 }
