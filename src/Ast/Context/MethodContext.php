@@ -39,4 +39,9 @@ class MethodContext
     {
         return $this->context->fqcn();
     }
+
+    public function methodName(): string
+    {
+        return $this->methodName;
+    }
 }

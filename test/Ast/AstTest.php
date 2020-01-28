@@ -22,7 +22,7 @@ class AstTest extends TestCase
 //        $methodAst = $classAst->parseMethod('callNest');
         $this->assertInstanceOf(MethodAst::class, $methodAst);
 
-        $methodCallNodes = $methodAst->methodAstNodes();
+        $methodCallNodes = $methodAst->dependentMethodAstList();
         $this->assertEquals([], $methodCallNodes);
     }
 

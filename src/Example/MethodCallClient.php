@@ -23,6 +23,11 @@ class MethodCallClient extends Client
         StaticMethodCall::byStaticMethodCall($staticArgument);
 
         $constructor = new Constructor(new ConstructorArgument());
+
+        $closure = function () {
+            $this->thisMethodCall();
+        };
+        $closure();
     }
 
     private function thisMethodCall()

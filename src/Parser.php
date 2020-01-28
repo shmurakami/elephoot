@@ -95,7 +95,7 @@ class Parser
         $fileAstResolver = new FileAstResolver($classMap);
         $methodAstResolver = new MethodAstResolver($classMap, $fileAstResolver->resolveImports($methodAst->fqcn()));
 
-        foreach ($methodAst->methodAstNodes($methodAstResolver) as $methodAstNode) {
+        foreach ($methodAst->dependentMethodAstList($methodAstResolver) as $methodAstNode) {
             $methodCallTree = $this->buildMethodTree($methodAstNode, $classMap);
             $tree->add($methodCallTree);
         }

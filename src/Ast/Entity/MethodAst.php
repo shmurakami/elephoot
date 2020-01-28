@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use Generator;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
@@ -13,6 +14,8 @@ use shmurakami\Spice\Stub\Kind;
 
 class MethodAst
 {
+    const RESOLVE_GENERATOR = 'RESOLVE_GENERATOR';
+
     /**
      * @var Node
      */
@@ -38,52 +41,102 @@ class MethodAst
         // how to retrieve arg nodes?
     }
 
-    public function parse()
-    {
-        // what it's required?
-        // traverse node
-        // keep variables if callable
-        // detect method call
-        // add to method call tree
-        // get instance
-        // trace method call
-        return [];
-    }
-
     /**
      * @return MethodAst[]
      */
-    public function methodAstNodes(MethodAstResolver $methodAstResolver): array
+    public function dependentMethodAstList(MethodAstResolver $methodAstResolver): array
     {
-        $statementNodes = $this->rootNode->children['stmts']->children ?? [];
+        $resolver = $this->resolver($methodAstResolver);
+        $this->parseLine($methodAstResolver, $resolver, $this->rootNode, []);
 
-        $methodAstNodes = [];
-        foreach ($statementNodes as $statementNode) {
-            if ($statementNode->kind === Kind::AST_ASSIGN) {
-                // TODO update variable map
-                $name = $statementNode->children['var']->children['name'];
-                $rightStatementNode = $statementNode->children['expr'];
-                // new statement
-                if ($rightStatementNode->kind === Kind::AST_NEW) {
-                    $astNodes = $this->parseNewStatement($methodAstResolver, $rightStatementNode);
-                    foreach ($astNodes as $node) {
-                        $methodAstNodes[] = $node;
-                    }
-                }
+        $resolver->send(self::RESOLVE_GENERATOR);
+        return $resolver->getReturn();
+    }
+
+    /**
+     * @param MethodAstResolver $methodAstResolver
+     * @param Generator $resolver
+     * @param Node $rootNode
+     * @param MethodAst[] $methodAstList
+     */
+    private function parseLine(MethodAstResolver $methodAstResolver, Generator $resolver, Node $rootNode, array $methodAstList)
+    {
+        foreach ($this->statementNodes($rootNode) as $statementNode) {
+            $statementMethodCallAstNodes = [];
+            switch ($statementNode->kind) {
+                case Kind::AST_ASSIGN:
+                    $this->parseStatement($methodAstResolver, $resolver, $statementNode, $methodAstList);
+                    break;
+                case Kind::AST_METHOD_CALL:
+                    $statementMethodCallAstNodes = $this->methodCallAstNodes($methodAstResolver, $statementNode);
+                    break;
+                case Kind::AST_STATIC_CALL:
+                    // like call unnamed function
+                    $statementMethodCallAstNodes = $this->methodCStaticCallAstNodes($methodAstResolver, $statementNode);
+                    break;
+                case Kind::AST_CALL:
+                    break;
+                default:
+                    break;
             }
-            if ($statementNode->kind === Kind::AST_METHOD_CALL) {
-                $statementMethodCallAstNodes = $this->methodCallAstNodes($methodAstResolver, $statementNode);
-            } else if ($statementNode->kind === Kind::AST_STATIC_CALL) {
-                $statementMethodCallAstNodes = $this->methodCStaticCallAstNodes($methodAstResolver, $statementNode);
-            } else {
-                continue;
-            }
+
             foreach ($statementMethodCallAstNodes as $statementMethodCallAstNode) {
-                $methodAstNodes[] = $statementMethodCallAstNode;
+                $resolver->send($statementMethodCallAstNode);
             }
         }
+    }
 
-        return $methodAstNodes;
+    /**
+     * @param MethodAstResolver $methodAstResolver
+     * @param Generator $resolver
+     * @param Node $statementNode
+     * @param MethodAst[] $methodAstList
+     * @return MethodAst[]
+     */
+    private function parseStatement(MethodAstResolver $methodAstResolver, Generator $resolver, Node $statementNode, array $methodAstList)
+    {
+        // TODO update variable map
+        $name = $statementNode->children['var']->children['name'];
+        $rightStatementNode = $statementNode->children['expr'];
+
+        switch ($rightStatementNode->kind) {
+            case Kind::AST_NEW:
+                $methodAstList = $this->parseNewStatement($methodAstResolver, $rightStatementNode);
+                foreach ($methodAstList as $methodAst) {
+                    $resolver->send($methodAst);
+                }
+                break;
+            case Kind::AST_CLOSURE:
+                // parse immediately if closure is detected. no need to see call closure
+                $this->parseLine($methodAstResolver, $resolver, $rightStatementNode, $methodAstList);
+                break;
+        }
+    }
+
+    private function resolver(MethodAstResolver $methodAstResolver): Generator
+    {
+        $resolved = [];
+        while (true) {
+            $value = yield;
+
+            if ($value === self::RESOLVE_GENERATOR) {
+                return $resolved;
+            }
+
+            if ($value instanceof MethodContext) {
+                $resolved[] = $methodAstResolver->resolve($value->fqcn(), $value->methodName());
+            } else if ($value instanceof MethodAst) {
+                $resolved[] = $value;
+            }
+        }
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function statementNodes(Node $node): array
+    {
+        return $node->children['stmts']->children ?? [];
     }
 
     /**
@@ -173,6 +226,12 @@ class MethodAst
         }
     }
 
+    /**
+     * @param MethodAstResolver $methodAstResolver
+     * @param Node $node
+     * @param MethodAst $nodes
+     * @return MethodAst[]
+     */
     private function methodCStaticCallAstNodes(MethodAstResolver $methodAstResolver, Node $node, array $nodes = [])
     {
         if ($node->kind !== Kind::AST_STATIC_CALL) {
