@@ -25,19 +25,31 @@ class MethodAst
      */
     private $methodContext;
     /**
-     * @var Context[]
-     * variableName => Context
+     * @var VariableMapTrait
      */
-    private $variableMap = [];
+    private $propertyMap;
+    /**
+     * @var VariableMapTrait
+     */
+    private $variableMap;
 
     /**
      * MethodAst constructor.
+     * @param MethodContext $methodContext
+     * @param Node $rootNode
+     * @param VariableMapTrait $propertyMap e.g. change property and call self instance method, need to be traced
      */
-    public function __construct(MethodContext $methodContext, Node $rootNode)
+    public function __construct(MethodContext $methodContext, Node $rootNode, $propertyMap = null)
     {
         $this->methodContext = $methodContext;
         $this->rootNode = $rootNode;
 
+        $this->propertyMap = $propertyMap ?? new class {
+            use VariableMapTrait;
+        };
+        $this->variableMap =  new class {
+            use VariableMapTrait;
+        };
         // how to retrieve arg nodes?
     }
 
@@ -71,10 +83,13 @@ class MethodAst
                     $statementMethodCallAstNodes = $this->methodCallAstNodes($methodAstResolver, $statementNode);
                     break;
                 case Kind::AST_STATIC_CALL:
-                    // like call unnamed function
-                    $statementMethodCallAstNodes = $this->methodCStaticCallAstNodes($methodAstResolver, $statementNode);
+                    $statementMethodCallAstNodes = $this->methodStaticCallAstNodes($methodAstResolver, $statementNode);
                     break;
                 case Kind::AST_CALL:
+                    // like call unnamed function
+                    break;
+                case Kind::AST_PROP:
+                    // TODO method chain $this->parseLine(); with prop and then method call
                     break;
                 default:
                     break;
@@ -109,6 +124,19 @@ class MethodAst
             case Kind::AST_CLOSURE:
                 // parse immediately if closure is detected. no need to see call closure
                 $this->parseLine($methodAstResolver, $resolver, $rightStatementNode, $methodAstList);
+                break;
+            // TODO parsLineと同じなので構造を整理して共通化する
+            case Kind::AST_METHOD_CALL:
+                $statementMethodCallAstNodes = $this->methodCallAstNodes($methodAstResolver, $statementNode);
+                foreach ($statementMethodCallAstNodes as $statementMethodCallAstNode) {
+                    $resolver->send($statementMethodCallAstNode);
+                }
+                break;
+            case Kind::AST_STATIC_CALL:
+                $statementMethodCallAstNodes = $this->methodStaticCallAstNodes($methodAstResolver, $statementNode);
+                foreach ($statementMethodCallAstNodes as $statementMethodCallAstNode) {
+                    $resolver->send($statementMethodCallAstNode);
+                }
                 break;
         }
     }
@@ -164,7 +192,7 @@ class MethodAst
                 $methodAsts[] = $this->methodCallAstNodes($methodAstResolver, $argumentNode);
             }
             if ($argumentNode->kind === Kind::AST_STATIC_CALL) {
-                $methodAsts[] = $this->methodCStaticCallAstNodes($methodAstResolver, $argumentNode);
+                $methodAsts[] = $this->methodStaticCallAstNodes($methodAstResolver, $argumentNode);
             }
         }
 
@@ -206,7 +234,6 @@ class MethodAst
         }
         $leftStatementNode = $node->children['expr'];
 
-        $methodOwner = $leftStatementNode->children['name'] ?? '';
         $argumentNodes = $node->children['args']->children ?? [];
         foreach ($argumentNodes as $argumentNode) {
             $nodes = $this->methodCallAstNodes($methodAstResolver, $argumentNode, $nodes);
@@ -217,7 +244,7 @@ class MethodAst
         $methodName = $node->children['method'];
 
         try {
-            $methodAst = $this->resolveCallMethodAst($methodAstResolver, $methodOwner, $methodName);
+            $methodAst = $this->resolveCallMethodAst($methodAstResolver, $leftStatementNode, $methodName);
             if ($methodAst) {
                 $nodes[] = $methodAst;
             }
@@ -232,7 +259,7 @@ class MethodAst
      * @param MethodAst $nodes
      * @return MethodAst[]
      */
-    private function methodCStaticCallAstNodes(MethodAstResolver $methodAstResolver, Node $node, array $nodes = [])
+    private function methodStaticCallAstNodes(MethodAstResolver $methodAstResolver, Node $node, array $nodes = [])
     {
         if ($node->kind !== Kind::AST_STATIC_CALL) {
             return $nodes;
@@ -256,18 +283,20 @@ class MethodAst
         }
     }
 
-    private function resolveCallMethodAst(MethodAstResolver $methodAstResolver, string $variableName, string $methodName): ?MethodAst
+    private function resolveCallMethodAst(MethodAstResolver $methodAstResolver, Node $leftStatementNode, string $methodName): ?MethodAst
     {
-        if ($variableName === 'this') {
-            return $methodAstResolver->resolve($this->methodContext->fqcn(), $methodName);
+        // TODO resolve variable from variable map
+        if ($leftStatementNode->kind === Kind::AST_PROP) {
+            $context = $this->resolvePropertyContext($leftStatementNode);
+        } else {
+            // may should check kind
+            $variableName = $leftStatementNode->children['name'] ?? '';
+            if ($variableName === 'this') {
+                return $methodAstResolver->resolve($this->methodContext->fqcn(), $methodName);
+            }
+            $context = $this->variableMap[$variableName] ?? $methodAstResolver->resolveContext($variableName) ?? null;
         }
 
-        // how fqcn happens if instance method?
-        if ($this->isFqcn($variableName)) {
-            return $methodAstResolver->resolve($variableName, $methodName);
-        }
-
-        $context = $methodAstResolver->resolveContext($variableName);
         if ($context) {
             return $methodAstResolver->resolve($context->fqcn(), $methodName);
         }
@@ -292,9 +321,18 @@ class MethodAst
         return null;
     }
 
-    private function isFqcn(string $className): bool
+    private function resolvePropertyContext(Node $propertyNode): ?Context
     {
-        return strpos($className, '\\') !== false;
+        $variable = $propertyNode->children['expr']->children['name'] ?? '';
+        $property = $propertyNode->children['prop'];
+
+        if ($variable === 'this') {
+            return $this->propertyMap->get($property);
+        }
+
+        // TODO public property method
+        // how?
+        return null;
     }
 
     public function fqcn(): string

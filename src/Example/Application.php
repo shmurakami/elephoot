@@ -93,4 +93,8 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
         };
         return $f();
     }
+
+    public function doNothing()
+    {
+    }
 }

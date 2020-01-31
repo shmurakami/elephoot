@@ -161,9 +161,11 @@ class ParserTest extends TestCase
         $thisFromClosureCallTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'thisMethodCall'));
         $clientTree->add($thisFromClosureCallTree);
 
+        $propertyMethodCallTree = new MethodTree(new MethodTreeNode(Application::class, 'doNothing'));
+        $clientTree->add($propertyMethodCallTree);
+
         /**
          * Check
-         * - property method call
          * - trait method
          * - parent method
          *

@@ -70,7 +70,7 @@ class ClassAst
                 if ($nodeMethodName === $methodName) {
                     $argumentNodes = $this->rootNode->children['params']->children ?? [];
                     $methodContext = new MethodContext($this->context, $methodName, $argumentNodes);
-                    $propertyMap = $this->properties->propertyContextMap();
+                    $propertyMap = $this->properties->propertyContextMap($this->imports);
                     return new MethodAst($methodContext, $node, $propertyMap);
                 }
             }

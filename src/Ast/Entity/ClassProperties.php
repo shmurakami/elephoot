@@ -2,8 +2,11 @@
 
 namespace shmurakami\Spice\Ast\Entity;
 
+use shmurakami\Spice\Ast\Parser\FqcnParser;
+
 class ClassProperties
 {
+    use FqcnParser;
 
     /**
      * @var ClassProperty[]
@@ -26,15 +29,27 @@ class ClassProperties
     }
 
     /**
+     * @param Imports $imports
      * @return PropertyMap
      */
-    public function propertyContextMap(): PropertyMap
+    public function propertyContextMap(Imports $imports): PropertyMap
     {
         $propertyMap = new PropertyMap();
         foreach ($this->values as $property) {
             // doc comment may has multi types. how to retrieve exact one?
             // must trace instance condition
-            $context = $property->classFqcnListFromDocComment()[0] ?? null;
+            $context = null;
+            $className = $property->classFqcnListFromDocComment()[0] ?? null;
+            if ($className) {
+                if ($this->isFqcn($className)) {
+                    $context = $this->parseFqcn($className);
+                } else {
+                    $imported = $imports->resolve($className);
+                    if ($imported) {
+                        $context = $this->parseFqcn($imported);
+                    }
+                }
+            }
             $propertyMap->update($property->getPropertyName(), $context);
         }
         return $propertyMap;
