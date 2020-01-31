@@ -5,6 +5,9 @@ namespace shmurakami\Spice\Ast\Context;
 use ast\Node;
 use shmurakami\Spice\Ast\Parser\FqcnParser;
 
+/**
+ * maybe deprecated?
+ */
 class MethodContext
 {
     use FqcnParser;

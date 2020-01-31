@@ -18,21 +18,17 @@ class ClassAst
     use TypeParser;
 
     /**
-     * @var ClassProperty[]
+     * @var ClassProperties
      */
-    private $properties = [];
+    private $properties;
     /**
-     * @var string
+     * @var Context
      */
-    private $namespace;
+    private $context;
     /**
      * @var Node
      */
     private $classRootNode;
-    /**
-     * @var string
-     */
-    private $className;
     /**
      * @var Imports
      */
@@ -41,23 +37,24 @@ class ClassAst
     /**
      * ClassAst constructor.
      */
-    public function __construct(string $namespace, string $className, Imports $imports, Node $classRootNode)
+    public function __construct(Context $context, Imports $imports, Node $classRootNode)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
+        $this->context = $context;
         $this->classRootNode = $classRootNode;
         $this->imports = $imports;
 
-        $this->parseProperties($namespace, $className);
+        $this->parseProperties($context);
     }
 
-    private function parseProperties(string $namespace, string $className): void
+    private function parseProperties(Context $context): void
     {
+        $properties = [];
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
-                $this->properties[] = new ClassProperty($namespace, $className, $node);
+                $properties[] = new ClassProperty($context, $node);
             }
         }
+        $this->properties = new ClassProperties($properties);
     }
 
     /**
@@ -72,9 +69,9 @@ class ClassAst
                 $nodeMethodName = $node->children['name'];
                 if ($nodeMethodName === $methodName) {
                     $argumentNodes = $this->rootNode->children['params']->children ?? [];
-                    $context = new Context($this->namespace, $this->className);
-                    $methodContext = new MethodContext($context, $methodName, $argumentNodes);
-                    return new MethodAst($methodContext, $node);
+                    $methodContext = new MethodContext($this->context, $methodName, $argumentNodes);
+                    $propertyMap = $this->properties->propertyContextMap();
+                    return new MethodAst($methodContext, $node, $propertyMap);
                 }
             }
         }
@@ -98,8 +95,8 @@ class ClassAst
         $resolver($this->extractUsingTrait());
 
         // property, only need to parse doc comment
-        foreach ($this->properties as $classProperty) {
-            $resolver($classProperty->classFqcnListFromDocComment());
+        foreach ($this->properties->classFqcnListFromDocComment() as $classFqcnList) {
+            $resolver($classFqcnList);
         }
 
         // parse method
@@ -130,7 +127,7 @@ class ClassAst
             }
 
             $originalFqcn = $classFqcn;
-            $classFqcn = $this->parseType($this->namespace, $classFqcn);
+            $classFqcn = $this->parseType($this->context->getNamespace(), $classFqcn);
             if ($classFqcn === null) {
                 $resolved[$classFqcn] = true;
                 continue;
@@ -141,7 +138,7 @@ class ClassAst
             }
 
             // fqcn is same with current target class, skip to avoid infinite loop
-            if ($this->fqcn() === $classFqcn) {
+            if ($this->context->fqcn() === $classFqcn) {
                 $resolved[$classFqcn] = true;
                 continue;
             }
@@ -175,7 +172,7 @@ class ClassAst
         // extract method nodes
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $methodNodes[] = new MethodNode($this->namespace, $node);
+                $methodNodes[] = new MethodNode($this->context->getNamespace(), $node);
             }
         }
 
@@ -314,7 +311,7 @@ class ClassAst
 
     public function treeNode(): ClassTreeNode
     {
-        return new ClassTreeNode($this->fqcn());
+        return new ClassTreeNode($this->context->fqcn());
     }
 
     /**
@@ -322,10 +319,7 @@ class ClassAst
      */
     public function fqcn(): string
     {
-        if ($this->namespace) {
-            return $this->namespace . '\\' . $this->className;
-        }
-        return $this->className;
+        return $this->context->fqcn();
     }
 
     /**

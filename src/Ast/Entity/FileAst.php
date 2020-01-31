@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
@@ -72,7 +73,7 @@ class FileAst
                     $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 }
                 if ($nodeClassFqcn === $this->classFqcn) {
-                    return new ClassAst($this->getNamespace(), $nodeClassName, $this->imports, $node);
+                    return new ClassAst(new Context($this->getNamespace(), $nodeClassName), $this->imports, $node);
                 }
             }
         }

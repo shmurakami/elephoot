@@ -24,6 +24,19 @@ class Context
 
     public function fqcn(): string
     {
-        return $this->namespace . '\\' . $this->className;
+        if ($this->namespace) {
+            return $this->namespace . '\\' . $this->className;
+        }
+
+        // don't use \ prefix for now
+        return $this->className;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace(): string
+    {
+        return $this->namespace;
     }
 }

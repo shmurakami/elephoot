@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Test\Ast\Entity;
 
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\ClassProperty;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\ExtendApplication;
@@ -18,31 +19,32 @@ class ClassPropertyTest extends TestCase
         // any way to write these tests more easier?
         $namespace = 'shmurakami\\Spice\\Example';
         $className = 'SomeProperty';
+        $context = new Context($namespace, $className);
 
         //
         $unionTypesWithAdditionalComment = $propertyNodes[0];
-        $classProperty = new ClassProperty($namespace, $className, $unionTypesWithAdditionalComment);
+        $classProperty = new ClassProperty($context, $unionTypesWithAdditionalComment);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [Application::class, ExtendApplication::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $fqcnType = $propertyNodes[1];
-        $classProperty = new ClassProperty($namespace, $className, $fqcnType);
+        $classProperty = new ClassProperty($context, $fqcnType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [Application::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $simpleType = $propertyNodes[2];
-        $classProperty = new ClassProperty($namespace, $className, $simpleType);
+        $classProperty = new ClassProperty($context, $simpleType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [ExtendApplication::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $wrongType = $propertyNodes[3];
-        $classProperty = new ClassProperty($namespace, $className, $wrongType);
+        $classProperty = new ClassProperty($context, $wrongType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         // does not exist but parsable as string in ClassProperty context
         $expect = ["shmurakami\\Spice\\Example\\NotExistingClass"];
