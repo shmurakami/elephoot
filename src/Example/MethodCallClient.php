@@ -6,9 +6,12 @@ use shmurakami\Spice\Example\MagicMethod\Constructor;
 use shmurakami\Spice\Example\MagicMethod\ConstructorArgument;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCall;
 use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
+use shmurakami\Spice\Example\Traits\UsingTrait;
 
 class MethodCallClient extends Client
 {
+    use UsingTrait;
+
     /**
      * @var Application
      */
@@ -38,6 +41,9 @@ class MethodCallClient extends Client
 
         // property method call
         $this->application->doNothing();
+
+        // trait method
+        $this->traitMethod();
     }
 
     private function thisMethodCall()

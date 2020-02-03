@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Parser;
 
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Entity\Imports;
 
 trait FqcnParser
 {
@@ -26,6 +27,22 @@ trait FqcnParser
     private function isFqcn(string $className): bool
     {
         return strpos($className, '\\') !== false;
+    }
+
+    /**
+     * TODO refactoring. this method should not be here
+     */
+    private function parseFqcnWithImports(string $className, Imports $imports): ?Context
+    {
+        if ($this->isFqcn($className)) {
+            return $this->parseFqcn($className);
+        }
+
+        $imported = $imports->resolve($className);
+        if ($imported) {
+            return $this->parseFqcn($imported);
+        }
+        return null;
     }
 
 }

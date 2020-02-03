@@ -292,7 +292,19 @@ class MethodAst
             // may should check kind
             $variableName = $leftStatementNode->children['name'] ?? '';
             if ($variableName === 'this') {
-                return $methodAstResolver->resolve($this->methodContext->fqcn(), $methodName);
+                // should be parsed at ClassAst parseMethod actually?
+                // same name method priority is self, trait, parent method
+                // self
+                if (method_exists($this->methodContext->fqcn(), $methodName)) {
+                    return $methodAstResolver->resolve($this->methodContext->fqcn(), $methodName);
+                }
+
+                // trait method
+
+                // trait
+
+                // TODO parent
+
             }
             $context = $this->variableMap[$variableName] ?? $methodAstResolver->resolveContext($variableName) ?? null;
         }

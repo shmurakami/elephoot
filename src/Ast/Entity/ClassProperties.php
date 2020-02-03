@@ -41,14 +41,7 @@ class ClassProperties
             $context = null;
             $className = $property->classFqcnListFromDocComment()[0] ?? null;
             if ($className) {
-                if ($this->isFqcn($className)) {
-                    $context = $this->parseFqcn($className);
-                } else {
-                    $imported = $imports->resolve($className);
-                    if ($imported) {
-                        $context = $this->parseFqcn($imported);
-                    }
-                }
+                $context = $this->parseFqcnWithImports($className, $imports);
             }
             $propertyMap->update($property->getPropertyName(), $context);
         }

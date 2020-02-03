@@ -6,6 +6,7 @@ use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Entity\Imports;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Parser\FqcnParser;

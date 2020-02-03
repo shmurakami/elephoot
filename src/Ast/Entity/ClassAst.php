@@ -75,7 +75,6 @@ class ClassAst
                 }
             }
         }
-        // TODO support parent method
         throw new MethodNotFoundException();
     }
 

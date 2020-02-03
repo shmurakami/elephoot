@@ -3,7 +3,6 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
-use Prophecy\Exception\Doubler\MethodNotFoundException;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
