@@ -44,6 +44,18 @@ class MethodCallClient extends Client
 
         // trait method
         $this->traitMethod();
+
+        // method call in argument
+        $this->methodCallInArgumentReceiver($this->methodCallInArgument());
+    }
+
+    private function methodCallInArgumentReceiver($mixed)
+    {
+    }
+
+    private function methodCallInArgument()
+    {
+        $this->thisMethodCall();
     }
 
     private function thisMethodCall()

@@ -164,15 +164,19 @@ class ParserTest extends TestCase
         $propertyMethodCallTree = new MethodTree(new MethodTreeNode(Application::class, 'doNothing'));
         $clientTree->add($propertyMethodCallTree);
 
+        $methodCallInArgumentTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'methodCallInArgument'));
+        $methodCallInArgumentTree->add(new MethodTree(new MethodTreeNode(MethodCallClient::class, 'thisMethodCall')));
+        $clientTree->add($methodCallInArgumentTree);
+
+        $methodCallInArgumentReceiverTree = new MethodTree(new MethodTreeNode(MethodCallClient::class, 'methodCallInArgumentReceiver'));
+        $clientTree->add($methodCallInArgumentReceiverTree);
+
+        // later
 //        $traitMethodCallTree = new MethodTree(new MethodTreeNode(UsingTrait::class, 'traitMethod'));
 //        $clientTree->add($traitMethodCallTree);
 
         /**
          * Check
-         * - trait method
-         * - parent method
-         *
-         * - argument instance method
          * - method chain
          * - in closure use statement
          * - generator
@@ -181,6 +185,9 @@ class ParserTest extends TestCase
          * - not written constructor
          *
          * - function call
+         *
+         * - trait method
+         * - parent method
          */
 
         $expect = $clientTree;
