@@ -164,8 +164,8 @@ class ParserTest extends TestCase
         $propertyMethodCallTree = new MethodTree(new MethodTreeNode(Application::class, 'doNothing'));
         $clientTree->add($propertyMethodCallTree);
 
-        $traitMethodCallTree = new MethodTree(new MethodTreeNode(UsingTrait::class, 'traitMethod'));
-        $clientTree->add($traitMethodCallTree);
+//        $traitMethodCallTree = new MethodTree(new MethodTreeNode(UsingTrait::class, 'traitMethod'));
+//        $clientTree->add($traitMethodCallTree);
 
         /**
          * Check
