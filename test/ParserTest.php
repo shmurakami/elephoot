@@ -192,7 +192,7 @@ class ParserTest extends TestCase
          */
 
         $expect = $clientTree;
-        $this->assertEquals($expect, $parser->buildMethodTree($methodAst, $classMap));
+        $this->assertEquals($expect, $parser->buildMethodTree($methodAst, new AstResolver($classMap)));
     }
 
 }

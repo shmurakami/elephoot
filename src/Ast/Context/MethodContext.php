@@ -47,4 +47,9 @@ class MethodContext
     {
         return $this->methodName;
     }
+
+    public function context()
+    {
+        return $this->context;
+    }
 }

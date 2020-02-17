@@ -57,8 +57,9 @@ class Parser
         $classMap = $this->request->getClassMap();
         $classAst = (new AstLoader($classMap))->loadByClass($classFqcn);
         $methodAst = $classAst->parseMethod($methodName);
+        $astResolver = new AstResolver($classMap);
 
-        $methodTree = $this->buildMethodTree($methodAst, $classMap);
+        $methodTree = $this->buildMethodTree($methodAst, $astResolver);
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);
         $filepath = $drawer->draw($methodTree);
@@ -93,15 +94,12 @@ class Parser
         return $tree;
     }
 
-    public function buildMethodTree(MethodAst $methodAst, ClassMap $classMap): MethodTree
+    public function buildMethodTree(MethodAst $methodAst, AstResolver $astResolver): MethodTree
     {
         $tree = new MethodTree($methodAst->treeNode());
 
-        $fileAstResolver = new FileAstResolver($classMap);
-        $methodAstResolver = new MethodAstResolver($classMap, $fileAstResolver->resolveImports($methodAst->fqcn()));
-
-        foreach ($methodAst->dependentMethodAstList($methodAstResolver) as $methodAstNode) {
-            $methodCallTree = $this->buildMethodTree($methodAstNode, $classMap);
+        foreach ($methodAst->dependentMethodAstList($astResolver) as $methodAstNode) {
+            $methodCallTree = $this->buildMethodTree($methodAstNode, $astResolver);
             $tree->add($methodCallTree);
         }
         return $tree;
