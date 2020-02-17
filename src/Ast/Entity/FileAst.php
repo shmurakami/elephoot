@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Resolver\AstResolver;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
@@ -107,23 +108,23 @@ class FileAst
     /**
      * @return ClassAst[]
      */
-    public function dependentClassAstList(ClassAstResolver $classAstResolver): array
+    public function dependentClassAstList(AstResolver $astResolver): array
     {
         return array_merge(
-            $this->importedClasses($classAstResolver),
-            $this->extendClasses($classAstResolver),
-            $this->relatedClasses($classAstResolver));
+            $this->importedClasses($astResolver),
+            $this->extendClasses($astResolver),
+            $this->relatedClasses($astResolver));
     }
 
     /**
      * @return ClassAst[]
      */
-    private function importedClasses(ClassAstResolver $classAstResolver): array
+    private function importedClasses(AstResolver $astResolver): array
     {
         $imported = [];
         foreach ($this->imports->values() as $import) {
             $className = $import->className();
-            $classAst = $classAstResolver->resolve($className);
+            $classAst = $astResolver->resolveClassAst($className);
             if ($classAst) {
                 $imported[$className] = $classAst;
             }
@@ -135,7 +136,7 @@ class FileAst
     /**
      * @return ClassAst[]
      */
-    private function extendClasses(ClassAstResolver $classAstResolver): array
+    private function extendClasses(AstResolver $astResolver): array
     {
         // extend and implements
         $extends = [];
@@ -151,7 +152,7 @@ class FileAst
         if ($classNode) {
             $extendClassName = $classNode->children['extends']->children['name'] ?? '';
             if ($extendClassName) {
-                $classAst = $classAstResolver->resolve($extendClassName);
+                $classAst = $astResolver->resolveClassAst($extendClassName);
                 if ($classAst) {
                     $extends[$extendClassName] = $classAst;
                 }
@@ -161,7 +162,7 @@ class FileAst
                 return $implementNode->children['name'];
             }, $classNode->children['implements']->children ?? []);
             foreach ($implementClassNames as $className) {
-                $classAst = $classAstResolver->resolve($className);
+                $classAst = $astResolver->resolveClassAst($className);
                 if ($classAst) {
                     $extends[$className] = $classAst;
                 }
@@ -176,9 +177,9 @@ class FileAst
      * @return ClassAst[]
      * @throws ClassNotFoundException
      */
-    private function relatedClasses(ClassAstResolver $classAstResolver): array
+    private function relatedClasses(AstResolver $astResolver): array
     {
-        return $this->parse()->relatedClasses($classAstResolver);
+        return $this->parse()->relatedClasses($astResolver);
     }
 
     /**

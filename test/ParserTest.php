@@ -6,6 +6,7 @@ use BreakingPsr;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Request;
+use shmurakami\Spice\Ast\Resolver\AstResolver;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\ExtendApplication;
@@ -48,7 +49,7 @@ class ParserTest extends TestCase
         ]);
 
         $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
-        $actual = $parser->buildClassTree($classAst, $classMap);
+        $actual = $parser->buildClassTree($classAst, new AstResolver($classMap));
 
         $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
 

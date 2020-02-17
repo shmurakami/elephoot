@@ -62,12 +62,9 @@ class AstLoader
         }
 
         $reflector = new ReflectionClass($className);
-        $fileName = $reflector->getFileName();
+        $filepath = $reflector->getFileName();
 
-        $rootNode = parse_file($fileName, 70);
-
-        // should return ClassAst? who should parse namespace?
-        return new FileAst($rootNode, $className);
+        return $this->loadFromFilepath($className, $filepath);
     }
 
     private function loadFromFilepath(string $className, string $filepath): FileAst

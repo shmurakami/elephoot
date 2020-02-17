@@ -8,6 +8,7 @@ use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Request;
+use shmurakami\Spice\Ast\Resolver\AstResolver;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
 use shmurakami\Spice\Ast\Resolver\MethodAstResolver;
@@ -23,6 +24,10 @@ class Parser
      * @var Request
      */
     private $request;
+    /**
+     * @var AstResolver
+     */
+    private $astResolver;
 
     public function __construct(Request $request)
     {
@@ -64,26 +69,26 @@ class Parser
     {
         $classMap = $this->request->getClassMap();
         $classAst = (new AstLoader($classMap))->loadByClass($classFqcn);
-        $classTree = $this->buildClassTree($classAst, $classMap);
+        $astResolver = new AstResolver($classMap);
+
+        $classTree = $this->buildClassTree($classAst, $astResolver);
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);
         $filepath = $drawer->draw($classTree);
     }
 
-    public function buildClassTree(ClassAst $classAst, ClassMap $classMap): ClassTree
+    public function buildClassTree(ClassAst $classAst, AstResolver $astResolver): ClassTree
     {
         $tree = new ClassTree($classAst->treeNode());
 
-        $resolver = new FileAstResolver($classMap);
-        $fileAst = $resolver->resolve($classAst->fqcn());
+        $fileAst = $astResolver->resolveFileAst($classAst->fqcn());
         if (!$fileAst) {
             return $tree;
         }
 
-        $classAstResolver = new ClassAstResolver($classMap);
-        $dependencies = $fileAst->dependentClassAstList($classAstResolver);
+        $dependencies = $fileAst->dependentClassAstList($astResolver);
         foreach ($dependencies as $dependentClassAst) {
-            $tree->add($this->buildClassTree($dependentClassAst, $classMap));
+            $tree->add($this->buildClassTree($dependentClassAst, $astResolver));
         }
         return $tree;
     }

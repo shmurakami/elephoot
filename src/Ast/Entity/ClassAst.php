@@ -8,6 +8,7 @@ use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
 use shmurakami\Spice\Ast\Parser\TypeParser;
+use shmurakami\Spice\Ast\Resolver\AstResolver;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
@@ -81,9 +82,9 @@ class ClassAst
     /**
      * @return ClassAst[]
      */
-    public function relatedClasses(ClassAstResolver $classAstResolver): array
+    public function relatedClasses(AstResolver $astResolver): array
     {
-        $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
+        $dependentClassAstResolver = $this->dependentClassAstResolver($astResolver);
         $resolver = function(array $fqcnList) use ($dependentClassAstResolver) {
             foreach ($fqcnList as $classFqcn) {
                 $dependentClassAstResolver->send($classFqcn);
@@ -112,7 +113,7 @@ class ClassAst
     /**
      * @return Generator|array
      */
-    private function dependentClassAstResolver(ClassAstResolver $classAstResolver): Generator
+    private function dependentClassAstResolver(AstResolver $astResolver): Generator
     {
         // to not search same wrong name class is given sometime
         $resolved = [];
@@ -142,14 +143,14 @@ class ClassAst
                 continue;
             }
 
-            $classAst = $classAstResolver->resolve($classFqcn);
+            $classAst = $astResolver->resolveClassAst($classFqcn);
             if ($classAst) {
                 $dependencies[$classFqcn] = $classAst;
             } else {
                 // search global scope class from namespaced class
                 $isFqcnCompleted = $classFqcn !== $originalFqcn;
                 if ($isFqcnCompleted) {
-                    $classAst = $classAstResolver->resolve($originalFqcn);
+                    $classAst = $astResolver->resolveClassAst($originalFqcn);
                     if ($classAst) {
                         $dependencies[$originalFqcn] = $classAst;
                     }
