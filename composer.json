@@ -29,5 +29,8 @@
     },
     "bin": [
         "bin/spice"
-    ]
+    ],
+    "scripts": {
+        "test": "phpunit test"
+    }
 }
