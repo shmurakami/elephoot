@@ -16,6 +16,7 @@ use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Output\MethodCallTree;
 
+// TODO parser should not call drawer. it's responsible for flow. flow should get parse result and call drawer
 class Parser
 {
     /**
