@@ -23,7 +23,9 @@ jobs:
       - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
       #- run: sudo docker-php-ext-install zip
       - run: sudo pecl install ast
-      - run: sudo docker-php-ext-install ast
+      # docker-php-ext-install does not works for ast extension
+      - run: echo 'extension=ast.so' > $(php -i |grep 'Scan this dir for additional .ini files' |cut -f 9 -d\ ))/ext.ini
+#      - run: sudo docker-php-ext-install ast
 
       # Download and cache dependencies
       - restore_cache:
