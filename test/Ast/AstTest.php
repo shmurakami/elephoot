@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Test\Ast;
 
 use shmurakami\Spice\Ast\AstLoader;
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Example\Application;
@@ -14,7 +15,7 @@ class AstTest extends TestCase
 {
     public function testAst()
     {
-        $astLoader = new AstLoader();
+        $astLoader = new AstLoader(new ClassMap([]));
         $classAst = $astLoader->loadByClass(Application::class);
         $this->assertInstanceOf(ClassAst::class, $classAst);
 
@@ -29,13 +30,13 @@ class AstTest extends TestCase
     public function testClassNotFoundException()
     {
         $this->expectException(ClassNotFoundException::class);
-        (new AstLoader())->loadByClass('_' . Application::class);
+        (new AstLoader(new ClassMap([])))->loadByClass('_' . Application::class);
     }
 
     public function testMethodNotFoundException()
     {
         $this->expectException(MethodNotFoundException::class);
-        (new AstLoader())
+        (new AstLoader(new ClassMap([])))
             ->loadByClass(Application::class)
             ->parseMethod('notExistMethod');
     }
