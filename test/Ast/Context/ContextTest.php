@@ -4,7 +4,6 @@ namespace shmurakami\Spice\Test\Ast\Context;
 
 use shmurakami\Spice\Ast\Context\Context;
 use PHPUnit\Framework\TestCase;
-use shmurakami\Spice\Ast\Context\MethodContext;
 
 class ContextTest extends TestCase
 {

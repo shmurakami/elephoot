@@ -4,6 +4,8 @@ namespace shmurakami\Spice\Test\Ast;
 
 use BreakingPsr;
 use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Test\TestCase;
 
@@ -22,28 +24,30 @@ class RequestTest extends TestCase
     public function testGetTargetByClass()
     {
         $targetClass = Request::class;
+        $expect = new Context('shmurakami\\Spice\\Ast\\Request');
+
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
-        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
+        $this->assertEquals($expect, $request->getTarget());
 
         // option is prioritized
         $request = new Request(Request::MODE_CLASS, $targetClass, '', __DIR__ . '/resource/config.json');
-        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
+        $this->assertEquals($expect, $request->getTarget());
     }
 
     public function testGetTargetByMethod()
     {
         $targetClass = Request::class;
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals(['class' => $targetClass, 'method' => 'sample'], $request->getTarget());
+        $this->assertEquals(new MethodContext($targetClass, 'sample'), $request->getTarget());
 
         // option is prioritized
         $target = "$targetClass@sample";
         $request = new Request(Request::MODE_CLASS, $target, '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals(['class' => $targetClass, 'method' => 'sample'], $request->getTarget());
+        $this->assertEquals(new MethodContext($targetClass, 'sample'), $request->getTarget());
 
         // even combined, prior argument
         $request = new Request(Request::MODE_CLASS, $targetClass, '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals(['class' => $targetClass, 'method' => ''], $request->getTarget());
+        $this->assertEquals(new Context($targetClass), $request->getTarget());
     }
 
     /**

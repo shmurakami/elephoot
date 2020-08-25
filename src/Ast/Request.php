@@ -2,6 +2,11 @@
 
 namespace shmurakami\Spice\Ast;
 
+use InvalidArgumentException;
+use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\ContextInterface;
+use shmurakami\Spice\Ast\Context\MethodContext;
+
 class Request
 {
     const MODE_CLASS = 'CLASS';
@@ -54,7 +59,7 @@ class Request
         return $default;
     }
 
-    public function getTarget(): array
+    public function getTarget(): ContextInterface
     {
         $target = $this->configure['target'] ?? '';
         if ($this->target) {
@@ -63,8 +68,15 @@ class Request
 
         $parts = explode('@', $target);
         $class = $parts[0];
+        if (!$class) {
+            throw new InvalidArgumentException();
+        }
+
         $method = $parts[1] ?? '';
-        return ['class' => $class, 'method' => $method];
+        if ($method) {
+            return new MethodContext($class, $method);
+        }
+        return new Context($class);
     }
 
     public function isClassMode(): bool
@@ -87,10 +99,12 @@ class Request
     public function isValid()
     {
         $output = $this->getOutputDirectory();
-        $targetClass = $this->getTarget()['class'] ?? '';
-        return ($output !== '' && $output !== null)
-            && ($targetClass !== '' && $targetClass !== null)
-            ;
+        try {
+            $this->getTarget();
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
+        return $output !== '' && $output !== null;
     }
 
     public function getClassMap(): ClassMap
