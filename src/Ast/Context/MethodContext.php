@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Ast\Context;
 
-class Context implements ContextInterface
+class MethodContext implements ContextInterface
 {
     use ContextBehavior;
 
@@ -10,19 +10,25 @@ class Context implements ContextInterface
      * @var string
      */
     private $fqcn;
+    /**
+     * @var string
+     */
+    private $method;
 
     /**
-     * Context constructor.
+     * MethodContext constructor.
      */
-    public function __construct(string $fqcn)
+    public function __construct(string $fqcn, string $method)
     {
         $this->fqcn = $fqcn;
+        $this->method = $method;
+
         $this->extractNamespaceAndClass($fqcn);
     }
 
     public function fqcn(): string
     {
         // add \\ prefix if global namespace
-        return $this->namespace . '\\' . $this->className;
+        return $this->namespace . '\\' . $this->className . '@' . $this->method;
     }
 }
