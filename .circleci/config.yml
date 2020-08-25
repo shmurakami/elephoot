@@ -24,7 +24,7 @@ jobs:
       #- run: sudo docker-php-ext-install zip
       - run: sudo pecl install ast
       # docker-php-ext-install does not works for ast extension
-      - run: echo 'extension=ast.so' > $(php -i |grep 'Scan this dir for additional .ini files' |cut -f 9 -d\ )/ast.ini
+      - run: sudo echo 'extension=ast.so' > $(php -i |grep 'Scan this dir for additional .ini files' |cut -f 9 -d\ )/ast.ini
 #      - run: sudo docker-php-ext-install ast
 
       # Download and cache dependencies
