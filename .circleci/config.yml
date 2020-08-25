@@ -23,7 +23,7 @@ jobs:
       - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
       #- run: sudo docker-php-ext-install zip
       - run: sudo tar xf /usr/src/php.tar.xz
-      - run: sudo mv php-7.3.21 php
+      - run: sudo mv php-7.3.21 /usr/src/php
       - run: sudo pecl download ast-1.0.8
       - run: sudo tar xf ast-1.0.8.tgz
       - run: sudo mv ast-1.0.8 /usr/src/php/ext/ast
