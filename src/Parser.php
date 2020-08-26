@@ -86,6 +86,7 @@ class Parser
 
         $classAstResolver = new ClassAstResolver($classMap);
         $dependencies = $fileAst->dependentClassAstList($classAstResolver);
+        // TODO set memo dependency and result tree
         foreach ($dependencies as $dependentClassAst) {
             $tree->add($this->buildClassTree($dependentClassAst, $classMap));
         }
