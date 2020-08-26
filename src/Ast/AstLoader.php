@@ -67,6 +67,9 @@ class AstLoader
 
         $reflector = new ReflectionClass($className);
         $fileName = $reflector->getFileName();
+        if (!$fileName) {
+            throw new ClassNotFoundException("class or interface or trait $className not found");
+        }
 
         $rootNode = parse_file($fileName, 70);
 
