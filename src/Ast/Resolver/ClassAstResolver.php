@@ -5,6 +5,7 @@ namespace shmurakami\Spice\Ast\Resolver;
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 
@@ -35,7 +36,7 @@ class ClassAstResolver
         }
 
         try {
-            $classAst = (new AstLoader($this->classMap))->loadByClass($className);
+            $classAst = (new AstLoader($this->classMap))->loadByClass(new ClassContext($className));
         } catch (ReflectionException|ClassNotFoundException $e) {
             // should log error anyway
             $classAst = null;

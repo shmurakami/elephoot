@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
@@ -16,17 +17,16 @@ class FileAst
     /**
      * @var string
      */
-    private $classFqcn;
-    /**
-     * @var string
-     */
     private $namespace;
+    /**
+     * @var Context
+     */
+    private $context;
 
-    public function __construct(Node $rootNode, string $classFqcn)
+    public function __construct(Node $rootNode, Context $context)
     {
         $this->rootNode = $rootNode;
-        // file may not have class so weird to require
-        $this->classFqcn = trim($classFqcn, '\\');
+        $this->context = $context;
     }
 
     /**
@@ -47,12 +47,9 @@ class FileAst
 
             if ($node->kind === Kind::AST_CLASS) {
                 $nodeClassName =  $node->children['name'];
-                $nodeClassFqcn = $nodeClassName;
-                if ($namespace) {
-                    $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
-                }
-                if ($nodeClassFqcn === $this->classFqcn) {
-                    return new ClassAst($this->getNamespace(), $nodeClassName, $node);
+                $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
+                if ($nodeClassFqcn === $this->context->fqcn()) {
+                    return new ClassAst($this->context, $node);
                 }
             }
         }

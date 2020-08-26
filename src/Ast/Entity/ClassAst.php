@@ -4,6 +4,8 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use Generator;
+use shmurakami\Spice\Ast\Context\ClassContext;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
 use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
@@ -31,24 +33,27 @@ class ClassAst
      * @var string
      */
     private $className;
+    /**
+     * @var Context
+     */
+    private $context;
 
     /**
      * ClassAst constructor.
      */
-    public function __construct(string $namespace, string $className, Node $classRootNode)
+    public function __construct(Context $context, Node $classRootNode)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
+        $this->context = $context;
         $this->classRootNode = $classRootNode;
 
-        $this->parseProperties($namespace, $className);
+        $this->parseProperties($context);
     }
 
-    private function parseProperties(string $namespace, string $className): void
+    private function parseProperties(Context $context): void
     {
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
-                $this->properties[] = new ClassProperty($namespace, $className, $node);
+                $this->properties[] = new ClassProperty($context, $node);
             }
         }
     }
@@ -77,7 +82,7 @@ class ClassAst
     public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
-        $resolver = function(array $fqcnList) use ($dependentClassAstResolver) {
+        $resolver = function (array $fqcnList) use ($dependentClassAstResolver) {
             foreach ($fqcnList as $classFqcn) {
                 $dependentClassAstResolver->send($classFqcn);
             }
@@ -111,6 +116,9 @@ class ClassAst
         $resolved = [];
         $dependencies = [];
 
+        $currentContextFqcn = $this->context->fqcn();
+        $currentContextNamespace = $this->context->extractNamespace();
+
         while (true) {
             $classFqcn = yield;
             // give null to finish
@@ -118,8 +126,14 @@ class ClassAst
                 return $dependencies;
             }
 
+            // TODO all message should be Context instance
             $originalFqcn = $classFqcn;
-            $classFqcn = $this->parseType($this->namespace, $classFqcn);
+            if (strpos($classFqcn, '\\') === false) {
+                $targetContext = new ClassContext($currentContextNamespace . '\\' . $classFqcn);
+            } else {
+                $targetContext = new ClassContext($classFqcn);
+            }
+            $classFqcn = $this->parseType($targetContext);
             if ($classFqcn === null) {
                 $resolved[$classFqcn] = true;
                 continue;
@@ -130,7 +144,7 @@ class ClassAst
             }
 
             // fqcn is same with current target class, skip to avoid infinite loop
-            if ($this->fqcn() === $classFqcn) {
+            if ($currentContextFqcn === $classFqcn) {
                 $resolved[$classFqcn] = true;
                 continue;
             }
@@ -164,7 +178,7 @@ class ClassAst
         // extract method nodes
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $methodNodes[] = new MethodNode($this->namespace, $node);
+                $methodNodes[] = new MethodNode($this->context, $node);
             }
         }
 
@@ -281,7 +295,6 @@ class ClassAst
         return $list;
     }
 
-
     /**
      * @return string[]
      */
@@ -303,7 +316,7 @@ class ClassAst
 
     public function treeNode(): ClassTreeNode
     {
-        return new ClassTreeNode($this->fqcn());
+        return new ClassTreeNode($this->context);
     }
 
     /**
@@ -311,10 +324,8 @@ class ClassAst
      */
     public function fqcn(): string
     {
-        if ($this->namespace) {
-            return $this->namespace . '\\' . $this->className;
-        }
-        return $this->className;
+        // TODO weird
+        return $this->context->fqcn();
     }
 
     /**

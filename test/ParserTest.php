@@ -5,6 +5,7 @@ namespace shmurakami\Spice\Test;
 use BreakingPsr;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\Client;
@@ -42,49 +43,49 @@ class ParserTest extends TestCase
             BreakingPsr::class => __DIR__ . '/../src/Example/other/BreakingPsr.php',
         ]);
 
-        $classAst = (new AstLoader($classMap))->loadByClass(Client::class);
+        $classAst = (new AstLoader($classMap))->loadByClass(new ClassContext(Client::class));
         $actual = $parser->buildClassTree($classAst, $classMap);
 
-        $applicationTree = new ClassTree(new ClassTreeNode(Application::class));
+        $applicationTree = new ClassTree(new ClassTreeNode(new ClassContext(Application::class)));
 
-        $importedClassTree = new ClassTree(new ClassTreeNode(ByImport::class));
+        $importedClassTree = new ClassTree(new ClassTreeNode(new ClassContext(ByImport::class)));
         $applicationTree->add($importedClassTree);
 
-        $inheritClassTree = new ClassTree(new ClassTreeNode(InheritClass::class));
+        $inheritClassTree = new ClassTree(new ClassTreeNode(new ClassContext(InheritClass::class)));
         // depended class also has own tree
-        $inheritDependencyClassTree = new ClassTree(new ClassTreeNode(InheritDependency::class));
+        $inheritDependencyClassTree = new ClassTree(new ClassTreeNode(new ClassContext(InheritDependency::class)));
         $inheritClassTree->add($inheritDependencyClassTree);
         $applicationTree->add($inheritClassTree);
 
-        $interfaceClassTree = new ClassTree(new ClassTreeNode(Implement1::class));
-        $interfaceClassTree2 = new ClassTree(new ClassTreeNode(Implement2::class));
+        $interfaceClassTree = new ClassTree(new ClassTreeNode(new ClassContext(Implement1::class)));
+        $interfaceClassTree2 = new ClassTree(new ClassTreeNode(new ClassContext(Implement2::class)));
         $applicationTree->add($interfaceClassTree);
         $applicationTree->add($interfaceClassTree2);
 
-        $traitClassTree = new ClassTree(new ClassTreeNode(UsingTrait::class));
+        $traitClassTree = new ClassTree(new ClassTreeNode(new ClassContext(UsingTrait::class)));
         $applicationTree->add($traitClassTree);
 
-        $methodDocCommentTree = new ClassTree(new ClassTreeNode(DocComment::class));
-        $methodTypeHintingTree = new ClassTree(new ClassTreeNode(TypeHinting::class));
+        $methodDocCommentTree = new ClassTree(new ClassTreeNode(new ClassContext(DocComment::class)));
+        $methodTypeHintingTree = new ClassTree(new ClassTreeNode(new ClassContext(TypeHinting::class)));
         $applicationTree->add($methodDocCommentTree);
         $applicationTree->add($methodTypeHintingTree);
 
-        $returnTypeTree = new ClassTree(new ClassTreeNode(ReturnType::class));
-        $returnInDocCommentTree = new ClassTree(new ClassTreeNode(ReturnInDocComment::class));
+        $returnTypeTree = new ClassTree(new ClassTreeNode(new ClassContext(ReturnType::class)));
+        $returnInDocCommentTree = new ClassTree(new ClassTreeNode(new ClassContext(ReturnInDocComment::class)));
         $applicationTree->add($returnTypeTree);
         $applicationTree->add($returnInDocCommentTree);
 
 
-        $simplyNewTree = new ClassTree(new ClassTreeNode(SimplyNew::class));
+        $simplyNewTree = new ClassTree(new ClassTreeNode(new ClassContext(SimplyNew::class)));
         $applicationTree->add($simplyNewTree);
 
-        $newInClosureTree = new ClassTree(new ClassTreeNode(NewInClosure::class));
+        $newInClosureTree = new ClassTree(new ClassTreeNode(new ClassContext(NewInClosure::class)));
         $applicationTree->add($newInClosureTree);
 
         // new statement has nested dependencies
-        $newStatementTree = new ClassTree(new ClassTreeNode(NewStatement::class));
-        $newStatementArgumentTree = new ClassTree(new ClassTreeNode(NewStatementArgument::class));
-        $newStatementArgumentArgumentTree = new ClassTree(new ClassTreeNode(NewStatementArgumentArgument::class));
+        $newStatementTree = new ClassTree(new ClassTreeNode(new ClassContext(NewStatement::class)));
+        $newStatementArgumentTree = new ClassTree(new ClassTreeNode(new ClassContext(NewStatementArgument::class)));
+        $newStatementArgumentArgumentTree = new ClassTree(new ClassTreeNode(new ClassContext(NewStatementArgumentArgument::class)));
         $newStatementArgumentTree->add($newStatementArgumentArgumentTree);
         $newStatementTree->add($newStatementArgumentTree);
 
@@ -93,22 +94,22 @@ class ParserTest extends TestCase
         $applicationTree->add($newStatementArgumentArgumentTree);
 
         // static method call
-        $staticMethodCallTree = new ClassTree(new ClassTreeNode(StaticMethodCall::class));
-        $staticMethodCallArgumentTree = new ClassTree(new ClassTreeNode(StaticMethodCallArgument::class));
+        $staticMethodCallTree = new ClassTree(new ClassTreeNode(new ClassContext(StaticMethodCall::class)));
+        $staticMethodCallArgumentTree = new ClassTree(new ClassTreeNode(new ClassContext(StaticMethodCallArgument::class)));
         $staticMethodCallTree->add($staticMethodCallArgumentTree);
         $applicationTree->add($staticMethodCallTree);
         $applicationTree->add($staticMethodCallArgumentTree);
 
         // breaking PSR-4 rule class
-        $breakingPsrClassTree = new ClassTree(new ClassTreeNode(BreakingPsr::class));
+        $breakingPsrClassTree = new ClassTree(new ClassTreeNode(new ClassContext(BreakingPsr::class)));
         $applicationTree->add($breakingPsrClassTree);
 
         // root client tree
-        $clientTree = new ClassTree(new ClassTreeNode(Client::class));
+        $clientTree = new ClassTree(new ClassTreeNode(new ClassContext(Client::class)));
         $clientTree->add($applicationTree);
 
         // client has other dependency
-        $extendApplicationTree = new ClassTree(new ClassTreeNode(ExtendApplication::class));
+        $extendApplicationTree = new ClassTree(new ClassTreeNode(new ClassContext(ExtendApplication::class)));
         $clientTree->add($extendApplicationTree);
 
         $expect = $clientTree;

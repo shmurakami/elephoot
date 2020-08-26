@@ -3,6 +3,8 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Context\ClassContext;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Ast\Parser\TypeParser;
 
@@ -31,12 +33,16 @@ class ClassProperty
      * @var string
      */
     private $docComment;
+    /**
+     * @var Context
+     */
+    private $context;
 
-    public function __construct(string $namespace, string $className, Node $propertyNode)
+    public function __construct(Context $context, Node $propertyNode)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
+        $this->context = $context;
         $this->propertyNode = $propertyNode;
+        $this->namespace = $context->extractNamespace();
 
         // retrieve doc comment
 
@@ -61,8 +67,13 @@ class ClassProperty
         }
 
         $classFqcnListInComment = $this->parseDocComment($this->docComment, '@var');
-        return array_map(function (string $fqcn) {
-            return $this->parseType($this->namespace, $fqcn);
+        return array_map(function (string $className) {
+            if ($this->isFqcn($className)) {
+                $context = new ClassContext($className);
+            } else {
+                $context = new ClassContext($this->namespace . '\\' . $className);
+            }
+            return $this->parseType($context);
         }, $classFqcnListInComment);
     }
 }

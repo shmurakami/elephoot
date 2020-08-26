@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Ast\Context;
 
-class MethodContext implements Context
+class ClassContext implements Context
 {
     use ContextBehavior;
 
@@ -10,19 +10,13 @@ class MethodContext implements Context
      * @var string
      */
     private $fqcn;
-    /**
-     * @var string
-     */
-    private $method;
 
     /**
-     * MethodContext constructor.
+     * Context constructor.
      */
-    public function __construct(string $fqcn, string $method)
+    public function __construct(string $fqcn)
     {
         $this->fqcn = $fqcn;
-        $this->method = $method;
-
         $this->extractNamespaceAndClass($fqcn);
     }
 
@@ -34,6 +28,6 @@ class MethodContext implements Context
 
     public function fullName(): string
     {
-        return $this->fqcn() . '@' . $this->method;
+        return $this->fqcn();
     }
 }

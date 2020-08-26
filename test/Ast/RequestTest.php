@@ -4,7 +4,7 @@ namespace shmurakami\Spice\Test\Ast;
 
 use BreakingPsr;
 use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Test\TestCase;
@@ -24,7 +24,7 @@ class RequestTest extends TestCase
     public function testGetTargetByClass()
     {
         $targetClass = Request::class;
-        $expect = new Context('shmurakami\\Spice\\Ast\\Request');
+        $expect = new ClassContext('shmurakami\\Spice\\Ast\\Request');
 
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
         $this->assertEquals($expect, $request->getTarget());
@@ -47,28 +47,7 @@ class RequestTest extends TestCase
 
         // even combined, prior argument
         $request = new Request(Request::MODE_CLASS, $targetClass, '', __DIR__ . '/resource/config_target_method.json');
-        $this->assertEquals(new Context($targetClass), $request->getTarget());
-    }
-
-    /**
-     * @dataProvider dataProviderForTestIsClassMode
-     */
-    public function testIsClassMode(string $mode, string $configFile, bool $expect)
-    {
-        $request = new Request($mode, '', '', $configFile);
-        $this->assertSame($expect, $request->isClassMode());
-    }
-
-    public function dataProviderForTestIsClassMode()
-    {
-        return [
-            ['',                   __DIR__ . '/resource/config.json', true],
-            [Request::MODE_METHOD, __DIR__ . '/resource/config.json', false],
-            ['',                  __DIR__ . '/resource/config_target_method.json', false],
-            [Request::MODE_CLASS, __DIR__ . '/resource/config_target_method.json', true],
-            [Request::MODE_METHOD, '', false],
-            [Request::MODE_CLASS,  '', true],
-        ];
+        $this->assertEquals(new ClassContext($targetClass), $request->getTarget());
     }
 
     public function testIsValid()

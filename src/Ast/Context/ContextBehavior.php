@@ -25,4 +25,14 @@ trait ContextBehavior
         $this->className = end($parts);
     }
 
+    public function hasNamespace(): bool
+    {
+        return (bool)$this->namespace;
+    }
+
+    public function extractNamespace(): string
+    {
+        return $this->namespace;
+    }
+
 }

@@ -5,6 +5,8 @@ namespace shmurakami\Spice;
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\ClassContext;
+use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Request;
@@ -31,23 +33,23 @@ class Parser
 
     public function parse()
     {
-        ['class' => $classFqcn, 'method' => $method] = $this->request->getTarget();
+        $context = $this->request->getTarget();
 
-        if ($this->request->isClassMode()) {
-            $this->parseByClass($classFqcn);
+        if ($context instanceof ClassContext) {
+            $this->parseByClass($context);
             return;
         }
-        $this->parseByMethod($classFqcn, $method);
+
+        /** @var MethodContext $context */
+        $this->parseByMethod($context);
     }
 
     /**
-     * @param string $classFqcn
-     * @param string $methodName
      * @throws Exception\ClassNotFoundException
      * @throws ReflectionException
      * @throws Exception\MethodNotFoundException
      */
-    public function parseByMethod(string $classFqcn, string $methodName): void
+    public function parseByMethod(MethodContext $context): void
     {
         /*
          * parse AST for Class and method
@@ -55,17 +57,17 @@ class Parser
          *
          * output graph
          */
-        $classAst = (new AstLoader())->loadByClass($classFqcn);
-        $methodAst = $classAst->parseMethod($methodName);
+//        $classAst = (new AstLoader())->loadByClass($classFqcn);
+//        $methodAst = $classAst->parseMethod($methodName);
 
-        $methodCallTree = $this->buildMethodCallTree($methodAst);
+//        $methodCallTree = $this->buildMethodCallTree($methodAst);
         // TODO output from methodCallTree
     }
 
-    public function parseByClass(string $classFqcn): void
+    public function parseByClass(ClassContext $context): void
     {
         $classMap = $this->request->getClassMap();
-        $classAst = (new AstLoader($classMap))->loadByClass($classFqcn);
+        $classAst = (new AstLoader($classMap))->loadByClass($context);
         $classTree = $this->buildClassTree($classAst, $classMap);
         $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
         $drawer = new Drawer($graphpAdaptor);

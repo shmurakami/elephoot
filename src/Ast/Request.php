@@ -3,8 +3,8 @@
 namespace shmurakami\Spice\Ast;
 
 use InvalidArgumentException;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Context\ContextInterface;
 use shmurakami\Spice\Ast\Context\MethodContext;
 
 class Request
@@ -59,7 +59,7 @@ class Request
         return $default;
     }
 
-    public function getTarget(): ContextInterface
+    public function getTarget(): Context
     {
         $target = $this->configure['target'] ?? '';
         if ($this->target) {
@@ -76,16 +76,7 @@ class Request
         if ($method) {
             return new MethodContext($class, $method);
         }
-        return new Context($class);
-    }
-
-    public function isClassMode(): bool
-    {
-        $mode = $this->configure['mode'] ?? self::MODE_CLASS;
-        if ($this->mode) {
-            $mode = $this->mode;
-        }
-        return strtoupper($mode) === self::MODE_CLASS;
+        return new ClassContext($class);
     }
 
     private function parseConfigFile(string $filepath): array

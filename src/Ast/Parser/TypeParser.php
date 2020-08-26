@@ -2,23 +2,23 @@
 
 namespace shmurakami\Spice\Ast\Parser;
 
+use shmurakami\Spice\Ast\Context\Context;
+
 trait TypeParser
 {
     /**
-     * @param string $namespace
-     * @param string $className
      * @return string|null
      */
-    private function parseType(string $namespace, $className)
+    private function parseType(Context $context): ?string
     {
-        $className = trim($className);
+        $className = $context->fqcn();
 
         if ($this->isNotSupportedPhpBaseType($className)) {
             return null;
         }
 
         // if namespace is blank, namespaced dependencies must have fqcn
-        if ($namespace === '') {
+        if (!$context->hasNamespace()) {
             return $className;
         }
 

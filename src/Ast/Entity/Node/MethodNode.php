@@ -3,6 +3,7 @@
 namespace shmurakami\Spice\Ast\Entity\Node;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Stub\Kind;
@@ -21,9 +22,9 @@ class MethodNode
      */
     private $node;
 
-    public function __construct(string $namespace, Node $node)
+    public function __construct(Context $context, Node $node)
     {
-        $this->namespace = $namespace;
+        $this->namespace = $context->extractNamespace();
         $this->node = $node;
     }
 
@@ -38,7 +39,8 @@ class MethodNode
         $doComment = $this->node->children['docComment'] ?? '';
         $typeNames = $this->parseDocComment($doComment, '@param');
         foreach ($typeNames as $typeName) {
-            $classFqcn = $this->parseType($this->namespace, $typeName);
+            $context = $this->toContext($this->namespace, $typeName);
+            $classFqcn = $this->parseType($context);
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;
             }
@@ -52,7 +54,8 @@ class MethodNode
         }, $argumentNodes);
         foreach ($typeNames as $typeName) {
             if ($typeName) {
-                $classFqcn = $this->parseType($this->namespace, $typeName);
+                $context = $this->toContext($this->namespace, $typeName);
+                $classFqcn = $this->parseType($context);
                 if ($classFqcn) {
                     $dependencyClassFqcnList[] = $classFqcn;
                 }
@@ -65,9 +68,10 @@ class MethodNode
         if ($returnTypeNode
             && ($returnTypeNode->kind === Kind::AST_TYPE || $returnTypeNode->kind === Kind::AST_NULLABLE_TYPE)
         ) {
-            $type = $returnTypeNode->children['type']->children['name'] ?? '';
-            if ($type) {
-                $classFqcn = $this->parseType($this->namespace, $type);
+            $typeName = $returnTypeNode->children['type']->children['name'] ?? '';
+            if ($typeName) {
+                $context = $this->toContext($this->namespace, $typeName);
+                $classFqcn = $this->parseType($context);
                 if ($classFqcn) {
                     $dependencyClassFqcnList[] = $classFqcn;
                 }
@@ -79,7 +83,8 @@ class MethodNode
         $doComment = $this->node->children['docComment'] ?? '';
         $typeNames = $this->parseDocComment($doComment, '@return');
         foreach ($typeNames as $typeName) {
-            $classFqcn = $this->parseType($this->namespace, $typeName);
+            $context = $this->toContext($this->namespace, $typeName);
+            $classFqcn = $this->parseType($context);
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;
             }

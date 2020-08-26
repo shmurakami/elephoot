@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Test\Ast\Entity;
 
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Entity\ClassProperty;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\ExtendApplication;
@@ -21,28 +22,28 @@ class ClassPropertyTest extends TestCase
 
         //
         $unionTypesWithAdditionalComment = $propertyNodes[0];
-        $classProperty = new ClassProperty($namespace, $className, $unionTypesWithAdditionalComment);
+        $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $unionTypesWithAdditionalComment);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [Application::class, ExtendApplication::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $fqcnType = $propertyNodes[1];
-        $classProperty = new ClassProperty($namespace, $className, $fqcnType);
+        $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $fqcnType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [Application::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $simpleType = $propertyNodes[2];
-        $classProperty = new ClassProperty($namespace, $className, $simpleType);
+        $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $simpleType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         $expect = [ExtendApplication::class];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $wrongType = $propertyNodes[3];
-        $classProperty = new ClassProperty($namespace, $className, $wrongType);
+        $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $wrongType);
         $fqcnList = $classProperty->classFqcnListFromDocComment();
         // does not exist but parsable as string in ClassProperty context
         $expect = ["shmurakami\\Spice\\Example\\NotExistingClass"];

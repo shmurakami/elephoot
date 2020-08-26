@@ -8,15 +8,15 @@ use PHPUnit\Framework\TestCase;
 class MethodContextTest extends TestCase
 {
 
-    public function testFqcn()
+    public function testFullName()
     {
         $context = new MethodContext('Foo\\Bar\\Class', 'method');
-        $this->assertEquals('Foo\\Bar\\Class@method', $context->fqcn());
+        $this->assertEquals('Foo\\Bar\\Class@method', $context->fullName());
     }
 
-    public function testGlobalNamespace()
+    public function testGlobalNamespaceFullname()
     {
         $context = new MethodContext('Class', 'method');
-        $this->assertEquals('\\Class@method', $context->fqcn());
+        $this->assertEquals('\\Class@method', $context->fullName());
     }
 }

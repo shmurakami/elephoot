@@ -20,8 +20,8 @@ class ClassMap
         return isset($this->classMap[$classFqcn]);
     }
 
-    public function filepathByFqcn(string $classFqcn): ?string
+    public function filepathByFqcn(string $classFqcn): string
     {
-        return $this->classMap[$classFqcn] ?? null;
+        return $this->classMap[$classFqcn] ?? '';
     }
 }
