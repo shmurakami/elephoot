@@ -66,14 +66,9 @@ class ClassProperty
             return [];
         }
 
-        $classFqcnListInComment = $this->parseDocComment($this->docComment, '@var');
-        return array_map(function (string $className) {
-            if ($this->isFqcn($className)) {
-                $context = new ClassContext($className);
-            } else {
-                $context = new ClassContext($this->namespace . '\\' . $className);
-            }
+        $classContextListInComment = $this->parseDocComment($this->context, $this->docComment, '@var');
+        return array_map(function (Context $context) {
             return $this->parseType($context);
-        }, $classFqcnListInComment);
+        }, $classContextListInComment);
     }
 }

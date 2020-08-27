@@ -21,9 +21,14 @@ class MethodNode
      * @var Node
      */
     private $node;
+    /**
+     * @var Context
+     */
+    private $context;
 
     public function __construct(Context $context, Node $node)
     {
+        $this->context = $context;
         $this->namespace = $context->extractNamespace();
         $this->node = $node;
     }
@@ -37,9 +42,8 @@ class MethodNode
 
         // doc comment
         $doComment = $this->node->children['docComment'] ?? '';
-        $typeNames = $this->parseDocComment($doComment, '@param');
-        foreach ($typeNames as $typeName) {
-            $context = $this->toContext($this->namespace, $typeName);
+        $contexts = $this->parseDocComment($this->context, $doComment, '@param');
+        foreach ($contexts as $context) {
             $classFqcn = $this->parseType($context);
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;
@@ -81,9 +85,8 @@ class MethodNode
         // return type in doc comment
         // redundant to parse doc comment again?
         $doComment = $this->node->children['docComment'] ?? '';
-        $typeNames = $this->parseDocComment($doComment, '@return');
-        foreach ($typeNames as $typeName) {
-            $context = $this->toContext($this->namespace, $typeName);
+        $contexts = $this->parseDocComment($this->context, $doComment, '@return');
+        foreach ($contexts as $context) {
             $classFqcn = $this->parseType($context);
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;

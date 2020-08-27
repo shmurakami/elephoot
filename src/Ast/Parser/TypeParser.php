@@ -7,6 +7,7 @@ use shmurakami\Spice\Ast\Context\Context;
 trait TypeParser
 {
     /**
+     * TODO what is this method for...?
      * @return string|null
      */
     private function parseType(Context $context): ?string
