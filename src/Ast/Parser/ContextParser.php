@@ -24,10 +24,21 @@ class ContextParser
             return null;
         }
 
-        if ($this->isFqcn($className)) {
+        if ($this->isFqcn($className) || $context = $this->contextIfValidClass($className)) {
             return new ClassContext($className);
         }
-        return new ClassContext($contextNamespace . '\\' . $className);
+        return $this->contextIfValidClass($contextNamespace . '\\' . $className);
+    }
+
+    private function contextIfValidClass(string $class): ?Context
+    {
+        if (class_exists($class)) {
+            return new ClassContext($class);
+        }
+        if ($this->classMap->registered($class)) {
+            return new ClassContext($class);
+        }
+        return null;
     }
 
     private function isFqcn(string $className): bool

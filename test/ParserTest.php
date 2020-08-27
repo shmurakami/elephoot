@@ -101,7 +101,7 @@ class ParserTest extends TestCase
         $applicationTree->add($staticMethodCallArgumentTree);
 
         // breaking PSR-4 rule class
-        $breakingPsrClassTree = new ClassTree(new ClassTreeNode(new ClassContext(BreakingPsr::class)));
+        $breakingPsrClassTree = new ClassTree(new ClassTreeNode(new ClassContext('\\' . BreakingPsr::class)));
         $applicationTree->add($breakingPsrClassTree);
 
         // root client tree

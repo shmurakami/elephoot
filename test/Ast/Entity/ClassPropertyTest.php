@@ -49,8 +49,8 @@ class ClassPropertyTest extends TestCase
         $wrongType = $propertyNodes[3];
         $classProperty = new ClassProperty($contextParser, new ClassContext($namespace . '\\' . $className), $wrongType);
         $fqcnList = $classProperty->classContextListFromDocComment();
-        // does not exist but parsable as string in ClassProperty context
-        $expect = [new ClassContext("shmurakami\\Spice\\Example\\NotExistingClass")];
+        // not exist class should be omitted
+        $expect = [];
         $this->assertEquals($expect, $fqcnList);
     }
 

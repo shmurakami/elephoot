@@ -145,18 +145,6 @@ class ClassAst
             $classAst = $classAstResolver->resolve($context->fqcn());
             if ($classAst) {
                 $dependencies[$targetFqcn] = $classAst;
-            } else {
-                // this block for bug. global scope class should be given as global scope context
-                // FIXME bug source is SomeClass.toContext
-
-                // search global scope class from namespaced class
-                $className = $context->extractClassName();
-                if (!isset($dependencies[$className])) {
-                    $classAst = $classAstResolver->resolve($className);
-                    if ($classAst) {
-                        $dependencies[$className] = $classAst;
-                    }
-                }
             }
 
             $resolved[$targetFqcn] = true;
