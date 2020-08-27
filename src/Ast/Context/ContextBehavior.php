@@ -35,4 +35,9 @@ trait ContextBehavior
         return $this->namespace;
     }
 
+    public function extractClassName(): string
+    {
+        return $this->className;
+    }
+
 }

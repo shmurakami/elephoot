@@ -14,5 +14,6 @@ interface Context
      * should avoid leaking field
      */
     public function extractNamespace(): string;
+    public function extractClassName(): string;
 
 }

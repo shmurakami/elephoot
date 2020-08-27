@@ -3,7 +3,6 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Ast\Parser\TypeParser;
@@ -16,19 +15,7 @@ class ClassProperty
     /**
      * @var string
      */
-    private $namespace;
-    /**
-     * @var string
-     */
     private $className;
-    /**
-     * @var Node
-     */
-    private $propertyNode;
-    /**
-     * @var string
-     */
-    private $propertyName;
     /**
      * @var string
      */
@@ -41,8 +28,6 @@ class ClassProperty
     public function __construct(Context $context, Node $propertyNode)
     {
         $this->context = $context;
-        $this->propertyNode = $propertyNode;
-        $this->namespace = $context->extractNamespace();
 
         // retrieve doc comment
 
@@ -50,7 +35,6 @@ class ClassProperty
         $propDeclaration = $propertyNode->children['props'];
         /** @var Node $propElement */
         $propElement = $propDeclaration->children[0];
-        $this->propertyName = $propElement->children['name'];
         $this->docComment = $propElement->children['docComment'] ?? '';
     }
 
@@ -58,17 +42,14 @@ class ClassProperty
      * parse doc comment
      * return AstEntity if this property is class instance
      *
-     * @return string[]
+     * @return Context[]
      */
-    public function classFqcnListFromDocComment(): array
+    public function classContextListFromDocComment(): array
     {
         if ($this->docComment === '') {
             return [];
         }
 
-        $classContextListInComment = $this->parseDocComment($this->context, $this->docComment, '@var');
-        return array_map(function (Context $context) {
-            return $this->parseType($context);
-        }, $classContextListInComment);
+        return $this->parseDocComment($this->context, $this->docComment, '@var');
     }
 }

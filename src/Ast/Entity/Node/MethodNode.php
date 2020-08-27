@@ -34,6 +34,7 @@ class MethodNode
     }
 
     /**
+     * FIXME should return Context
      * @return string[]
      */
     public function parse()
