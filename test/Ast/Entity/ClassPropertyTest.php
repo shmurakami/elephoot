@@ -24,21 +24,21 @@ class ClassPropertyTest extends TestCase
         $unionTypesWithAdditionalComment = $propertyNodes[0];
         $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $unionTypesWithAdditionalComment);
         $fqcnList = $classProperty->classContextListFromDocComment();
-        $expect = [Application::class, ExtendApplication::class];
+        $expect = [new ClassContext(Application::class), new ClassContext(ExtendApplication::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $fqcnType = $propertyNodes[1];
         $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $fqcnType);
         $fqcnList = $classProperty->classContextListFromDocComment();
-        $expect = [Application::class];
+        $expect = [new ClassContext(Application::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $simpleType = $propertyNodes[2];
         $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $simpleType);
         $fqcnList = $classProperty->classContextListFromDocComment();
-        $expect = [ExtendApplication::class];
+        $expect = [new ClassContext(ExtendApplication::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
@@ -46,7 +46,7 @@ class ClassPropertyTest extends TestCase
         $classProperty = new ClassProperty(new ClassContext($namespace . '\\' . $className), $wrongType);
         $fqcnList = $classProperty->classContextListFromDocComment();
         // does not exist but parsable as string in ClassProperty context
-        $expect = ["shmurakami\\Spice\\Example\\NotExistingClass"];
+        $expect = [new ClassContext("shmurakami\\Spice\\Example\\NotExistingClass")];
         $this->assertEquals($expect, $fqcnList);
     }
 
