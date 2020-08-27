@@ -178,23 +178,18 @@ class ClassAst
             }
         }
 
-        // retrieve class fqcn from method node
-        $classFqcn = [];
+        $dependencyContexts = [];
         foreach ($methodNodes as $methodNode) {
-            $fqcnList = $methodNode->parse();
-            foreach ($fqcnList as $fqcn) {
-                $classFqcn[] = $fqcn;
+            foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
+                $fqcn = $context->fqcn();
+                if (isset($dependencyContexts[$fqcn])) {
+                    continue;
+                }
+                $dependencyContexts[$fqcn] = $context;
             }
         }
 
-        $contexts = [];
-        foreach (array_unique($classFqcn) as $fqcn) {
-            $context = $this->toContext($this->namespace, $fqcn);
-            if ($context) {
-                $contexts[] = $context;
-            }
-        }
-        return $contexts;
+        return array_values($dependencyContexts);
     }
 
     /**

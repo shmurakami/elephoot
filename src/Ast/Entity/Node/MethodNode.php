@@ -32,21 +32,17 @@ class MethodNode
     }
 
     /**
-     * FIXME should return Context
-     * @return string[]
+     * @return Context[]
      */
-    public function parse()
+    public function parseMethodAttributeToContexts()
     {
-        $dependencyClassFqcnList = [];
+        $dependencyContexts = [];
 
         // doc comment
         $doComment = $this->node->children['docComment'] ?? '';
         $contexts = $this->parseDocComment($this->context, $doComment, '@param');
         foreach ($contexts as $context) {
-            $classFqcn = $context->fqcn();
-            if ($classFqcn) {
-                $dependencyClassFqcnList[] = $classFqcn;
-            }
+            $dependencyContexts[] = $context;
         }
 
         // type hinting
@@ -59,10 +55,7 @@ class MethodNode
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
                 if ($context) {
-                    $classFqcn = $context->fqcn();
-                    if ($classFqcn) {
-                        $dependencyClassFqcnList[] = $classFqcn;
-                    }
+                    $dependencyContexts[] = $context;
                 }
             }
         }
@@ -77,10 +70,7 @@ class MethodNode
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
                 if ($context) {
-                    $classFqcn = $context->fqcn();
-                    if ($classFqcn) {
-                        $dependencyClassFqcnList[] = $classFqcn;
-                    }
+                    $dependencyContexts[] = $context;
                 }
             }
         }
@@ -90,13 +80,19 @@ class MethodNode
         $doComment = $this->node->children['docComment'] ?? '';
         $contexts = $this->parseDocComment($this->context, $doComment, '@return');
         foreach ($contexts as $context) {
-            $classFqcn = $context->fqcn();
-            if ($classFqcn) {
-                $dependencyClassFqcnList[] = $classFqcn;
-            }
+            $dependencyContexts[] = $context;
         }
 
-        return array_unique($dependencyClassFqcnList);
+        $uniqueDependencyContexts = [];
+        foreach ($dependencyContexts as $context) {
+            $fqcn = $context->fqcn();
+            if (isset($uniqueDependencyContexts[$fqcn])) {
+                continue;
+            }
+            $uniqueDependencyContexts[$fqcn] = $context;
+        }
+        // fqcn key is not needed
+        return array_values($uniqueDependencyContexts);
     }
 
 }
