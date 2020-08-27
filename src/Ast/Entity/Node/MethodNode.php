@@ -5,13 +5,11 @@ namespace shmurakami\Spice\Ast\Entity\Node;
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
-use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Stub\Kind;
 
 class MethodNode
 {
     use DocCommentParser;
-    use TypeParser;
 
     /**
      * @var string
@@ -45,7 +43,7 @@ class MethodNode
         $doComment = $this->node->children['docComment'] ?? '';
         $contexts = $this->parseDocComment($this->context, $doComment, '@param');
         foreach ($contexts as $context) {
-            $classFqcn = $this->parseType($context);
+            $classFqcn = $context->fqcn();
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;
             }
@@ -61,7 +59,7 @@ class MethodNode
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
                 if ($context) {
-                    $classFqcn = $this->parseType($context);
+                    $classFqcn = $context->fqcn();
                     if ($classFqcn) {
                         $dependencyClassFqcnList[] = $classFqcn;
                     }
@@ -79,7 +77,7 @@ class MethodNode
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
                 if ($context) {
-                    $classFqcn = $this->parseType($context);
+                    $classFqcn = $context->fqcn();
                     if ($classFqcn) {
                         $dependencyClassFqcnList[] = $classFqcn;
                     }
@@ -92,7 +90,7 @@ class MethodNode
         $doComment = $this->node->children['docComment'] ?? '';
         $contexts = $this->parseDocComment($this->context, $doComment, '@return');
         foreach ($contexts as $context) {
-            $classFqcn = $this->parseType($context);
+            $classFqcn = $context->fqcn();
             if ($classFqcn) {
                 $dependencyClassFqcnList[] = $classFqcn;
             }

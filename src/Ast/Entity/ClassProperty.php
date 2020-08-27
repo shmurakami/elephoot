@@ -5,11 +5,9 @@ namespace shmurakami\Spice\Ast\Entity;
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
-use shmurakami\Spice\Ast\Parser\TypeParser;
 
 class ClassProperty
 {
-    use TypeParser;
     use DocCommentParser;
 
     /**
