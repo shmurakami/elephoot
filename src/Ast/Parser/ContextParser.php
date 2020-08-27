@@ -2,17 +2,23 @@
 
 namespace shmurakami\Spice\Ast\Parser;
 
+use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
 
-trait ContextParser
+class ContextParser
 {
-    private function isFqcn(string $className): bool
+    /**
+     * @var ClassMap
+     */
+    private $classMap;
+
+    public function __construct(ClassMap $classMap)
     {
-        return strpos($className, '\\') !== false;
+        $this->classMap = $classMap;
     }
 
-    private function toContext(string $contextNamespace, string $className): ?Context
+    public function toContext(string $contextNamespace, string $className): ?Context
     {
         if ($this->isNotSupportedPhpBaseType($className)) {
             return null;
@@ -22,6 +28,11 @@ trait ContextParser
             return new ClassContext($className);
         }
         return new ClassContext($contextNamespace . '\\' . $className);
+    }
+
+    private function isFqcn(string $className): bool
+    {
+        return strpos($className, '\\') !== false;
     }
 
     private function isNotSupportedPhpBaseType(string $classType): bool

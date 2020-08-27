@@ -15,8 +15,6 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
-    use ContextParser;
-
     /**
      * @var ClassProperty[]
      */
@@ -37,12 +35,17 @@ class ClassAst
      * @var Context
      */
     private $context;
+    /**
+     * @var ContextParser
+     */
+    private $contextParser;
 
     /**
      * ClassAst constructor.
      */
-    public function __construct(Context $context, Node $classRootNode)
+    public function __construct(ContextParser $contextParser, Context $context, Node $classRootNode)
     {
+        $this->contextParser = $contextParser;
         $this->context = $context;
         $this->classRootNode = $classRootNode;
         $this->namespace = $context->extractNamespace();
@@ -54,7 +57,7 @@ class ClassAst
     {
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
-                $this->properties[] = new ClassProperty($context, $node);
+                $this->properties[] = new ClassProperty($this->contextParser, $context, $node);
             }
         }
     }
@@ -170,7 +173,7 @@ class ClassAst
         // extract method nodes
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $methodNode = new MethodNode($this->context, $node);
+                $methodNode = new MethodNode($this->contextParser, $this->context, $node);
                 foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
                     $fqcn = $context->fqcn();
                     if (isset($dependencyContexts[$fqcn])) {
@@ -212,7 +215,7 @@ class ClassAst
             if ($rightStatementNode->kind === Kind::AST_NEW) {
                 $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
                 foreach ($list as $f) {
-                    $context = $this->toContext($this->namespace, $f);
+                    $context = $this->contextParser->toContext($this->namespace, $f);
                     if ($context) {
                         $contextList[] = $context;
                     }
@@ -236,7 +239,7 @@ class ClassAst
             $staticMethodClassNode = $rootNode->children['class'] ?? null;
             if ($staticMethodClassNode) {
                 $newClassName = $staticMethodClassNode->children['name'];
-                $context = $this->toContext($this->namespace, $newClassName);
+                $context = $this->contextParser->toContext($this->namespace, $newClassName);
                 if ($context) {
                     $contextList[] = $context;
                 }
@@ -258,7 +261,7 @@ class ClassAst
         if ($kind === Kind::AST_NEW) {
             $list = $this->parseNewStatementFqcnList($rootNode, []);
             foreach ($list as $f) {
-                $context = $this->toContext($this->namespace, $f);
+                $context = $this->contextParser->toContext($this->namespace, $f);
                 if ($context) {
                     $contextList[] = $context;
                 }

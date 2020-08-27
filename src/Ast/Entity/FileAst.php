@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use shmurakami\Spice\Stub\Kind;
@@ -22,10 +23,15 @@ class FileAst
      * @var Context
      */
     private $context;
+    /**
+     * @var ContextParser
+     */
+    private $contextParser;
 
-    public function __construct(Node $rootNode, Context $context)
+    public function __construct(Node $rootNode, ContextParser $contextParser, Context $context)
     {
         $this->rootNode = $rootNode;
+        $this->contextParser = $contextParser;
         $this->context = $context;
     }
 
@@ -49,7 +55,7 @@ class FileAst
                 $nodeClassName =  $node->children['name'];
                 $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 if ($nodeClassFqcn === $this->context->fqcn()) {
-                    return new ClassAst($this->context, $node);
+                    return new ClassAst($this->contextParser, $this->context, $node);
                 }
             }
         }

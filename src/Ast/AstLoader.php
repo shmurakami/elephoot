@@ -4,10 +4,10 @@ namespace shmurakami\Spice\Ast;
 
 use ReflectionClass;
 use ReflectionException;
-use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\ClassAst;
 use shmurakami\Spice\Ast\Entity\FileAst;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Exception\ClassNotFoundException;
 use function ast\parse_file;
 
@@ -74,12 +74,12 @@ class AstLoader
         $rootNode = parse_file($fileName, 70);
 
         // should return ClassAst? who should parse namespace?
-        return new FileAst($rootNode, $context);
+        return new FileAst($rootNode, new ContextParser($this->classMap), $context);
     }
 
     private function loadFromFilepath(Context $context, string $filepath): FileAst
     {
         $rootNode = parse_file($filepath, 70);
-        return new FileAst($rootNode, $context);
+        return new FileAst($rootNode, new ContextParser($this->classMap), $context);
     }
 }

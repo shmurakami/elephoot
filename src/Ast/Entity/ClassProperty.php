@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 
 class ClassProperty
@@ -22,9 +23,14 @@ class ClassProperty
      * @var Context
      */
     private $context;
+    /**
+     * @var ContextParser
+     */
+    private $contextParser;
 
-    public function __construct(Context $context, Node $propertyNode)
+    public function __construct(ContextParser $contextParser, Context $context, Node $propertyNode)
     {
+        $this->contextParser = $contextParser;
         $this->context = $context;
 
         // retrieve doc comment
@@ -48,6 +54,6 @@ class ClassProperty
             return [];
         }
 
-        return $this->parseDocComment($this->context, $this->docComment, '@var');
+        return $this->parseDocComment($this->contextParser, $this->context, $this->docComment, '@var');
     }
 }

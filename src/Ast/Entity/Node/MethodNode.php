@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity\Node;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Parser\DocCommentParser;
 use shmurakami\Spice\Stub\Kind;
 
@@ -23,9 +24,14 @@ class MethodNode
      * @var Context
      */
     private $context;
+    /**
+     * @var ContextParser
+     */
+    private $contextParser;
 
-    public function __construct(Context $context, Node $node)
+    public function __construct(ContextParser $contextParser, Context $context, Node $node)
     {
+        $this->contextParser = $contextParser;
         $this->context = $context;
         $this->namespace = $context->extractNamespace();
         $this->node = $node;
@@ -40,7 +46,7 @@ class MethodNode
 
         // doc comment
         $doComment = $this->node->children['docComment'] ?? '';
-        $contexts = $this->parseDocComment($this->context, $doComment, '@param');
+        $contexts = $this->parseDocComment($this->contextParser, $this->context, $doComment, '@param');
         foreach ($contexts as $context) {
             $dependencyContexts[] = $context;
         }
@@ -53,7 +59,7 @@ class MethodNode
         }, $argumentNodes);
         foreach ($typeNames as $typeName) {
             if ($typeName) {
-                $context = $this->toContext($this->namespace, $typeName);
+                $context = $this->contextParser->toContext($this->namespace, $typeName);
                 if ($context) {
                     $dependencyContexts[] = $context;
                 }
@@ -68,7 +74,7 @@ class MethodNode
         ) {
             $typeName = $returnTypeNode->children['type']->children['name'] ?? '';
             if ($typeName) {
-                $context = $this->toContext($this->namespace, $typeName);
+                $context = $this->contextParser->toContext($this->namespace, $typeName);
                 if ($context) {
                     $dependencyContexts[] = $context;
                 }
@@ -78,7 +84,7 @@ class MethodNode
         // return type in doc comment
         // redundant to parse doc comment again?
         $doComment = $this->node->children['docComment'] ?? '';
-        $contexts = $this->parseDocComment($this->context, $doComment, '@return');
+        $contexts = $this->parseDocComment($this->contextParser, $this->context, $doComment, '@return');
         foreach ($contexts as $context) {
             $dependencyContexts[] = $context;
         }
