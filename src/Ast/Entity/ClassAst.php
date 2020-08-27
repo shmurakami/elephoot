@@ -7,7 +7,7 @@ use Generator;
 use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
-use shmurakami\Spice\Ast\Parser\DocCommentParser;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Parser\TypeParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
@@ -16,8 +16,7 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
-    // FIXME DocCommentParser is used for context conversion. move these methods to other
-    use DocCommentParser;
+    use ContextParser;
     use TypeParser;
 
     /**
