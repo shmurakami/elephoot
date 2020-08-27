@@ -60,9 +60,11 @@ class MethodNode
         foreach ($typeNames as $typeName) {
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
-                $classFqcn = $this->parseType($context);
-                if ($classFqcn) {
-                    $dependencyClassFqcnList[] = $classFqcn;
+                if ($context) {
+                    $classFqcn = $this->parseType($context);
+                    if ($classFqcn) {
+                        $dependencyClassFqcnList[] = $classFqcn;
+                    }
                 }
             }
         }
@@ -76,9 +78,11 @@ class MethodNode
             $typeName = $returnTypeNode->children['type']->children['name'] ?? '';
             if ($typeName) {
                 $context = $this->toContext($this->namespace, $typeName);
-                $classFqcn = $this->parseType($context);
-                if ($classFqcn) {
-                    $dependencyClassFqcnList[] = $classFqcn;
+                if ($context) {
+                    $classFqcn = $this->parseType($context);
+                    if ($classFqcn) {
+                        $dependencyClassFqcnList[] = $classFqcn;
+                    }
                 }
             }
         }

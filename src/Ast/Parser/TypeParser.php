@@ -14,10 +14,6 @@ trait TypeParser
     {
         $className = $context->fqcn();
 
-        if ($this->isNotSupportedPhpBaseType($className)) {
-            return null;
-        }
-
         // if namespace is blank, namespaced dependencies must have fqcn
         if (!$context->hasNamespace()) {
             return $className;
@@ -34,22 +30,4 @@ trait TypeParser
         return $className;
     }
 
-    private function isNotSupportedPhpBaseType(string $classType): bool
-    {
-        return in_array($classType, [
-            'int', 'integer',
-            'string',
-            'bool', 'boolean',
-            'float',
-            'double',
-            'object',
-            'array', // array can be callable...
-            'callable',
-            'iterable',
-            'mixed',
-            'number',
-            'void',
-            'null',
-        ], true);
-    }
 }

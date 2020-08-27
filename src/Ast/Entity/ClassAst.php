@@ -189,9 +189,14 @@ class ClassAst
             }
         }
 
-        return array_map(function (string $fqcn) {
-            return $this->toContext($this->namespace, $fqcn);
-        }, array_unique($classFqcn));
+        $contexts = [];
+        foreach (array_unique($classFqcn) as $fqcn) {
+            $context = $this->toContext($this->namespace, $fqcn);
+            if ($context) {
+                $contexts[] = $context;
+            }
+        }
+        return $contexts;
     }
 
     /**
@@ -222,7 +227,10 @@ class ClassAst
             if ($rightStatementNode->kind === Kind::AST_NEW) {
                 $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
                 foreach ($list as $f) {
-                    $contextList[] = $this->toContext($this->namespace, $f);
+                    $context = $this->toContext($this->namespace, $f);
+                    if ($context) {
+                        $contextList[] = $context;
+                    }
                 }
                 return $contextList;
             }
@@ -243,7 +251,10 @@ class ClassAst
             $staticMethodClassNode = $rootNode->children['class'] ?? null;
             if ($staticMethodClassNode) {
                 $newClassName = $staticMethodClassNode->children['name'];
-                $contextList[] = $this->toContext($this->namespace, $newClassName);
+                $context = $this->toContext($this->namespace, $newClassName);
+                if ($context) {
+                    $contextList[] = $context;
+                }
             }
 
             $argumentNodes = $rootNode->children['args']->children ?? [];
@@ -262,7 +273,10 @@ class ClassAst
         if ($kind === Kind::AST_NEW) {
             $list = $this->parseNewStatementFqcnList($rootNode, []);
             foreach ($list as $f) {
-                $contextList[] = $this->toContext($this->namespace, $f);
+                $context = $this->toContext($this->namespace, $f);
+                if ($context) {
+                    $contextList[] = $context;
+                }
             }
             return $contextList;
         }
