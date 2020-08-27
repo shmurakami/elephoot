@@ -166,26 +166,18 @@ class ClassAst
      */
     private function extractContextListFromMethodNodes(): array
     {
-        // FIXME redundant two loop
-
-        /** @var MethodNode[] $methodNodes */
-        $methodNodes = [];
-
+        $dependencyContexts = [];
         // extract method nodes
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $methodNodes[] = new MethodNode($this->context, $node);
-            }
-        }
-
-        $dependencyContexts = [];
-        foreach ($methodNodes as $methodNode) {
-            foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
-                $fqcn = $context->fqcn();
-                if (isset($dependencyContexts[$fqcn])) {
-                    continue;
+                $methodNode = new MethodNode($this->context, $node);
+                foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
+                    $fqcn = $context->fqcn();
+                    if (isset($dependencyContexts[$fqcn])) {
+                        continue;
+                    }
+                    $dependencyContexts[$fqcn] = $context;
                 }
-                $dependencyContexts[$fqcn] = $context;
             }
         }
 
