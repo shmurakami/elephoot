@@ -5,6 +5,7 @@ namespace shmurakami\Spice\Ast\Resolver;
 use ReflectionException;
 use shmurakami\Spice\Ast\AstLoader;
 use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Entity\FileAst;
 
 class FileAstResolver
@@ -34,7 +35,7 @@ class FileAstResolver
         }
 
         try {
-            $fileAst = (new AstLoader($this->classMap))->loadFileAst($className);
+            $fileAst = (new AstLoader($this->classMap))->loadFileAst(new ClassContext($className));
         } catch (ReflectionException $e) {
             // should log error anyway
             $fileAst = null;

@@ -81,6 +81,9 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
         return new \BreakingPsr();
     }
 
+    /**
+     * @return string
+     */
     private function internalMethod(): string
     {
         return 'Hello';

@@ -33,6 +33,7 @@ class MethodAst
      * @param Node $classNode
      * @param Node $methodRootNode
      */
+    // TODO change to MethodContext
     public function __construct(string $namespace, string $className, array $classProperties, Node $methodRootNode)
     {
         $this->namespace = $namespace;

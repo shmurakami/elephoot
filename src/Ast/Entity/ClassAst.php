@@ -4,8 +4,10 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use Generator;
+use shmurakami\Spice\Ast\Context\ClassContext;
+use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
-use shmurakami\Spice\Ast\Parser\TypeParser;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
 use shmurakami\Spice\Output\ClassTreeNode;
@@ -13,8 +15,6 @@ use shmurakami\Spice\Stub\Kind;
 
 class ClassAst
 {
-    use TypeParser;
-
     /**
      * @var ClassProperty[]
      */
@@ -31,24 +31,33 @@ class ClassAst
      * @var string
      */
     private $className;
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var ContextParser
+     */
+    private $contextParser;
 
     /**
      * ClassAst constructor.
      */
-    public function __construct(string $namespace, string $className, Node $classRootNode)
+    public function __construct(ContextParser $contextParser, Context $context, Node $classRootNode)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
+        $this->contextParser = $contextParser;
+        $this->context = $context;
         $this->classRootNode = $classRootNode;
+        $this->namespace = $context->extractNamespace();
 
-        $this->parseProperties($namespace, $className);
+        $this->parseProperties($context);
     }
 
-    private function parseProperties(string $namespace, string $className): void
+    private function parseProperties(Context $context): void
     {
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_PROP_GROUP) {
-                $this->properties[] = new ClassProperty($namespace, $className, $node);
+                $this->properties[] = new ClassProperty($this->contextParser, $context, $node);
             }
         }
     }
@@ -77,9 +86,9 @@ class ClassAst
     public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
-        $resolver = function(array $fqcnList) use ($dependentClassAstResolver) {
-            foreach ($fqcnList as $classFqcn) {
-                $dependentClassAstResolver->send($classFqcn);
+        $resolver = function (array $contexts) use ($dependentClassAstResolver) {
+            foreach ($contexts as $context) {
+                $dependentClassAstResolver->send($context);
             }
         };
 
@@ -88,11 +97,11 @@ class ClassAst
 
         // property, only need to parse doc comment
         foreach ($this->properties as $classProperty) {
-            $resolver($classProperty->classFqcnListFromDocComment());
+            $resolver($classProperty->classContextListFromDocComment());
         }
 
         // parse method
-        $resolver($this->extractClassFqcnFromMethodNodes());
+        $resolver($this->extractContextListFromMethodNodes());
 
         // parse new statements
         $resolver($this->parseNewStatement($this->classRootNode));
@@ -111,81 +120,68 @@ class ClassAst
         $resolved = [];
         $dependencies = [];
 
+        $currentContextFqcn = $this->context->fqcn();
+
         while (true) {
-            $classFqcn = yield;
+            /** @var Context $context */
+            $context = yield;
             // give null to finish
-            if ($classFqcn === null) {
+            if ($context === null) {
                 return $dependencies;
             }
 
-            $originalFqcn = $classFqcn;
-            $classFqcn = $this->parseType($this->namespace, $classFqcn);
-            if ($classFqcn === null) {
-                $resolved[$classFqcn] = true;
-                continue;
-            }
+            $targetFqcn = $context->fqcn();
 
-            if (isset($resolved[$classFqcn])) {
+            if (isset($resolved[$targetFqcn])) {
                 continue;
             }
 
             // fqcn is same with current target class, skip to avoid infinite loop
-            if ($this->fqcn() === $classFqcn) {
-                $resolved[$classFqcn] = true;
+            if ($currentContextFqcn === $targetFqcn) {
+                $resolved[$targetFqcn] = true;
                 continue;
             }
 
-            $classAst = $classAstResolver->resolve($classFqcn);
+            $classAst = $classAstResolver->resolve($context->fqcn());
             if ($classAst) {
-                $dependencies[$classFqcn] = $classAst;
-            } else {
-                // search global scope class from namespaced class
-                $isFqcnCompleted = $classFqcn !== $originalFqcn;
-                if ($isFqcnCompleted) {
-                    $classAst = $classAstResolver->resolve($originalFqcn);
-                    if ($classAst) {
-                        $dependencies[$originalFqcn] = $classAst;
-                    }
-                }
+                $dependencies[$targetFqcn] = $classAst;
             }
 
-            $resolved[$classFqcn] = true;
+            $resolved[$targetFqcn] = true;
         }
     }
 
     /**
-     * @return string[]
+     * FIXME this method may has bug
+     * @return Context[]
      */
-    private function extractClassFqcnFromMethodNodes(): array
+    private function extractContextListFromMethodNodes(): array
     {
-        /** @var MethodNode[] $methodNodes */
-        $methodNodes = [];
-
+        $dependencyContexts = [];
         // extract method nodes
         foreach ($this->statementNodes() as $node) {
             if ($node->kind === Kind::AST_METHOD) {
-                $methodNodes[] = new MethodNode($this->namespace, $node);
+                $methodNode = new MethodNode($this->contextParser, $this->context, $node);
+                foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
+                    $fqcn = $context->fqcn();
+                    if (isset($dependencyContexts[$fqcn])) {
+                        continue;
+                    }
+                    $dependencyContexts[$fqcn] = $context;
+                }
             }
         }
 
-        // retrieve class fqcn from method node
-        $classFqcn = [];
-        foreach ($methodNodes as $methodNode) {
-            $fqcnList = $methodNode->parse();
-            foreach ($fqcnList as $fqcn) {
-                $classFqcn[] = $fqcn;
-            }
-        }
-        return array_unique($classFqcn);
+        return array_values($dependencyContexts);
     }
 
     /**
      * digging class statement
      * TODO refactoring
      *
-     * @return string[]
+     * @return Context[]
      */
-    private function parseNewStatement(Node $rootNode, $fqcnList = []): array
+    private function parseNewStatement(Node $rootNode, $contextList = []): array
     {
         $kind = $rootNode->kind;
 
@@ -193,27 +189,30 @@ class ClassAst
         if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
             $statementNodes = $this->statementNodes($rootNode);
             foreach ($statementNodes as $statementNode) {
-                $fqcnList = $this->parseNewStatement($statementNode, $fqcnList);
+                $contextList = $this->parseNewStatement($statementNode, $contextList);
             }
-            return $fqcnList;
+            return $contextList;
         }
 
         // see right statement
         if (in_array($kind, [Kind::AST_ASSIGN, Kind::AST_RETURN])) {
             $rightStatementNode = $rootNode->children['expr'];
             if (!($rightStatementNode instanceof Node)) {
-                return $fqcnList;
+                return $contextList;
             }
             if ($rightStatementNode->kind === Kind::AST_NEW) {
                 $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
                 foreach ($list as $f) {
-                    $fqcnList[] = $f;
+                    $context = $this->contextParser->toContext($this->namespace, $f);
+                    if ($context) {
+                        $contextList[] = $context;
+                    }
                 }
-                return $fqcnList;
+                return $contextList;
             }
 
             if ($kind === Kind::AST_RETURN) {
-                return $this->parseNewStatement($rightStatementNode, $fqcnList);
+                return $this->parseNewStatement($rightStatementNode, $contextList);
             }
         }
 
@@ -228,17 +227,20 @@ class ClassAst
             $staticMethodClassNode = $rootNode->children['class'] ?? null;
             if ($staticMethodClassNode) {
                 $newClassName = $staticMethodClassNode->children['name'];
-                $fqcnList[] = $newClassName;
+                $context = $this->contextParser->toContext($this->namespace, $newClassName);
+                if ($context) {
+                    $contextList[] = $context;
+                }
             }
 
             $argumentNodes = $rootNode->children['args']->children ?? [];
             foreach ($argumentNodes as $argumentNode) {
                 if ($argumentNode instanceof Node) {
-                    $list = $this->parseNewStatement($argumentNode, $fqcnList);
-                    foreach ($list as $fqcn) {
-                        $fqcnList[] = $fqcn;
+                    $list = $this->parseNewStatement($argumentNode, $contextList);
+                    foreach ($list as $context) {
+                        $contextList[] = $context;
                     }
-                    return $fqcnList;
+                    return $contextList;
                 }
             }
         }
@@ -247,17 +249,20 @@ class ClassAst
         if ($kind === Kind::AST_NEW) {
             $list = $this->parseNewStatementFqcnList($rootNode, []);
             foreach ($list as $f) {
-                $fqcnList[] = $f;
+                $context = $this->contextParser->toContext($this->namespace, $f);
+                if ($context) {
+                    $contextList[] = $context;
+                }
             }
-            return $fqcnList;
+            return $contextList;
         }
 
         // nothing to do
         if (in_array($kind, [Kind::AST_PROP_GROUP])) {
-            return $fqcnList;
+            return $contextList;
         }
 
-        return array_unique($fqcnList);
+        return $contextList;
     }
 
     /**
@@ -281,29 +286,28 @@ class ClassAst
         return $list;
     }
 
-
     /**
-     * @return string[]
+     * @return Context[]
      */
     private function extractUsingTrait(): array
     {
-        $traits = [];
+        $traitContexts = [];
         foreach ($this->statementNodes() as $statementNode) {
             if ($statementNode->kind === Kind::AST_USE_TRAIT) {
                 $traitNames = array_map(function (Node $traitNode) {
                     return $traitNode->children['name'];
                 }, $statementNode->children['traits']->children ?? []);
                 foreach ($traitNames as $traitName) {
-                    $traits[] = $traitName;
+                    $traitContexts[] = new ClassContext($traitName);
                 }
             }
         }
-        return $traits;
+        return $traitContexts;
     }
 
     public function treeNode(): ClassTreeNode
     {
-        return new ClassTreeNode($this->fqcn());
+        return new ClassTreeNode($this->context);
     }
 
     /**
@@ -311,10 +315,8 @@ class ClassAst
      */
     public function fqcn(): string
     {
-        if ($this->namespace) {
-            return $this->namespace . '\\' . $this->className;
-        }
-        return $this->className;
+        // TODO weird
+        return $this->context->fqcn();
     }
 
     /**

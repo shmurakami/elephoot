@@ -2,7 +2,10 @@
 
 namespace shmurakami\Spice\Test\Ast\Entity;
 
+use shmurakami\Spice\Ast\ClassMap;
+use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Entity\ClassProperty;
+use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Example\Application;
 use shmurakami\Spice\Example\ExtendApplication;
 use shmurakami\Spice\Test\TestCase;
@@ -19,33 +22,35 @@ class ClassPropertyTest extends TestCase
         $namespace = 'shmurakami\\Spice\\Example';
         $className = 'SomeProperty';
 
+        $contextParser = new ContextParser(new ClassMap([]));
+
         //
         $unionTypesWithAdditionalComment = $propertyNodes[0];
-        $classProperty = new ClassProperty($namespace, $className, $unionTypesWithAdditionalComment);
-        $fqcnList = $classProperty->classFqcnListFromDocComment();
-        $expect = [Application::class, ExtendApplication::class];
+        $classProperty = new ClassProperty($contextParser, new ClassContext($namespace . '\\' . $className), $unionTypesWithAdditionalComment);
+        $fqcnList = $classProperty->classContextListFromDocComment();
+        $expect = [new ClassContext(Application::class), new ClassContext(ExtendApplication::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $fqcnType = $propertyNodes[1];
-        $classProperty = new ClassProperty($namespace, $className, $fqcnType);
-        $fqcnList = $classProperty->classFqcnListFromDocComment();
-        $expect = [Application::class];
+        $classProperty = new ClassProperty($contextParser, new ClassContext($namespace . '\\' . $className), $fqcnType);
+        $fqcnList = $classProperty->classContextListFromDocComment();
+        $expect = [new ClassContext(Application::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $simpleType = $propertyNodes[2];
-        $classProperty = new ClassProperty($namespace, $className, $simpleType);
-        $fqcnList = $classProperty->classFqcnListFromDocComment();
-        $expect = [ExtendApplication::class];
+        $classProperty = new ClassProperty($contextParser, new ClassContext($namespace . '\\' . $className), $simpleType);
+        $fqcnList = $classProperty->classContextListFromDocComment();
+        $expect = [new ClassContext(ExtendApplication::class)];
         $this->assertEquals($expect, $fqcnList);
 
         //
         $wrongType = $propertyNodes[3];
-        $classProperty = new ClassProperty($namespace, $className, $wrongType);
-        $fqcnList = $classProperty->classFqcnListFromDocComment();
-        // does not exist but parsable as string in ClassProperty context
-        $expect = ["shmurakami\\Spice\\Example\\NotExistingClass"];
+        $classProperty = new ClassProperty($contextParser, new ClassContext($namespace . '\\' . $className), $wrongType);
+        $fqcnList = $classProperty->classContextListFromDocComment();
+        // not exist class should be omitted
+        $expect = [];
         $this->assertEquals($expect, $fqcnList);
     }
 

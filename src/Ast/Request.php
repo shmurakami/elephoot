@@ -2,6 +2,11 @@
 
 namespace shmurakami\Spice\Ast;
 
+use InvalidArgumentException;
+use shmurakami\Spice\Ast\Context\ClassContext;
+use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
+
 class Request
 {
     const MODE_CLASS = 'CLASS';
@@ -54,7 +59,7 @@ class Request
         return $default;
     }
 
-    public function getTarget(): array
+    public function getTarget(): Context
     {
         $target = $this->configure['target'] ?? '';
         if ($this->target) {
@@ -63,17 +68,15 @@ class Request
 
         $parts = explode('@', $target);
         $class = $parts[0];
-        $method = $parts[1] ?? '';
-        return ['class' => $class, 'method' => $method];
-    }
-
-    public function isClassMode(): bool
-    {
-        $mode = $this->configure['mode'] ?? self::MODE_CLASS;
-        if ($this->mode) {
-            $mode = $this->mode;
+        if (!$class) {
+            throw new InvalidArgumentException();
         }
-        return strtoupper($mode) === self::MODE_CLASS;
+
+        $method = $parts[1] ?? '';
+        if ($method) {
+            return new MethodContext($class, $method);
+        }
+        return new ClassContext($class);
     }
 
     private function parseConfigFile(string $filepath): array
@@ -87,10 +90,12 @@ class Request
     public function isValid()
     {
         $output = $this->getOutputDirectory();
-        $targetClass = $this->getTarget()['class'] ?? '';
-        return ($output !== '' && $output !== null)
-            && ($targetClass !== '' && $targetClass !== null)
-            ;
+        try {
+            $this->getTarget();
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
+        return $output !== '' && $output !== null;
     }
 
     public function getClassMap(): ClassMap

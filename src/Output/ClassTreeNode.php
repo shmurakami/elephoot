@@ -2,19 +2,21 @@
 
 namespace shmurakami\Spice\Output;
 
+use shmurakami\Spice\Ast\Context\Context;
+
 class ClassTreeNode
 {
     /**
-     * @var string
+     * @var Context
      */
-    private $className;
+    private $context;
 
     /**
      * ClassTreeNode constructor.
      */
-    public function __construct(string $className)
+    public function __construct(Context $context)
     {
-        $this->className = $className;
+        $this->context = $context;
     }
 
     /**
@@ -22,6 +24,6 @@ class ClassTreeNode
      */
     public function getClassName(): string
     {
-        return $this->className;
+        return $this->context->fqcn();
     }
 }
