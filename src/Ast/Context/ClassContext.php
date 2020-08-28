@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Ast\Context;
 
+// TODO consider about having class import list in context to resolve some dependency
 class ClassContext implements Context
 {
     use ContextBehavior;
