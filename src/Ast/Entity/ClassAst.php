@@ -292,14 +292,10 @@ class ClassAst
     private function extractUsingTrait(): array
     {
         $traitContexts = [];
-        foreach ($this->statementNodes() as $statementNode) {
-            if ($statementNode->kind === Kind::AST_USE_TRAIT) {
-                $traitNames = array_map(function (Node $traitNode) {
-                    return $traitNode->children['name'];
-                }, $statementNode->children['traits']->children ?? []);
-                foreach ($traitNames as $traitName) {
-                    $traitContexts[] = new ClassContext($traitName);
-                }
+        foreach ($this->extractNodes(Kind::AST_USE_TRAIT) as $traitNodes) {
+            foreach ($traitNodes->children['traits']->children ?? [] as $traitNode) {
+                $traitName = $traitNode->children['name'];
+                $traitContexts[] = new ClassContext($traitName);
             }
         }
         return $traitContexts;
@@ -328,6 +324,33 @@ class ClassAst
             $rootNode = $this->classRootNode;
         }
         return $rootNode->children['stmts']->children ?? [];
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function extractNodes(int $kind, Node $rootNode = null)
+    {
+        return array_filter($this->statementNodes($rootNode), function (Node $node) use ($kind) {
+            return $node->kind === $kind;
+        });
+    }
+
+    /**
+     * @param Context[] $contexts
+     * @return Context[]
+     */
+    private function uniqueContexts(array $contexts)
+    {
+        $uniqueList = [];
+        foreach ($contexts as $context) {
+            $fqcn = $context->fqcn();
+            if (isset($uniqueList[$fqcn])) {
+                continue;
+            }
+            $uniqueList[$fqcn] = $context;
+        }
+        return $uniqueList;
     }
 
 }
