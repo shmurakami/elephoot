@@ -55,7 +55,7 @@ class Request
             return $configOutput;
         }
 
-        $default = sys_get_temp_dir();
+        $default = getcwd();
         return $default;
     }
 

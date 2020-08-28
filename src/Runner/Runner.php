@@ -3,6 +3,9 @@
 namespace shmurakami\Spice\Runner;
 
 use shmurakami\Spice\Ast\Request;
+use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
+use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
+use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Parser;
 
 class Runner
@@ -18,7 +21,7 @@ class Runner
         $mode = $args['m'] ?? $args['mode'] ?? Request::MODE_CLASS;
         $target = $args['t'] ?? $args['target'] ?? '';
         $configure = $args['c'] ?? $args['configure'] ?? '';
-        $output = $args['o'] ?? $args['output'] ?? '';
+        $output = $args['o'] ?? $args['output'] ?? getcwd();
         $help = (bool)($args['h'] ?? $args['help'] ?? false);
         if ($help) {
             $this->showHelp();
@@ -32,7 +35,12 @@ class Runner
         }
 
         $parser = new Parser($request);
-        $parser->parse();
+        $objectRelationTree = $parser->parse();
+        $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($request->getOutputDirectory()));
+        $drawer = new Drawer($graphpAdaptor);
+        $filepath = $drawer->draw($objectRelationTree);
+
+        echo "file outputted to $filepath\n";
     }
 
     private function showHelp()
@@ -44,7 +52,7 @@ Usage:
 
 -m Mode: Parse mode. Value can be "class" or "method".
 -t Target class or method name. Class name must be FQCN. Use @ as separator to specify method name like "${currentMethod}".
--o Output directory path. If not passed, use system temporary directory.
+-o Output directory path. If not passed, output to current directory.
 -c Configuration file path. JSON format is supported. See README for more detail.
 -h Show this message.
 EOF;

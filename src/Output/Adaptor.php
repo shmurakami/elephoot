@@ -8,6 +8,6 @@ interface Adaptor
      * @param ClassTree $classTree
      * @return string
      */
-    public function createDest(ClassTree $classTree): string;
+    public function createDest(ObjectRelationTree $classTree): string;
 
 }

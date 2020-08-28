@@ -2,7 +2,7 @@
 
 namespace shmurakami\Spice\Output;
 
-class MethodCallTree
+class MethodCallTree implements ObjectRelationTree
 {
     /**
      * @var MethodTreeNode
