@@ -8,6 +8,7 @@ use Graphp\GraphViz\GraphViz;
 use shmurakami\Spice\Exception\FileNotCreatedException;
 use shmurakami\Spice\Output\Adaptor;
 use shmurakami\Spice\Output\ClassTree;
+use shmurakami\Spice\Output\ObjectRelationTree;
 
 class GraphpAdaptor implements Adaptor
 {
@@ -24,7 +25,7 @@ class GraphpAdaptor implements Adaptor
     /**
      * @inheritDoc
      */
-    public function createDest(ClassTree $classTree): string
+    public function createDest(ObjectRelationTree $classTree): string
     {
         $filepath = $this->convert($classTree);
         $destPath = $this->adaptorConfig->getOutputDirectory() . '/spice.png';

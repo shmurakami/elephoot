@@ -17,8 +17,8 @@ use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
 use shmurakami\Spice\Output\ClassTree;
 use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Output\MethodCallTree;
+use shmurakami\Spice\Output\ObjectRelationTree;
 
-// TODO parser should not call drawer. it's responsible for flow. flow should get parse result and call drawer
 class Parser
 {
     /**
@@ -31,17 +31,16 @@ class Parser
         $this->request = $request;
     }
 
-    public function parse()
+    public function parse(): ObjectRelationTree
     {
         $context = $this->request->getTarget();
 
         if ($context instanceof ClassContext) {
-            $this->parseByClass($context);
-            return;
+            return $this->parseByClass($context);
         }
 
         /** @var MethodContext $context */
-        $this->parseByMethod($context);
+        return $this->parseByMethod($context);
     }
 
     /**
@@ -49,7 +48,7 @@ class Parser
      * @throws ReflectionException
      * @throws Exception\MethodNotFoundException
      */
-    public function parseByMethod(MethodContext $context): void
+    public function parseByMethod(MethodContext $context): ObjectRelationTree
     {
         /*
          * parse AST for Class and method
@@ -64,14 +63,11 @@ class Parser
         // TODO output from methodCallTree
     }
 
-    public function parseByClass(ClassContext $context): void
+    public function parseByClass(ClassContext $context): ClassTree
     {
         $classMap = $this->request->getClassMap();
         $classAst = (new AstLoader($classMap))->loadByClass($context);
-        $classTree = $this->buildClassTree($classAst, $classMap);
-        $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($this->request->getOutputDirectory()));
-        $drawer = new Drawer($graphpAdaptor);
-        $filepath = $drawer->draw($classTree);
+        return $this->buildClassTree($classAst, $classMap);
     }
 
     public function buildClassTree(ClassAst $classAst, ClassMap $classMap): ClassTree

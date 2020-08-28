@@ -3,6 +3,9 @@
 namespace shmurakami\Spice\Runner;
 
 use shmurakami\Spice\Ast\Request;
+use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
+use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
+use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Parser;
 
 class Runner
@@ -32,7 +35,12 @@ class Runner
         }
 
         $parser = new Parser($request);
-        $parser->parse();
+        $objectRelationTree = $parser->parse();
+        $graphpAdaptor = new GraphpAdaptor(new AdaptorConfig($request->getOutputDirectory()));
+        $drawer = new Drawer($graphpAdaptor);
+        $filepath = $drawer->draw($objectRelationTree);
+
+        echo "file outputted to $filepath\n";
     }
 
     private function showHelp()
