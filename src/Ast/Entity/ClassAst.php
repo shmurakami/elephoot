@@ -196,6 +196,7 @@ class ClassAst
             if ($rightStatementNode->kind === Kind::AST_NEW || $kind === Kind::AST_RETURN) {
                 return $this->parseNewStatement($rightStatementNode, $contextList);
             }
+            return $contextList;
         }
 
         // method call
