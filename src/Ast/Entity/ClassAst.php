@@ -263,18 +263,18 @@ class ClassAst
      */
     private function parseNewStatementFqcnList(Node $node, array $list = []): array
     {
-        // if class name by assigned to variable?
-        $newClassName = $node->children['class']->children['name'];
-        $list[] = $newClassName;
-
         $arguments = $node->children['args']->children ?? [];
         foreach ($arguments as $argumentNode) {
             if ($argumentNode->kind === Kind::AST_NEW) {
-                array_map(function (string $fqcn) use (&$list) {
+                foreach ($this->parseNewStatementFqcnList($argumentNode, $list) as $fqcn) {
                     $list[] = $fqcn;
-                }, $this->parseNewStatementFqcnList($argumentNode, $list));
+                }
             }
         }
+
+        // if class name by assigned to variable?
+        $newClassName = $node->children['class']->children['name'];
+        $list[] = $newClassName;
         return $list;
     }
 

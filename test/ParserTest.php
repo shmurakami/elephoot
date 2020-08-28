@@ -90,8 +90,9 @@ class ParserTest extends TestCase
         $newStatementTree->add($newStatementArgumentTree);
 
         $applicationTree->add($newStatementTree);
-        $applicationTree->add($newStatementArgumentTree);
+        // order by internally
         $applicationTree->add($newStatementArgumentArgumentTree);
+        $applicationTree->add($newStatementArgumentTree);
 
         // static method call
         $staticMethodCallTree = new ClassTree(new ClassTreeNode(new ClassContext(StaticMethodCall::class)));
