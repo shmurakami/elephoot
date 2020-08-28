@@ -55,10 +55,8 @@ class ClassAst
 
     private function parseProperties(Context $context): void
     {
-        foreach ($this->statementNodes() as $node) {
-            if ($node->kind === Kind::AST_PROP_GROUP) {
-                $this->properties[] = new ClassProperty($this->contextParser, $context, $node);
-            }
+        foreach ($this->extractNodes(Kind::AST_PROP_GROUP) as $propertyGroupNode) {
+            $this->properties[] = new ClassProperty($this->contextParser, $context, $propertyGroupNode);
         }
     }
 
@@ -69,12 +67,10 @@ class ClassAst
      */
     public function parseMethod(string $method): MethodAst
     {
-        foreach ($this->statementNodes() as $node) {
-            if ($node->kind === Kind::AST_METHOD) {
-                $rootMethod = $node->children['name'];
-                if ($rootMethod === $method) {
-                    return new MethodAst($this->namespace, $this->className, $this->properties, $node);
-                }
+        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
+            $rootMethod = $methodNode->children['name'];
+            if ($rootMethod === $method) {
+                return new MethodAst($this->namespace, $this->className, $this->properties, $methodNode);
             }
         }
         throw new MethodNotFoundException();
@@ -159,16 +155,14 @@ class ClassAst
     {
         $dependencyContexts = [];
         // extract method nodes
-        foreach ($this->statementNodes() as $node) {
-            if ($node->kind === Kind::AST_METHOD) {
-                $methodNode = new MethodNode($this->contextParser, $this->context, $node);
-                foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
-                    $fqcn = $context->fqcn();
-                    if (isset($dependencyContexts[$fqcn])) {
-                        continue;
-                    }
-                    $dependencyContexts[$fqcn] = $context;
+        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
+            $methodNode = new MethodNode($this->contextParser, $this->context, $methodNode);
+            foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
+                $fqcn = $context->fqcn();
+                if (isset($dependencyContexts[$fqcn])) {
+                    continue;
                 }
+                $dependencyContexts[$fqcn] = $context;
             }
         }
 
