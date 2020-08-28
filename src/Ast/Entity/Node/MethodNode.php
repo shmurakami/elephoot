@@ -88,16 +88,8 @@ class MethodNode
             $dependencyContexts[] = $context;
         }
 
-        $uniqueDependencyContexts = [];
-        foreach ($dependencyContexts as $context) {
-            $fqcn = $context->fqcn();
-            if (isset($uniqueDependencyContexts[$fqcn])) {
-                continue;
-            }
-            $uniqueDependencyContexts[$fqcn] = $context;
-        }
         // fqcn key is not needed
-        return array_values($uniqueDependencyContexts);
+        return array_values($this->contextParser->unique($dependencyContexts));
     }
 
 }
