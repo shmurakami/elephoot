@@ -57,13 +57,12 @@ class MethodNode
         $typeNames = array_map(function (Node $node) {
             return $node->children['type']->children['name'] ?? '';
         }, $argumentNodes);
-        foreach ($typeNames as $typeName) {
-            if ($typeName) {
-                $context = $this->contextParser->toContext($this->namespace, $typeName);
-                if ($context) {
-                    $dependencyContexts[] = $context;
-                }
-            }
+        // remove empty string
+        $typeNames = array_filter($typeNames, function (string $name) {
+            return (bool)$name;
+        });
+        foreach ($this->contextParser->toContextList($this->namespace, $typeNames) as $context) {
+            $dependencyContexts[] = $context;
         }
 
         // return statement

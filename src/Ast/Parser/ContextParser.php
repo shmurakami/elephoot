@@ -30,6 +30,21 @@ class ContextParser
         return $this->contextIfValidClass($contextNamespace . '\\' . $className);
     }
 
+    /**
+     * @return Context[]
+     */
+    public function toContextList(string $contextNamespace, array $classNames)
+    {
+        $contexts = [];
+        foreach ($classNames as $className) {
+            $context = $this->toContext($contextNamespace, $className);
+            if ($context) {
+                $contexts[] = $context;
+            }
+        }
+        return $contexts;
+    }
+
     private function contextIfValidClass(string $class): ?Context
     {
         if (class_exists($class)) {

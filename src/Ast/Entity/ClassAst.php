@@ -202,11 +202,8 @@ class ClassAst
             }
             if ($rightStatementNode->kind === Kind::AST_NEW) {
                 $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
-                foreach ($list as $f) {
-                    $context = $this->contextParser->toContext($this->namespace, $f);
-                    if ($context) {
-                        $contextList[] = $context;
-                    }
+                foreach ($this->contextParser->toContextList($this->namespace, $list) as $context) {
+                    $contextList[] = $context;
                 }
                 return $contextList;
             }
@@ -248,11 +245,8 @@ class ClassAst
         // not assigning new, e.g. in argument
         if ($kind === Kind::AST_NEW) {
             $list = $this->parseNewStatementFqcnList($rootNode, []);
-            foreach ($list as $f) {
-                $context = $this->contextParser->toContext($this->namespace, $f);
-                if ($context) {
-                    $contextList[] = $context;
-                }
+            foreach ($this->contextParser->toContextList($this->namespace, $list) as $context) {
+                $contextList[] = $context;
             }
             return $contextList;
         }
