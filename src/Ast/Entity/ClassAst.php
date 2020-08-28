@@ -193,11 +193,7 @@ class ClassAst
             if (!($rightStatementNode instanceof Node)) {
                 return $contextList;
             }
-            if ($rightStatementNode->kind === Kind::AST_NEW) {
-                return $this->parseNewStatementContextList($rightStatementNode, $contextList);
-            }
-
-            if ($kind === Kind::AST_RETURN) {
+            if ($rightStatementNode->kind === Kind::AST_NEW || $kind === Kind::AST_RETURN) {
                 return $this->parseNewStatement($rightStatementNode, $contextList);
             }
         }
@@ -222,13 +218,10 @@ class ClassAst
             $argumentNodes = $rootNode->children['args']->children ?? [];
             foreach ($argumentNodes as $argumentNode) {
                 if ($argumentNode instanceof Node) {
-                    $list = $this->parseNewStatement($argumentNode, $contextList);
-                    foreach ($list as $context) {
-                        $contextList[] = $context;
-                    }
-                    return $contextList;
+                    $contextList = $this->parseNewStatement($argumentNode, $contextList);
                 }
             }
+            return $contextList;
         }
 
         // not assigning new, e.g. in argument
