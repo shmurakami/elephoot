@@ -33,7 +33,7 @@ class GraphpAdaptor implements Adaptor
         if (!$created) {
             throw new FileNotCreatedException("failed to copy image to $destPath");
         }
-        return $filepath;
+        return $destPath;
     }
 
     private function convert(ClassTree $classTree): string
