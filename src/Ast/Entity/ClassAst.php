@@ -148,7 +148,6 @@ class ClassAst
     }
 
     /**
-     * FIXME this method may has bug
      * @return Context[]
      */
     private function extractContextListFromMethodNodes(): array
@@ -195,11 +194,7 @@ class ClassAst
                 return $contextList;
             }
             if ($rightStatementNode->kind === Kind::AST_NEW) {
-                $list = $this->parseNewStatementFqcnList($rightStatementNode, []);
-                foreach ($this->contextParser->toContextList($this->namespace, $list) as $context) {
-                    $contextList[] = $context;
-                }
-                return $contextList;
+                return $this->parseNewStatementContextList($rightStatementNode, $contextList);
             }
 
             if ($kind === Kind::AST_RETURN) {
@@ -238,11 +233,7 @@ class ClassAst
 
         // not assigning new, e.g. in argument
         if ($kind === Kind::AST_NEW) {
-            $list = $this->parseNewStatementFqcnList($rootNode, []);
-            foreach ($this->contextParser->toContextList($this->namespace, $list) as $context) {
-                $contextList[] = $context;
-            }
-            return $contextList;
+            return $this->parseNewStatementContextList($rootNode, $contextList);
         }
 
         // nothing to do
@@ -250,6 +241,19 @@ class ClassAst
             return $contextList;
         }
 
+        return $contextList;
+    }
+
+    /**
+     * @return Context[]
+     */
+    private function parseNewStatementContextList(Node $node, array $contextList = [])
+    {
+        $fqcnList = $this->parseNewStatementFqcnList($node, []);
+
+        foreach ($this->contextParser->toContextList($this->namespace, $fqcnList) as $context) {
+            $contextList[] = $context;
+        }
         return $contextList;
     }
 
@@ -323,22 +327,4 @@ class ClassAst
             return $node->kind === $kind;
         });
     }
-
-    /**
-     * @param Context[] $contexts
-     * @return Context[]
-     */
-    private function uniqueContexts(array $contexts)
-    {
-        $uniqueList = [];
-        foreach ($contexts as $context) {
-            $fqcn = $context->fqcn();
-            if (isset($uniqueList[$fqcn])) {
-                continue;
-            }
-            $uniqueList[$fqcn] = $context;
-        }
-        return $uniqueList;
-    }
-
 }
