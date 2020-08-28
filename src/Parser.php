@@ -12,10 +12,7 @@ use shmurakami\Spice\Ast\Entity\MethodAst;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
-use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
-use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
 use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\Drawer;
 use shmurakami\Spice\Output\MethodCallTree;
 use shmurakami\Spice\Output\ObjectRelationTree;
 
