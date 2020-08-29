@@ -16,6 +16,11 @@ class GraphpAdaptor implements Adaptor
      * @var AdaptorConfig
      */
     private $adaptorConfig;
+    /**
+     * cache as marker of edge already connected
+     * @var array<string,string>[]
+     */
+    private $related = [];
 
     public function __construct(AdaptorConfig $adaptorConfig)
     {
@@ -57,8 +62,12 @@ class GraphpAdaptor implements Adaptor
         $graphNode = $this->retrieveNode($graph, $className);
 
         if ($parentNode) {
-            // connect parent to self
-            $parentNode->createEdgeTo($graphNode);
+            $graphNodeId = $graphNode->getId();
+            if (!isset($this->related[$className][$graphNodeId])) {
+                // connect parent to self
+                $parentNode->createEdgeTo($graphNode);
+                $this->related[$className][$graphNodeId] = true;
+            }
         }
 
         foreach ($classTree->getChildTrees() as $childTree) {
