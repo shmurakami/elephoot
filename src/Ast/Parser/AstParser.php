@@ -17,19 +17,19 @@ class AstParser
 
     public function __construct(ClassAstResolver $classAstResolver)
     {
+        // probably this class should not need to depend on ClassAstResolver
         $this->classAstResolver = $classAstResolver;
     }
 
     public function parseNamespace(Node $node): string
     {
-        /** @var Node $childNode */
-        foreach ($node->children as $childNode) {
-            if ($childNode->kind === Kind::AST_NAMESPACE) {
-                $namespace = $childNode->children['name'];
-                return $namespace;
-            }
+        $namespaceNode = $this->childNodesByKind($node, Kind::AST_NAMESPACE)[0] ?? null;
+        if (!$namespaceNode) {
+            return '';
         }
-        return '';
+
+        $namespace = $namespaceNode->children['name'];
+        return $namespace;
     }
 
     /**
@@ -38,14 +38,14 @@ class AstParser
     public function importedClassAsts(Node $node): array
     {
         $imported = [];
-        foreach ($node->children as $childNode) {
-            if ($childNode->kind === Kind::AST_USE) {
-                // support alias?
-                $className = $childNode->children[0]->children['name'];
-                $classAst = $this->classAstResolver->resolve($className);
-                if ($classAst) {
-                    $imported[$className] = $classAst;
-                }
+
+        $useNodes = $this->childNodesByKind($node, Kind::AST_USE);
+        foreach ($useNodes as $useNode) {
+            // support alias?
+            $className = $useNode->children[0]->children['name'];
+            $classAst = $this->classAstResolver->resolve($className);
+            if ($classAst) {
+                $imported[$className] = $classAst;
             }
         }
         return $imported;
@@ -57,35 +57,38 @@ class AstParser
     public function extendClassAsts(Node $node): array
     {
         // extend and implements
-        $extends = [];
 
-        $classNode = null;
-        foreach ($node->children as $childNode) {
-            if ($childNode->kind === Kind::AST_CLASS) {
-                $classNode = $childNode;
-                break;
+        $classNode = $this->childNodesByKind($node, Kind::AST_CLASS)[0] ?? null;
+        if (!$classNode) {
+            return [];
+        }
+
+        $extends = [];
+        $extendClassName = $classNode->children['extends']->children['name'] ?? '';
+        if ($extendClassName) {
+            $classAst = $this->classAstResolver->resolve($extendClassName);
+            if ($classAst) {
+                $extends[$extendClassName] = $classAst;
             }
         }
 
-        if ($classNode) {
-            $extendClassName = $classNode->children['extends']->children['name'] ?? '';
-            if ($extendClassName) {
-                $classAst = $this->classAstResolver->resolve($extendClassName);
-                if ($classAst) {
-                    $extends[$extendClassName] = $classAst;
-                }
-            }
-
-            $implementClassNames = array_map(function (Node $implementNode) {
-                return $implementNode->children['name'];
-            }, $classNode->children['implements']->children ?? []);
-            foreach ($implementClassNames as $className) {
-                $classAst = $this->classAstResolver->resolve($className);
-                if ($classAst) {
-                    $extends[$className] = $classAst;
-                }
+        foreach ($classNode->children['implements']->children ?? [] as $implementNode) {
+            $interfaceName = $implementNode->children['name'];
+            $classAst = $this->classAstResolver->resolve($interfaceName);
+            if ($classAst) {
+                $extends[$interfaceName] = $classAst;
             }
         }
         return $extends;
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function childNodesByKind(Node $node, int $kind): array
+    {
+        return array_values(array_filter($node->children, function (Node $node) use ($kind) {
+            return $node->kind === $kind;
+        }));
     }
 }
