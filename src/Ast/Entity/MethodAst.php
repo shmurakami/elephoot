@@ -3,18 +3,12 @@
 namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
+use shmurakami\Spice\Ast\Context\MethodContext;
+use shmurakami\Spice\Ast\Parser\AstParser;
 use shmurakami\Spice\Output\MethodTreeNode;
 
 class MethodAst
 {
-    /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var string
-     */
-    private $className;
     /**
      * @var ClassProperty[]
      */
@@ -27,19 +21,27 @@ class MethodAst
      * @var array
      */
     private $variables = [];
+    /**
+     * @var MethodContext
+     */
+    private $context;
+    /**
+     * @var AstParser
+     */
+    private $astParser;
 
     /**
      * MethodAst constructor.
-     * @param Node $classNode
      * @param Node $methodRootNode
+     * @param MethodContext $context
+     * @param ClassProperty[] $classProperties
      */
-    // TODO change to MethodContext
-    public function __construct(string $namespace, string $className, array $classProperties, Node $methodRootNode)
+    public function __construct(Node $methodRootNode, MethodContext $context, array $classProperties, AstParser $astParser)
     {
-        $this->namespace = $namespace;
-        $this->className = $className;
-        $this->classProperties = $classProperties;
         $this->methodRootNode = $methodRootNode;
+        $this->context = $context;
+        $this->classProperties = $classProperties;
+        $this->astParser = $astParser;
     }
 
     public function parse()
@@ -64,8 +66,8 @@ class MethodAst
 
     public function treeNode(): MethodTreeNode
     {
-        $fqcn = $this->namespace . '\\' . $this->className;
-        $methodName = $this->methodRootNode->children['name'];
+        $fqcn = $this->context->fqcn();
+        $methodName = $this->context->methodName();
         return new MethodTreeNode($fqcn, $methodName);
     }
 

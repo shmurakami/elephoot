@@ -4,6 +4,7 @@ namespace shmurakami\Spice\Ast\Entity;
 
 use ast\Node;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Parser\AstParser;
 use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\ClassNotFoundException;
@@ -16,10 +17,6 @@ class FileAst
      */
     private $rootNode;
     /**
-     * @var string
-     */
-    private $namespace;
-    /**
      * @var Context
      */
     private $context;
@@ -27,12 +24,17 @@ class FileAst
      * @var ContextParser
      */
     private $contextParser;
+    /**
+     * @var AstParser
+     */
+    private $astParser;
 
-    public function __construct(Node $rootNode, ContextParser $contextParser, Context $context)
+    public function __construct(Node $rootNode, Context $context, ContextParser $contextParser, AstParser $astParser)
     {
         $this->rootNode = $rootNode;
         $this->contextParser = $contextParser;
         $this->context = $context;
+        $this->astParser = $astParser;
     }
 
     /**
@@ -40,45 +42,26 @@ class FileAst
      * @return ClassAst
      * @throws ClassNotFoundException
      */
-    public function parse(?Node $rootNode = null): ClassAst
+    public function toClassAst(?Node $rootNode = null): ClassAst
     {
         $rootNode = $rootNode ?? $this->rootNode;
 
-        $namespace = $this->getNamespace();
+        $namespace = $this->astParser->parseNamespace($this->rootNode);
         foreach ($rootNode->children as $node) {
             if ($node->kind === Kind::AST_STMT_LIST) {
                 // may stmt exist in this time?
-                return $this->parse($node);
+                return $this->toClassAst($node);
             }
 
             if ($node->kind === Kind::AST_CLASS) {
                 $nodeClassName =  $node->children['name'];
                 $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 if ($nodeClassFqcn === $this->context->fqcn()) {
-                    return new ClassAst($this->contextParser, $this->context, $node);
+                    return new ClassAst($node, $this->context, $this->contextParser, $this->astParser);
                 }
             }
         }
         throw new ClassNotFoundException();
-    }
-
-    /**
-     * @return string
-     */
-    private function getNamespace(): string
-    {
-        if ($this->namespace === null) {
-            $namespace = '';
-            /** @var Node $node */
-            foreach ($this->rootNode->children as $node) {
-                if ($node->kind === Kind::AST_NAMESPACE) {
-                    $namespace = $node->children['name'];
-                    break;
-                }
-            }
-            $this->namespace = $namespace;
-        }
-        return $this->namespace;
     }
 
     /**
@@ -87,67 +70,9 @@ class FileAst
     public function dependentClassAstList(ClassAstResolver $classAstResolver): array
     {
         return array_merge(
-            $this->importedClasses($classAstResolver),
-            $this->extendClasses($classAstResolver),
+            $this->astParser->importedClassAsts($this->rootNode),
+            $this->astParser->extendClassAsts($this->rootNode),
             $this->relatedClasses($classAstResolver));
-    }
-
-    /**
-     * @return ClassAst[]
-     */
-    private function importedClasses(ClassAstResolver $classAstResolver): array
-    {
-        $imported = [];
-        foreach ($this->rootNode->children as $node) {
-            if ($node->kind === Kind::AST_USE) {
-                // support alias?
-                $className = $node->children[0]->children['name'];
-                $classAst = $classAstResolver->resolve($className);
-                if ($classAst) {
-                    $imported[$className] = $classAst;
-                }
-            }
-        }
-
-        return $imported;
-    }
-
-    /**
-     * @return ClassAst[]
-     */
-    private function extendClasses(ClassAstResolver $classAstResolver): array
-    {
-        // extend and implements
-        $extends = [];
-
-        $classNode = null;
-        foreach ($this->rootNode->children as $node) {
-            if ($node->kind === Kind::AST_CLASS) {
-                $classNode = $node;
-                break;
-            }
-        }
-
-        if ($classNode) {
-            $extendClassName = $classNode->children['extends']->children['name'] ?? '';
-            if ($extendClassName) {
-                $classAst = $classAstResolver->resolve($extendClassName);
-                if ($classAst) {
-                    $extends[$extendClassName] = $classAst;
-                }
-            }
-
-            $implementClassNames = array_map(function (Node $implementNode) {
-                return $implementNode->children['name'];
-            }, $classNode->children['implements']->children ?? []);
-            foreach ($implementClassNames as $className) {
-                $classAst = $classAstResolver->resolve($className);
-                if ($classAst) {
-                    $extends[$className] = $classAst;
-                }
-            }
-        }
-        return $extends;
     }
 
     /**
@@ -158,6 +83,7 @@ class FileAst
      */
     private function relatedClasses(ClassAstResolver $classAstResolver): array
     {
-        return $this->parse()->relatedClasses($classAstResolver);
+        return $this->toClassAst()->relatedClasses($classAstResolver);
     }
+
 }
