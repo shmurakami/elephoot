@@ -13,6 +13,7 @@ use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Ast\Resolver\FileAstResolver;
 use shmurakami\Spice\Output\ClassTree;
+use shmurakami\Spice\Output\LazyReplacementTree;
 use shmurakami\Spice\Output\MethodCallTree;
 use shmurakami\Spice\Output\ObjectRelationTree;
 
@@ -22,6 +23,10 @@ class Parser
      * @var Request
      */
     private $request;
+    /**
+     * @var ObjectRelationTree[]
+     */
+    private $builtTreeCache = [];
 
     public function __construct(Request $request)
     {
@@ -31,9 +36,10 @@ class Parser
     public function parse(): ObjectRelationTree
     {
         $context = $this->request->getTarget();
+        $classMap = $this->request->getClassMap();
 
         if ($context instanceof ClassContext) {
-            return $this->parseByClass($context);
+            return $this->parseByClass($context, $classMap);
         }
 
         /** @var MethodContext $context */
@@ -60,11 +66,14 @@ class Parser
         // TODO output from methodCallTree
     }
 
-    public function parseByClass(ClassContext $context): ClassTree
+    public function parseByClass(ClassContext $context, ClassMap $classMap): ClassTree
     {
-        $classMap = $this->request->getClassMap();
         $classAst = (new AstLoader($classMap))->loadByClass($context);
-        return $this->buildClassTree($classAst, $classMap);
+        $classTree = $this->buildClassTree($classAst, $classMap);
+
+        /** @var ClassTree $resolvedClassTree */
+        $resolvedClassTree = $this->resolveLazyReplacements($classTree);
+        return $resolvedClassTree;
     }
 
     public function buildClassTree(ClassAst $classAst, ClassMap $classMap): ClassTree
@@ -79,9 +88,15 @@ class Parser
 
         $classAstResolver = new ClassAstResolver($classMap);
         $dependencies = $fileAst->dependentClassAstList($classAstResolver);
-        // TODO set memo dependency and result tree
         foreach ($dependencies as $dependentClassAst) {
-            $tree->add($this->buildClassTree($dependentClassAst, $classMap));
+            $fqcn = $dependentClassAst->fqcn();
+            if (!array_key_exists($fqcn, $this->builtTreeCache)) {
+                // mark as already parsed to support circular reference
+                $this->builtTreeCache[$fqcn] = new LazyReplacementTree($fqcn);
+                $this->builtTreeCache[$fqcn] = $this->buildClassTree($dependentClassAst, $classMap);
+            }
+
+            $tree->add($this->builtTreeCache[$fqcn]);
         }
         return $tree;
     }
@@ -95,5 +110,24 @@ class Parser
             $tree->add($methodCallTree);
         }
         return $tree;
+    }
+
+    /**
+     * deep copy tree with replace LazyReplacementTree
+     * @param ObjectRelationTree[] $newChildTrees
+     */
+    private function resolveLazyReplacements(ObjectRelationTree $sourceTree): ObjectRelationTree
+    {
+        if ($sourceTree instanceof LazyReplacementTree) {
+            $replacementFqcn = $sourceTree->nameShouldBeReplaced();
+            $replacementTree = $this->builtTreeCache[$replacementFqcn]->replacementTree();
+            return $replacementTree;
+        }
+
+        $copyTree = $sourceTree->replacementTree();
+        foreach ($sourceTree->getChildTrees() as $childTree) {
+            $copyTree->add($this->resolveLazyReplacements($childTree));
+        }
+        return $copyTree;
     }
 }

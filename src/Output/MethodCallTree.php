@@ -23,8 +23,19 @@ class MethodCallTree implements ObjectRelationTree
         $this->rootNode = $rootNode;
     }
 
-    public function add(MethodCallTree $tree)
+    public function add(ObjectRelationTree $tree)
     {
         $this->childTree[] = $tree;
+    }
+
+    public function getChildTrees(): array
+    {
+        return $this->childTree;
+    }
+
+    public function replacementTree(): ObjectRelationTree
+    {
+        // dump child tree i.e. shallow copy
+        return new MethodCallTree($this->rootNode);
     }
 }

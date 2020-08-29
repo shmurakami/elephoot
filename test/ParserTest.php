@@ -8,6 +8,8 @@ use shmurakami\Spice\Ast\ClassMap;
 use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Request;
 use shmurakami\Spice\Example\Application;
+use shmurakami\Spice\Example\CircularReference\CircularReference1;
+use shmurakami\Spice\Example\CircularReference\CircularReference2;
 use shmurakami\Spice\Example\Client;
 use shmurakami\Spice\Example\ExtendApplication;
 use shmurakami\Spice\Example\Import\ByImport;
@@ -43,8 +45,7 @@ class ParserTest extends TestCase
             BreakingPsr::class => __DIR__ . '/../src/Example/other/BreakingPsr.php',
         ]);
 
-        $classAst = (new AstLoader($classMap))->loadByClass(new ClassContext(Client::class));
-        $actual = $parser->buildClassTree($classAst, $classMap);
+        $actual = $parser->parseByClass($request->getTarget(), $classMap);
 
         $applicationTree = new ClassTree(new ClassTreeNode(new ClassContext(Application::class)));
 
@@ -112,6 +113,15 @@ class ParserTest extends TestCase
         // client has other dependency
         $extendApplicationTree = new ClassTree(new ClassTreeNode(new ClassContext(ExtendApplication::class)));
         $clientTree->add($extendApplicationTree);
+
+        // circular reference should be overwritten without childTree of original
+        // 1 and 2 depend each other but child of 2 does not have 1
+        $secondCircularReferenceTree = new ClassTree(new ClassTreeNode(new ClassContext(CircularReference2::class)));
+        $secondCircularReferenceTree->add(new ClassTree(new ClassTreeNode(new ClassContext(CircularReference1::class))));
+        $circularReferenceTree = new ClassTree(new ClassTreeNode(new ClassContext(CircularReference1::class)));
+        $circularReferenceTree->add($secondCircularReferenceTree);
+
+        $clientTree->add($circularReferenceTree);
 
         $expect = $clientTree;
 

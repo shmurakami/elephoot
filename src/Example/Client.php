@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Example;
 
+
 class Client
 {
     /**
@@ -36,5 +37,10 @@ class Client
         $calls[] = $this->application->sampleMethod('Dave');
 
         return $calls;
+    }
+
+    private function circularReference()
+    {
+        return new \shmurakami\Spice\Example\CircularReference\CircularReference1();
     }
 }
