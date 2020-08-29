@@ -83,6 +83,38 @@ class AstParser
     }
 
     /**
+     * @param Node $node
+     * @return Node[]
+     */
+    public function propertyGroupNodes(Node $node)
+    {
+        return $this->extractNodes($node, Kind::AST_PROP_GROUP);
+    }
+
+    /**
+     * @return Node[]
+     */
+    public function extractUsingTrait(Node $node): array
+    {
+        $traitNodes = [];
+        foreach ($this->extractNodes($node, Kind::AST_USE_TRAIT) as $parentTraitNode) {
+            foreach ($parentTraitNode->children['traits']->children ?? [] as $traitNode) {
+                $traitNodes[] = $traitNode;
+            }
+        }
+        return $traitNodes;
+    }
+
+    /**
+     * @param Node $node
+     * @return Node[]
+     */
+    public function extractMethodNodes(Node $node)
+    {
+        return $this->extractNodes($node, Kind::AST_METHOD);
+    }
+
+    /**
      * @return Node[]
      */
     private function childNodesByKind(Node $node, int $kind): array
@@ -90,5 +122,23 @@ class AstParser
         return array_values(array_filter($node->children, function (Node $node) use ($kind) {
             return $node->kind === $kind;
         }));
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function statementNodes(Node $node)
+    {
+        return $node->children['stmts']->children ?? [];
+    }
+
+    /**
+     * @return Node[]
+     */
+    private function extractNodes(Node $node, int $kind)
+    {
+        return array_filter($this->statementNodes($node), function (Node $node) use ($kind) {
+            return $node->kind === $kind;
+        });
     }
 }

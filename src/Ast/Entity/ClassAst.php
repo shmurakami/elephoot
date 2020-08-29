@@ -7,6 +7,7 @@ use Generator;
 use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
+use shmurakami\Spice\Ast\Parser\AstParser;
 use shmurakami\Spice\Ast\Parser\ContextParser;
 use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
 use shmurakami\Spice\Exception\MethodNotFoundException;
@@ -39,15 +40,23 @@ class ClassAst
      * @var ContextParser
      */
     private $contextParser;
+    /**
+     * @var AstParser
+     */
+    private $astParser;
 
     /**
      * ClassAst constructor.
+     * @param Node $classRootNode
+     * @param Context $context
+     * @param ContextParser $contextParser
      */
-    public function __construct(ContextParser $contextParser, Context $context, Node $classRootNode)
+    public function __construct(Node $classRootNode, Context $context, ContextParser $contextParser, AstParser $astParser)
     {
-        $this->contextParser = $contextParser;
         $this->context = $context;
         $this->classRootNode = $classRootNode;
+        $this->contextParser = $contextParser;
+        $this->astParser = $astParser;
         $this->namespace = $context->extractNamespace();
 
         $this->parseProperties($context);
@@ -55,7 +64,7 @@ class ClassAst
 
     private function parseProperties(Context $context): void
     {
-        foreach ($this->extractNodes(Kind::AST_PROP_GROUP) as $propertyGroupNode) {
+        foreach ($this->astParser->propertyGroupNodes($this->classRootNode) as $propertyGroupNode) {
             $this->properties[] = new ClassProperty($this->contextParser, $context, $propertyGroupNode);
         }
     }
@@ -153,8 +162,7 @@ class ClassAst
     private function extractContextListFromMethodNodes(): array
     {
         $dependencyContexts = [];
-        // extract method nodes
-        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
+        foreach ($this->astParser->extractMethodNodes($this->classRootNode) as $methodNode) {
             $methodNode = new MethodNode($this->contextParser, $this->context, $methodNode);
             foreach ($methodNode->parseMethodAttributeToContexts() as $context) {
                 $fqcn = $context->fqcn();
@@ -277,14 +285,10 @@ class ClassAst
      */
     private function extractUsingTrait(): array
     {
-        $traitContexts = [];
-        foreach ($this->extractNodes(Kind::AST_USE_TRAIT) as $traitNodes) {
-            foreach ($traitNodes->children['traits']->children ?? [] as $traitNode) {
-                $traitName = $traitNode->children['name'];
-                $traitContexts[] = new ClassContext($traitName);
-            }
-        }
-        return $traitContexts;
+        return array_map(function (Node $traitNode) {
+            $traitName = $traitNode->children['name'];
+            return new ClassContext($traitName);
+        }, $this->astParser->extractUsingTrait($this->classRootNode));
     }
 
     public function treeNode(): ClassTreeNode

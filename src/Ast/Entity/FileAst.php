@@ -57,7 +57,7 @@ class FileAst
                 $nodeClassName =  $node->children['name'];
                 $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 if ($nodeClassFqcn === $this->context->fqcn()) {
-                    return new ClassAst($this->contextParser, $this->context, $node);
+                    return new ClassAst($node, $this->context, $this->contextParser, $this->astParser);
                 }
             }
         }
