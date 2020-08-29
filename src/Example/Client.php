@@ -14,7 +14,7 @@ class Client
      * Client constructor.
      * @param Application $application
      */
-    public function __construct(?Application $application)
+    public function __construct(Application $application)
     {
         $this->application = $application;
     }
