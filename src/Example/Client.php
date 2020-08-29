@@ -2,6 +2,7 @@
 
 namespace shmurakami\Spice\Example;
 
+
 class Client
 {
     /**
@@ -13,7 +14,7 @@ class Client
      * Client constructor.
      * @param Application $application
      */
-    public function __construct(Application $application)
+    public function __construct(?Application $application)
     {
         $this->application = $application;
     }
@@ -36,5 +37,10 @@ class Client
         $calls[] = $this->application->sampleMethod('Dave');
 
         return $calls;
+    }
+
+    private function circularReference()
+    {
+        return new \shmurakami\Spice\Example\CircularReference\CircularReference1();
     }
 }

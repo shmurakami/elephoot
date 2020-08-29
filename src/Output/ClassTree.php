@@ -21,7 +21,7 @@ class ClassTree implements ObjectRelationTree
         $this->rootNode = $rootNode;
     }
 
-    public function add(ClassTree $classTree)
+    public function add(ObjectRelationTree $classTree)
     {
         $this->childTree[] = $classTree;
     }
@@ -52,5 +52,11 @@ class ClassTree implements ObjectRelationTree
     public function getChildTrees(): array
     {
         return $this->childTree;
+    }
+
+    public function replacementTree(): ObjectRelationTree
+    {
+        // dump child tree i.e. shallow copy
+        return new ClassTree($this->rootNode);
     }
 }
