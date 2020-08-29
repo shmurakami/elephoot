@@ -36,4 +36,9 @@ class MethodContext implements Context
     {
         return $this->fqcn() . '@' . $this->method;
     }
+
+    public function methodName(): string
+    {
+        return $this->method;
+    }
 }

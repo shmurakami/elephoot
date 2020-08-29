@@ -6,6 +6,7 @@ use ast\Node;
 use Generator;
 use shmurakami\Spice\Ast\Context\ClassContext;
 use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Spice\Ast\Context\MethodContext;
 use shmurakami\Spice\Ast\Entity\Node\MethodNode;
 use shmurakami\Spice\Ast\Parser\AstParser;
 use shmurakami\Spice\Ast\Parser\ContextParser;
@@ -79,7 +80,8 @@ class ClassAst
         foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
             $rootMethod = $methodNode->children['name'];
             if ($rootMethod === $method) {
-                return new MethodAst($this->namespace, $this->className, $this->properties, $methodNode);
+                $fqcn = $this->namespace . '\\' . $this->className;
+                return new MethodAst($methodNode, new MethodContext($fqcn, $method), $this->properties, $this->astParser);
             }
         }
         throw new MethodNotFoundException();
