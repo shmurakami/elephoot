@@ -4,7 +4,7 @@ From Elephant footprint.
 
 # About
 
-Statically visualizing PHP source code dependencies by class tree, or method call stack.
+Statically visualizing PHP source code dependencies by class tree.
 
 # Dependency
 
