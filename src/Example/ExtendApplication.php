@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example;
+namespace shmurakami\Elephoot\Example;
 
 class ExtendApplication extends Application
 {

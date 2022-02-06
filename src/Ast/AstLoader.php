@@ -1,16 +1,16 @@
 <?php
 
-namespace shmurakami\Spice\Ast;
+namespace shmurakami\Elephoot\Ast;
 
 use ReflectionClass;
 use ReflectionException;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Entity\ClassAst;
-use shmurakami\Spice\Ast\Entity\FileAst;
-use shmurakami\Spice\Ast\Parser\AstParser;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
-use shmurakami\Spice\Exception\ClassNotFoundException;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Entity\ClassAst;
+use shmurakami\Elephoot\Ast\Entity\FileAst;
+use shmurakami\Elephoot\Ast\Parser\AstParser;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Ast\Resolver\ClassAstResolver;
+use shmurakami\Elephoot\Exception\ClassNotFoundException;
 use function ast\parse_file;
 
 class AstLoader

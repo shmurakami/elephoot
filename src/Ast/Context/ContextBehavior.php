@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Context;
+namespace shmurakami\Elephoot\Ast\Context;
 
 trait ContextBehavior
 {

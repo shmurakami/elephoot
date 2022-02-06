@@ -1,13 +1,13 @@
 <?php
 
-namespace shmurakami\Spice\Test\Ast;
+namespace shmurakami\Elephoot\Test\Ast;
 
 use BreakingPsr;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Context\MethodContext;
-use shmurakami\Spice\Ast\Request;
-use shmurakami\Spice\Test\TestCase;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Request;
+use shmurakami\Elephoot\Test\TestCase;
 
 class RequestTest extends TestCase
 {
@@ -24,7 +24,7 @@ class RequestTest extends TestCase
     public function testGetTargetByClass()
     {
         $targetClass = Request::class;
-        $expect = new ClassContext('shmurakami\\Spice\\Ast\\Request');
+        $expect = new ClassContext('shmurakami\\Elephoot\\Ast\\Request');
 
         $request = new Request(Request::MODE_CLASS, '', '', __DIR__ . '/resource/config.json');
         $this->assertEquals($expect, $request->getTarget());

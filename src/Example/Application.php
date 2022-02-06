@@ -1,16 +1,16 @@
 <?php
 
-namespace shmurakami\Spice\Example;
+namespace shmurakami\Elephoot\Example;
 
-use shmurakami\Spice\Example\Import\ByImport;
+use shmurakami\Elephoot\Example\Import\ByImport;
 
-class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
+class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
     implements
-    \shmurakami\Spice\Example\Interfaces\Implement1,
-    \shmurakami\Spice\Example\Interfaces\Implement2
+    \shmurakami\Elephoot\Example\Interfaces\Implement1,
+    \shmurakami\Elephoot\Example\Interfaces\Implement2
 {
 
-    use \shmurakami\Spice\Example\Traits\UsingTrait;
+    use \shmurakami\Elephoot\Example\Traits\UsingTrait;
 
     /**
      * Application constructor.
@@ -36,23 +36,23 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
     }
 
     /**
-     * @param \shmurakami\Spice\Example\Method\DocComment $docComment
+     * @param \shmurakami\Elephoot\Example\Method\DocComment $docComment
      */
     private function byDocComment($docComment): void
     {
     }
 
-    private function byTypeHinting(\shmurakami\Spice\Example\Method\TypeHinting $typeHinting): void
+    private function byTypeHinting(\shmurakami\Elephoot\Example\Method\TypeHinting $typeHinting): void
     {
     }
 
-    private function byReturn(): ?\shmurakami\Spice\Example\ReturnType\ReturnType
+    private function byReturn(): ?\shmurakami\Elephoot\Example\ReturnType\ReturnType
     {
         return null;
     }
 
     /**
-     * @return \shmurakami\Spice\Example\ReturnType\ReturnInDocComment|null
+     * @return \shmurakami\Elephoot\Example\ReturnType\ReturnInDocComment|null
      */
     private function byReturnDocComment()
     {
@@ -60,20 +60,20 @@ class Application extends \shmurakami\Spice\Example\Inherit\InheritClass
 
     private function byNewStatement()
     {
-        new \shmurakami\Spice\Example\NewStatement\SimplyNew();
+        new \shmurakami\Elephoot\Example\NewStatement\SimplyNew();
         (function () {
-            new \shmurakami\Spice\Example\NewStatement\NewInClosure();
+            new \shmurakami\Elephoot\Example\NewStatement\NewInClosure();
         });
 
-        $foo = new \shmurakami\Spice\Example\NewStatement\NewStatement();
-        return $foo->foo(new \shmurakami\Spice\Example\NewStatement\NewStatementArgument(
-            new \shmurakami\Spice\Example\NewStatement\NewStatementArgumentArgument()
+        $foo = new \shmurakami\Elephoot\Example\NewStatement\NewStatement();
+        return $foo->foo(new \shmurakami\Elephoot\Example\NewStatement\NewStatementArgument(
+            new \shmurakami\Elephoot\Example\NewStatement\NewStatementArgumentArgument()
         ));
     }
 
     private function byStaticMethodCall()
     {
-        \shmurakami\Spice\Example\StaticMethod\StaticMethodCall::byStaticMethodCall(new \shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument());
+        \shmurakami\Elephoot\Example\StaticMethod\StaticMethodCall::byStaticMethodCall(new \shmurakami\Elephoot\Example\StaticMethod\StaticMethodCallArgument());
     }
 
     private function breakingPsr()

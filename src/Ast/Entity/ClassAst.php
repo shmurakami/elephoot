@@ -1,19 +1,19 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Entity;
+namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
 use Generator;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Context\MethodContext;
-use shmurakami\Spice\Ast\Entity\Node\MethodNode;
-use shmurakami\Spice\Ast\Parser\AstParser;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
-use shmurakami\Spice\Exception\MethodNotFoundException;
-use shmurakami\Spice\Output\ClassTreeNode;
-use shmurakami\Spice\Stub\Kind;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Entity\Node\MethodNode;
+use shmurakami\Elephoot\Ast\Parser\AstParser;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Ast\Resolver\ClassAstResolver;
+use shmurakami\Elephoot\Exception\MethodNotFoundException;
+use shmurakami\Elephoot\Output\ClassTreeNode;
+use shmurakami\Elephoot\Stub\Kind;
 
 class ClassAst
 {

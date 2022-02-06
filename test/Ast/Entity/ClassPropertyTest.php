@@ -1,14 +1,14 @@
 <?php
 
-namespace shmurakami\Spice\Test\Ast\Entity;
+namespace shmurakami\Elephoot\Test\Ast\Entity;
 
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Entity\ClassProperty;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Example\Application;
-use shmurakami\Spice\Example\ExtendApplication;
-use shmurakami\Spice\Test\TestCase;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Entity\ClassProperty;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Example\Application;
+use shmurakami\Elephoot\Example\ExtendApplication;
+use shmurakami\Elephoot\Test\TestCase;
 
 class ClassPropertyTest extends TestCase
 {
@@ -19,7 +19,7 @@ class ClassPropertyTest extends TestCase
         $propertyNodes = $node->children[1]->children['stmts']->children;
 
         // any way to write these tests more easier?
-        $namespace = 'shmurakami\\Spice\\Example';
+        $namespace = 'shmurakami\\Elephoot\\Example';
         $className = 'SomeProperty';
 
         $contextParser = new ContextParser(new ClassMap([]));

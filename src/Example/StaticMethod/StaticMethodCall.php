@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\StaticMethod;
+namespace shmurakami\Elephoot\Example\StaticMethod;
 
 class StaticMethodCall
 {

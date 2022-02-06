@@ -1,8 +1,8 @@
 <?php
 
-namespace shmurakami\Spice\Output;
+namespace shmurakami\Elephoot\Output;
 
-use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Context\Context;
 
 class ClassTreeNode
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Ast;
+namespace shmurakami\Elephoot\Ast;
 
 class ClassMap
 {

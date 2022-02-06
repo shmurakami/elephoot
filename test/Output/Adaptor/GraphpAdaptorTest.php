@@ -1,13 +1,13 @@
 <?php
 
-namespace shmurakami\Spice\Test\Output\Adaptor;
+namespace shmurakami\Elephoot\Test\Output\Adaptor;
 
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
-use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
-use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\ClassTreeNode;
-use shmurakami\Spice\Test\TestCase;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Output\Adaptor\AdaptorConfig;
+use shmurakami\Elephoot\Output\Adaptor\GraphpAdaptor;
+use shmurakami\Elephoot\Output\ClassTree;
+use shmurakami\Elephoot\Output\ClassTreeNode;
+use shmurakami\Elephoot\Test\TestCase;
 
 class GraphpAdaptorTest extends TestCase
 {

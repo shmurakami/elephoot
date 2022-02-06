@@ -1,12 +1,12 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Entity\Node;
+namespace shmurakami\Elephoot\Ast\Entity\Node;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Ast\Parser\DocCommentParser;
-use shmurakami\Spice\Stub\Kind;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Ast\Parser\DocCommentParser;
+use shmurakami\Elephoot\Stub\Kind;
 
 class MethodNode
 {

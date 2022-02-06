@@ -1,13 +1,13 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Resolver;
+namespace shmurakami\Elephoot\Ast\Resolver;
 
 use ReflectionException;
-use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Entity\ClassAst;
-use shmurakami\Spice\Exception\ClassNotFoundException;
+use shmurakami\Elephoot\Ast\AstLoader;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Entity\ClassAst;
+use shmurakami\Elephoot\Exception\ClassNotFoundException;
 
 class ClassAstResolver
 {

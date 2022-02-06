@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Output\Adaptor;
+namespace shmurakami\Elephoot\Output\Adaptor;
 
 class AdaptorConfig
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace shmurakami\Spice\Runner;
+namespace shmurakami\Elephoot\Runner;
 
-use shmurakami\Spice\Ast\Request;
-use shmurakami\Spice\Output\Adaptor\AdaptorConfig;
-use shmurakami\Spice\Output\Adaptor\GraphpAdaptor;
-use shmurakami\Spice\Output\Drawer;
-use shmurakami\Spice\Parser;
+use shmurakami\Elephoot\Ast\Request;
+use shmurakami\Elephoot\Output\Adaptor\AdaptorConfig;
+use shmurakami\Elephoot\Output\Adaptor\GraphpAdaptor;
+use shmurakami\Elephoot\Output\Drawer;
+use shmurakami\Elephoot\Parser;
 
 class Runner
 {
@@ -14,7 +14,7 @@ class Runner
     {
         /**
          * how to use
-         * ./spice -c /path/to/config_path -o /path/to/check_file_path
+         * ./elephoot -c /path/to/config_path -o /path/to/check_file_path
          */
         $args = getopt('m:t:c:o:h::', ['mode:', 'target:', 'configure:', 'output:', 'help::']);
 

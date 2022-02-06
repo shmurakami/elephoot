@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\Method;
+namespace shmurakami\Elephoot\Example\Method;
 
 class TypeHinting
 {

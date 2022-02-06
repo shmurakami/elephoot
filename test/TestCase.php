@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Test;
+namespace shmurakami\Elephoot\Test;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {

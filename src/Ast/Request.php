@@ -1,11 +1,11 @@
 <?php
 
-namespace shmurakami\Spice\Ast;
+namespace shmurakami\Elephoot\Ast;
 
 use InvalidArgumentException;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
 
 class Request
 {

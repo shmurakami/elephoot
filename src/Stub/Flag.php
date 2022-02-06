@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Stub;
+namespace shmurakami\Elephoot\Stub;
 
 class Flag
 {

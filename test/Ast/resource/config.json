@@ -1,6 +1,6 @@
 {
   "mode": "class",
-  "target": "shmurakami\\Spice\\Ast\\Request",
+  "target": "shmurakami\\Elephoot\\Ast\\Request",
   "output": "/tmp/foobar",
   "classMap": {
     "BreakingPsr": "/path/to/src/Example/other/BreakingPsr.php"

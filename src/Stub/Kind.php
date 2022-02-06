@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Stub;
+namespace shmurakami\Elephoot\Stub;
 
 /**
  * @see https://github.com/nikic/php-ast/blob/v1.0.2/ast_stub.php obtained by github

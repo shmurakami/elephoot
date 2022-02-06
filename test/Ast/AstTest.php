@@ -1,13 +1,13 @@
 <?php
 
-namespace shmurakami\Spice\Test\Ast;
+namespace shmurakami\Elephoot\Test\Ast;
 
-use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Example\Application;
-use shmurakami\Spice\Exception\ClassNotFoundException;
-use shmurakami\Spice\Test\TestCase;
+use shmurakami\Elephoot\Ast\AstLoader;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Example\Application;
+use shmurakami\Elephoot\Exception\ClassNotFoundException;
+use shmurakami\Elephoot\Test\TestCase;
 
 class AstTest extends TestCase
 {

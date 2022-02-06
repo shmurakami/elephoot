@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Exception;
+namespace shmurakami\Elephoot\Exception;
 
 class FileNotCreatedException extends Exception
 {

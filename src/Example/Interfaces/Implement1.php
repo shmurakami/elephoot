@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\Interfaces;
+namespace shmurakami\Elephoot\Example\Interfaces;
 
 interface Implement1
 {

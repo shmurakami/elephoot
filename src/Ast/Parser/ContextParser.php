@@ -1,10 +1,10 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Parser;
+namespace shmurakami\Elephoot\Ast\Parser;
 
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Context\Context;
 
 class ContextParser
 {

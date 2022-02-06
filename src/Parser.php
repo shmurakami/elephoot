@@ -1,21 +1,21 @@
 <?php
 
-namespace shmurakami\Spice;
+namespace shmurakami\Elephoot;
 
 use ReflectionException;
-use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Context\MethodContext;
-use shmurakami\Spice\Ast\Entity\ClassAst;
-use shmurakami\Spice\Ast\Entity\MethodAst;
-use shmurakami\Spice\Ast\Request;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
-use shmurakami\Spice\Ast\Resolver\FileAstResolver;
-use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\LazyReplacementTree;
-use shmurakami\Spice\Output\MethodCallTree;
-use shmurakami\Spice\Output\ObjectRelationTree;
+use shmurakami\Elephoot\Ast\AstLoader;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Entity\ClassAst;
+use shmurakami\Elephoot\Ast\Entity\MethodAst;
+use shmurakami\Elephoot\Ast\Request;
+use shmurakami\Elephoot\Ast\Resolver\ClassAstResolver;
+use shmurakami\Elephoot\Ast\Resolver\FileAstResolver;
+use shmurakami\Elephoot\Output\ClassTree;
+use shmurakami\Elephoot\Output\LazyReplacementTree;
+use shmurakami\Elephoot\Output\MethodCallTree;
+use shmurakami\Elephoot\Output\ObjectRelationTree;
 
 class Parser
 {

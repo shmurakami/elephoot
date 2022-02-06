@@ -1,14 +1,14 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Entity;
+namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Parser\AstParser;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
-use shmurakami\Spice\Exception\ClassNotFoundException;
-use shmurakami\Spice\Stub\Kind;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Parser\AstParser;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Ast\Resolver\ClassAstResolver;
+use shmurakami\Elephoot\Exception\ClassNotFoundException;
+use shmurakami\Elephoot\Stub\Kind;
 
 class FileAst
 {

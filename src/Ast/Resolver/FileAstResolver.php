@@ -1,12 +1,12 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Resolver;
+namespace shmurakami\Elephoot\Ast\Resolver;
 
 use ReflectionException;
-use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Entity\FileAst;
+use shmurakami\Elephoot\Ast\AstLoader;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Entity\FileAst;
 
 class FileAstResolver
 {

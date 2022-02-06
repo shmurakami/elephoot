@@ -1,6 +1,6 @@
 {
   "mode": "class",
-  "target": "shmurakami\\Spice\\Example\\Client",
+  "target": "shmurakami\\Elephoot\\Example\\Client",
   "classMap": {
 
   }

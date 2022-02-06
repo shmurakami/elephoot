@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\Import;
+namespace shmurakami\Elephoot\Example\Import;
 
 class ByImport
 {

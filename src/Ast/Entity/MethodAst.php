@@ -1,11 +1,11 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Entity;
+namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Context\MethodContext;
-use shmurakami\Spice\Ast\Parser\AstParser;
-use shmurakami\Spice\Output\MethodTreeNode;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Parser\AstParser;
+use shmurakami\Elephoot\Output\MethodTreeNode;
 
 class MethodAst
 {

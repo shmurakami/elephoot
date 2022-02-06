@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\ReturnType;
+namespace shmurakami\Elephoot\Example\ReturnType;
 
 class ReturnInDocComment
 {

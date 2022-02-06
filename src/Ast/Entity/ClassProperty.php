@@ -1,11 +1,11 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Entity;
+namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Context\Context;
-use shmurakami\Spice\Ast\Parser\ContextParser;
-use shmurakami\Spice\Ast\Parser\DocCommentParser;
+use shmurakami\Elephoot\Ast\Context\Context;
+use shmurakami\Elephoot\Ast\Parser\ContextParser;
+use shmurakami\Elephoot\Ast\Parser\DocCommentParser;
 
 class ClassProperty
 {

@@ -1,6 +1,6 @@
-# Spice
+# Elephoot
 
-something something
+From Elephant footprint.
 
 # About
 
@@ -17,13 +17,13 @@ Install from https://www.graphviz.org/
 Any of below lines.
 
 ```sh
-/path/to/bin/spice -m=class -o=$(pwd) -t=shmurakami\\Spice\\Example\\ExtendApplication
+/path/to/bin/elephoot -m=class -o=$(pwd) -t=shmurakami\\Elephoot\\Example\\ExtendApplication
 
 # help
 Usage:
 
 -m Mode: Parse mode. Value can be "class" or "method".
--t Target class or method name. Class name must be FQCN. Use @ as separator to specify method name like "shmurakami\Spice\Runner\Runner::showHelp".
+-t Target class or method name. Class name must be FQCN. Use @ as separator to specify method name like "shmurakami\Elephoot\Runner\Runner::showHelp".
 -o Output directory path. If not passed, use system temporary directory.
 -c Configuration file path. JSON format is supported. See README for more detail.
 -h Show this message.
@@ -46,12 +46,12 @@ WIP command
 
 All values follow syntax of command argument. See help message or [How to run](#how-to-run) for syntax.
 
-See [sample configuration file](shmurakami/spice/.config_class.json) for full example.
+See [sample configuration file](shmurakami/elephoot/.config_class.json) for full example.
 
 ```json
 {
   "mode": "class",
-  "target": "shmurakami\\Spice\\Ast\\Request",
+  "target": "shmurakami\\Elephoot\\Ast\\Request",
   "output": "/tmp/foobar",
   "classMap": {
     "BreakingPsr": "/path/to/src/Example/other/BreakingPsr.php"
@@ -65,4 +65,4 @@ See [sample configuration file](shmurakami/spice/.config_class.json) for full ex
 
 # Output
 
-For now dependency tree is generated as PNG file to output directory file named `spice.png`. In default output directory is system temporary diirectory like `/tmp`.
+For now dependency tree is generated as PNG file to output directory file named `elephoot.png`. In default output directory is system temporary diirectory like `/tmp`.

@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Context;
+namespace shmurakami\Elephoot\Ast\Context;
 
 // TODO consider about having class import list in context to resolve some dependency
 class ClassContext implements Context

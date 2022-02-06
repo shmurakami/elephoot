@@ -1,8 +1,8 @@
 <?php
 
-namespace shmurakami\Spice\Test\Ast\Context;
+namespace shmurakami\Elephoot\Test\Ast\Context;
 
-use shmurakami\Spice\Ast\Context\MethodContext;
+use shmurakami\Elephoot\Ast\Context\MethodContext;
 use PHPUnit\Framework\TestCase;
 
 class MethodContextTest extends TestCase

@@ -1,12 +1,12 @@
 <?php
 
-namespace shmurakami\Spice\Example;
+namespace shmurakami\Elephoot\Example;
 
 
 class Client
 {
     /**
-     * @var \shmurakami\Spice\Example\Application
+     * @var \shmurakami\Elephoot\Example\Application
      */
     private $application;
 
@@ -41,6 +41,6 @@ class Client
 
     private function circularReference()
     {
-        return new \shmurakami\Spice\Example\CircularReference\CircularReference1();
+        return new \shmurakami\Elephoot\Example\CircularReference\CircularReference1();
     }
 }

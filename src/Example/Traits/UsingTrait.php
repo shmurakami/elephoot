@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\Traits;
+namespace shmurakami\Elephoot\Example\Traits;
 
 trait UsingTrait
 {

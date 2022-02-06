@@ -1,4 +1,4 @@
 {
   "mode": "method",
-  "target": "shmurakami\\Spice\\Ast\\Request@sample"
+  "target": "shmurakami\\Elephoot\\Ast\\Request@sample"
 }

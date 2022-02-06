@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\CircularReference;
+namespace shmurakami\Elephoot\Example\CircularReference;
 
 class CircularReference2
 {

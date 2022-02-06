@@ -1,10 +1,10 @@
 <?php
 
-namespace shmurakami\Spice\Test\Example;
+namespace shmurakami\Elephoot\Test\Example;
 
-use shmurakami\Spice\Example\Application;
-use shmurakami\Spice\Example\Client;
-use shmurakami\Spice\Test\TestCase;
+use shmurakami\Elephoot\Example\Application;
+use shmurakami\Elephoot\Example\Client;
+use shmurakami\Elephoot\Test\TestCase;
 
 class ClientTest extends TestCase
 {

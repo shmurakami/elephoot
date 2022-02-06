@@ -1,11 +1,11 @@
 <?php
 
-namespace shmurakami\Spice\Ast\Parser;
+namespace shmurakami\Elephoot\Ast\Parser;
 
 use ast\Node;
-use shmurakami\Spice\Ast\Entity\ClassAst;
-use shmurakami\Spice\Ast\Resolver\ClassAstResolver;
-use shmurakami\Spice\Stub\Kind;
+use shmurakami\Elephoot\Ast\Entity\ClassAst;
+use shmurakami\Elephoot\Ast\Resolver\ClassAstResolver;
+use shmurakami\Elephoot\Stub\Kind;
 
 class AstParser
 {

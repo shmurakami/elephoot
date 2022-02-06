@@ -1,37 +1,37 @@
 <?php
 
-namespace shmurakami\Spice\Test;
+namespace shmurakami\Elephoot\Test;
 
 use BreakingPsr;
-use shmurakami\Spice\Ast\AstLoader;
-use shmurakami\Spice\Ast\ClassMap;
-use shmurakami\Spice\Ast\Context\ClassContext;
-use shmurakami\Spice\Ast\Request;
-use shmurakami\Spice\Example\Application;
-use shmurakami\Spice\Example\CircularReference\CircularReference1;
-use shmurakami\Spice\Example\CircularReference\CircularReference2;
-use shmurakami\Spice\Example\Client;
-use shmurakami\Spice\Example\ExtendApplication;
-use shmurakami\Spice\Example\Import\ByImport;
-use shmurakami\Spice\Example\Inherit\InheritClass;
-use shmurakami\Spice\Example\Inherit\InheritDependency;
-use shmurakami\Spice\Example\Interfaces\Implement1;
-use shmurakami\Spice\Example\Interfaces\Implement2;
-use shmurakami\Spice\Example\Method\DocComment;
-use shmurakami\Spice\Example\Method\TypeHinting;
-use shmurakami\Spice\Example\NewStatement\NewInClosure;
-use shmurakami\Spice\Example\NewStatement\NewStatement;
-use shmurakami\Spice\Example\NewStatement\NewStatementArgument;
-use shmurakami\Spice\Example\NewStatement\NewStatementArgumentArgument;
-use shmurakami\Spice\Example\NewStatement\SimplyNew;
-use shmurakami\Spice\Example\ReturnType\ReturnInDocComment;
-use shmurakami\Spice\Example\ReturnType\ReturnType;
-use shmurakami\Spice\Example\StaticMethod\StaticMethodCall;
-use shmurakami\Spice\Example\StaticMethod\StaticMethodCallArgument;
-use shmurakami\Spice\Example\Traits\UsingTrait;
-use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\ClassTreeNode;
-use shmurakami\Spice\Parser;
+use shmurakami\Elephoot\Ast\AstLoader;
+use shmurakami\Elephoot\Ast\ClassMap;
+use shmurakami\Elephoot\Ast\Context\ClassContext;
+use shmurakami\Elephoot\Ast\Request;
+use shmurakami\Elephoot\Example\Application;
+use shmurakami\Elephoot\Example\CircularReference\CircularReference1;
+use shmurakami\Elephoot\Example\CircularReference\CircularReference2;
+use shmurakami\Elephoot\Example\Client;
+use shmurakami\Elephoot\Example\ExtendApplication;
+use shmurakami\Elephoot\Example\Import\ByImport;
+use shmurakami\Elephoot\Example\Inherit\InheritClass;
+use shmurakami\Elephoot\Example\Inherit\InheritDependency;
+use shmurakami\Elephoot\Example\Interfaces\Implement1;
+use shmurakami\Elephoot\Example\Interfaces\Implement2;
+use shmurakami\Elephoot\Example\Method\DocComment;
+use shmurakami\Elephoot\Example\Method\TypeHinting;
+use shmurakami\Elephoot\Example\NewStatement\NewInClosure;
+use shmurakami\Elephoot\Example\NewStatement\NewStatement;
+use shmurakami\Elephoot\Example\NewStatement\NewStatementArgument;
+use shmurakami\Elephoot\Example\NewStatement\NewStatementArgumentArgument;
+use shmurakami\Elephoot\Example\NewStatement\SimplyNew;
+use shmurakami\Elephoot\Example\ReturnType\ReturnInDocComment;
+use shmurakami\Elephoot\Example\ReturnType\ReturnType;
+use shmurakami\Elephoot\Example\StaticMethod\StaticMethodCall;
+use shmurakami\Elephoot\Example\StaticMethod\StaticMethodCallArgument;
+use shmurakami\Elephoot\Example\Traits\UsingTrait;
+use shmurakami\Elephoot\Output\ClassTree;
+use shmurakami\Elephoot\Output\ClassTreeNode;
+use shmurakami\Elephoot\Parser;
 
 class ParserTest extends TestCase
 {

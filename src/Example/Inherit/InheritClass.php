@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\Inherit;
+namespace shmurakami\Elephoot\Example\Inherit;
 
 class InheritClass
 {

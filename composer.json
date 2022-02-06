@@ -1,5 +1,5 @@
 {
-    "name": "shmurakami/spice",
+    "name": "shmurakami/elephoot",
     "description": "dig method call tree",
     "type": "library",
     "license": "MIT",
@@ -16,19 +16,19 @@
     },
     "autoload": {
         "psr-4": {
-            "shmurakami\\Spice\\": "src/"
+            "shmurakami\\Elephoot\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "shmurakami\\Spice\\Test\\": "test/"
+            "shmurakami\\Elephoot\\Test\\": "test/"
         }
     },
     "require-dev": {
         "phpunit/phpunit": "^8"
     },
     "bin": [
-        "bin/spice"
+        "bin/elephoot"
     ],
     "scripts": {
         "test": "phpunit test"

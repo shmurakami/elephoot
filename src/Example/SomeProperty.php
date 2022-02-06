@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example;
+namespace shmurakami\Elephoot\Example;
 
 class SomeProperty
 {
@@ -9,7 +9,7 @@ class SomeProperty
      */
     private $application;
     /**
-     * @var \shmurakami\Spice\Example\Application
+     * @var \shmurakami\Elephoot\Example\Application
      */
     private $application2;
     /**

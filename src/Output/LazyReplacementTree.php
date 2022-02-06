@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Output;
+namespace shmurakami\Elephoot\Output;
 
 class LazyReplacementTree implements ObjectRelationTree
 {

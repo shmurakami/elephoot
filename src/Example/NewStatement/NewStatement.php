@@ -1,6 +1,6 @@
 <?php
 
-namespace shmurakami\Spice\Example\NewStatement;
+namespace shmurakami\Elephoot\Example\NewStatement;
 
 class NewStatement
 {

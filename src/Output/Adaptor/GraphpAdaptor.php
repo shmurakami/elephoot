@@ -1,14 +1,14 @@
 <?php
 
-namespace shmurakami\Spice\Output\Adaptor;
+namespace shmurakami\Elephoot\Output\Adaptor;
 
 use Fhaculty\Graph\Graph;
 use Fhaculty\Graph\Vertex;
 use Graphp\GraphViz\GraphViz;
-use shmurakami\Spice\Exception\FileNotCreatedException;
-use shmurakami\Spice\Output\Adaptor;
-use shmurakami\Spice\Output\ClassTree;
-use shmurakami\Spice\Output\ObjectRelationTree;
+use shmurakami\Elephoot\Exception\FileNotCreatedException;
+use shmurakami\Elephoot\Output\Adaptor;
+use shmurakami\Elephoot\Output\ClassTree;
+use shmurakami\Elephoot\Output\ObjectRelationTree;
 
 class GraphpAdaptor implements Adaptor
 {
@@ -33,7 +33,7 @@ class GraphpAdaptor implements Adaptor
     public function createDest(ObjectRelationTree $classTree): string
     {
         $filepath = $this->convert($classTree);
-        $destPath = $this->adaptorConfig->getOutputDirectory() . '/spice.png';
+        $destPath = $this->adaptorConfig->getOutputDirectory() . '/elephoot.png';
         $created = @copy($filepath, $destPath);
         if (!$created) {
             throw new FileNotCreatedException("failed to copy image to $destPath");
