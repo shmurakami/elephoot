@@ -15,18 +15,13 @@ use shmurakami\Elephoot\Output\ObjectRelationTree;
 class GraphpAdaptor implements Adaptor
 {
     /**
-     * @var AdaptorConfig
-     */
-    private $adaptorConfig;
-    /**
      * cache as marker of edge already connected
-     * @var array<string,string>[]
+     * @var <?array<string,string>[]>
      */
     private $related = [];
 
-    public function __construct(AdaptorConfig $adaptorConfig)
+    public function __construct(private AdaptorConfig $adaptorConfig)
     {
-        $this->adaptorConfig = $adaptorConfig;
     }
 
     /**

@@ -13,20 +13,12 @@ use shmurakami\Elephoot\Ast\Entity\FileAst;
 class FileAstResolver
 {
     /**
-     * @var FileAst[]
+     * @var <?FileAst[]>
      */
     private $resolved = [];
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
 
-    /**
-     * FileAstResolver constructor.
-     */
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     public function resolve(string $className): FileAst

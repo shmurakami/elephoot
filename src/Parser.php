@@ -55,6 +55,7 @@ class Parser
      */
     public function parseByMethod(MethodContext $context): ObjectRelationTree
     {
+        throw new \LogicException('not implemented');
         /*
          * parse AST for Class and method
          * pool to buffer
