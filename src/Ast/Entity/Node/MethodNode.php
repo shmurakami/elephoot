@@ -18,25 +18,10 @@ class MethodNode
      * @var string
      */
     private $namespace;
-    /**
-     * @var Node
-     */
-    private $node;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
 
-    public function __construct(ContextParser $contextParser, Context $context, Node $node)
+    public function __construct(private ContextParser $contextParser, private Context $context, private Node $node)
     {
-        $this->contextParser = $contextParser;
-        $this->context = $context;
         $this->namespace = $context->extractNamespace();
-        $this->node = $node;
     }
 
     /**

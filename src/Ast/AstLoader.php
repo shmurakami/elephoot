@@ -17,17 +17,9 @@ use function ast\parse_file;
 
 class AstLoader
 {
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
 
-    /**
-     * AstLoader constructor.
-     */
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     /**

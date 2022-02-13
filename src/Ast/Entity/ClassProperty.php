@@ -18,20 +18,13 @@ class ClassProperty
      * @var string
      */
     private $docComment;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
 
-    public function __construct(ContextParser $contextParser, Context $context, Node $propertyNode)
+    public function __construct(
+        private ContextParser $contextParser,
+        private Context $context,
+        private Node $propertyNode
+    )
     {
-        $this->contextParser = $contextParser;
-        $this->context = $context;
-
         // retrieve doc comment
 
         /** @var Node $propDeclaration */

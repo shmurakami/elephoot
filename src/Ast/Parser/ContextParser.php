@@ -10,14 +10,8 @@ use shmurakami\Elephoot\Ast\Context\Context;
 
 class ContextParser
 {
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
-
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     public function toContext(string $contextNamespace, string $className): ?Context

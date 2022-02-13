@@ -12,15 +12,9 @@ use shmurakami\Elephoot\Stub\Kind;
 class AstParser
 {
 
-    /**
-     * @var ClassAstResolver
-     */
-    private $classAstResolver;
-
-    public function __construct(ClassAstResolver $classAstResolver)
+    public function __construct(private ClassAstResolver $classAstResolver)
     {
         // probably this class should not need to depend on ClassAstResolver
-        $this->classAstResolver = $classAstResolver;
     }
 
     public function parseNamespace(Node $node): string

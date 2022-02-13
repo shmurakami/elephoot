@@ -8,17 +8,9 @@ use shmurakami\Elephoot\Ast\Context\Context;
 
 class ClassTreeNode
 {
-    /**
-     * @var Context
-     */
-    private $context;
 
-    /**
-     * ClassTreeNode constructor.
-     */
-    public function __construct(Context $context)
+    public function __construct(private Context $context)
     {
-        $this->context = $context;
     }
 
     /**

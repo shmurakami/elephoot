@@ -8,7 +8,6 @@ use ast\Node;
 use Generator;
 use shmurakami\Elephoot\Ast\Context\ClassContext;
 use shmurakami\Elephoot\Ast\Context\Context;
-use shmurakami\Elephoot\Ast\Context\MethodContext;
 use shmurakami\Elephoot\Ast\Entity\Node\MethodNode;
 use shmurakami\Elephoot\Ast\Parser\AstParser;
 use shmurakami\Elephoot\Ast\Parser\ContextParser;
@@ -27,23 +26,7 @@ class ClassAst
      * @var string
      */
     private $namespace;
-    /**
-     * @var Node
-     */
-    private $classRootNode;
 //    private string $className;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
-    /**
-     * @var AstParser
-     */
-    private $astParser;
 
     /**
      * ClassAst constructor.
@@ -51,14 +34,14 @@ class ClassAst
      * @param Context $context
      * @param ContextParser $contextParser
      */
-    public function __construct(Node $classRootNode, Context $context, ContextParser $contextParser, AstParser $astParser)
+    public function __construct(
+        private Node $classRootNode,
+        private Context $context,
+        private ContextParser $contextParser,
+        private AstParser $astParser
+    )
     {
-        $this->context = $context;
-        $this->classRootNode = $classRootNode;
-        $this->contextParser = $contextParser;
-        $this->astParser = $astParser;
         $this->namespace = $context->extractNamespace();
-
         $this->parseProperties($context);
     }
 

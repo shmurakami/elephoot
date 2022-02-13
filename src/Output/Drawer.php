@@ -6,14 +6,9 @@ namespace shmurakami\Elephoot\Output;
 
 class Drawer
 {
-    /**
-     * @var Adaptor
-     */
-    private $adaptor;
 
-    public function __construct(Adaptor $adaptor)
+    public function __construct(private Adaptor $adaptor)
     {
-        $this->adaptor = $adaptor;
     }
 
     public function draw(ObjectRelationTree $classTree): string

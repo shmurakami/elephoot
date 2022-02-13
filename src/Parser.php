@@ -22,17 +22,12 @@ use shmurakami\Elephoot\Output\ObjectRelationTree;
 class Parser
 {
     /**
-     * @var Request
-     */
-    private $request;
-    /**
      * @var ObjectRelationTree[]
      */
     private $builtTreeCache = [];
 
-    public function __construct(Request $request)
+    public function __construct(private Request $request)
     {
-        $this->request = $request;
     }
 
     public function parse(): ObjectRelationTree
