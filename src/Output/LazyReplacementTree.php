@@ -40,7 +40,7 @@ class LazyReplacementTree implements ObjectRelationTree
         return $this;
     }
 
-    public function add(ObjectRelationTree $classTree)
+    public function add(ObjectRelationTree $tree)
     {
     }
 }

@@ -23,9 +23,9 @@ class ClassTree implements ObjectRelationTree
         $this->rootNode = $rootNode;
     }
 
-    public function add(ObjectRelationTree $classTree)
+    public function add(ObjectRelationTree $tree)
     {
-        $this->childTree[] = $classTree;
+        $this->childTree[] = $tree;
     }
 
     public function getRootNode(): ClassTreeNode
