@@ -14,7 +14,7 @@ use shmurakami\Elephoot\Exception\ClassNotFoundException;
 class ClassAstResolver
 {
     /**
-     * @var <?ClassAst[]>
+     * @var array<string, ?ClassAst>
      */
     private array $resolved = [];
 

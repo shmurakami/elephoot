@@ -13,7 +13,7 @@ use shmurakami\Elephoot\Ast\Entity\FileAst;
 class FileAstResolver
 {
     /**
-     * @var <?FileAst[]>
+     * @var array<string, ?FileAst>
      */
     private $resolved = [];
 
