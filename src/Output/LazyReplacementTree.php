@@ -7,14 +7,8 @@ namespace shmurakami\Elephoot\Output;
 class LazyReplacementTree implements ObjectRelationTree
 {
 
-    /**
-     * @var string
-     */
-    private $className;
-
-    public function __construct(string $className)
+    public function __construct(private string $className)
     {
-        $this->className = $className;
     }
 
     /**
@@ -23,11 +17,6 @@ class LazyReplacementTree implements ObjectRelationTree
     public function nameShouldBeReplaced(): string
     {
         return $this->className;
-    }
-
-    public function shouldBeReplacedBy(string $className): bool
-    {
-        return $this->className === $className;
     }
 
     public function getChildTrees(): array
@@ -42,5 +31,10 @@ class LazyReplacementTree implements ObjectRelationTree
 
     public function add(ObjectRelationTree $tree)
     {
+    }
+
+    public function getRootNodeClassName(): string
+    {
+        return $this->className;
     }
 }

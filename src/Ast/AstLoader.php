@@ -69,6 +69,7 @@ class AstLoader
             return $this->loadFromFilepath($context, $mappedFilepath);
         }
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $reflector = new ReflectionClass($className);
         $fileName = $reflector->getFileName();
         if (!$fileName) {

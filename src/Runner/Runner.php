@@ -30,6 +30,7 @@ class Runner
             return;
         }
 
+        /** @psalm-suppress PossiblyInvalidArgument */
         $request = new Request($mode, $target, $output, $configure);
         if (!$request->isValid()) {
             $this->showHelp();

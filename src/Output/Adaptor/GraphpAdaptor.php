@@ -38,14 +38,14 @@ class GraphpAdaptor implements Adaptor
         return $destPath;
     }
 
-    private function convert(ClassTree $classTree): string
+    private function convert(ObjectRelationTree $classTree): string
     {
 //        $graphviz = new GraphViz();
 //        $graphviz->display($this->buildGraph($classTree));
         return (new GraphViz())->createImageFile($this->buildGraph($classTree));
     }
 
-    public function buildGraph(ClassTree $classTree): Graph
+    public function buildGraph(ObjectRelationTree $classTree): Graph
     {
         $graph = new Graph();
         $graph->setAttribute('graphviz.node.shape', 'rectangle');
@@ -53,7 +53,7 @@ class GraphpAdaptor implements Adaptor
         return $this->createNodeAndEdge($graph, $classTree);
     }
 
-    private function createNodeAndEdge(Graph $graph, ClassTree $classTree, Vertex $parentNode = null): Graph
+    private function createNodeAndEdge(Graph $graph, ObjectRelationTree $classTree, Vertex $parentNode = null): Graph
     {
         $className = $classTree->getRootNodeClassName();
         $graphNode = $this->retrieveNode($graph, $className);
