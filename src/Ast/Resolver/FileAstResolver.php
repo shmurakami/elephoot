@@ -21,7 +21,7 @@ class FileAstResolver
     {
     }
 
-    public function resolve(string $className): FileAst
+    public function resolve(string $className): ?FileAst
     {
         // null if parse failed
         if (array_key_exists($className, $this->resolved)) {
