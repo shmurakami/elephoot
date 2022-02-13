@@ -46,7 +46,7 @@ class MethodAst
         $this->astParser = $astParser;
     }
 
-    public function parse()
+    public function parse(): array
     {
         // what it's required?
         // traverse node

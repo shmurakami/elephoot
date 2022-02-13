@@ -15,7 +15,7 @@ trait ContextBehavior
      */
     private $className;
 
-    private function extractNamespaceAndClass(string $fqcn)
+    private function extractNamespaceAndClass(string $fqcn): void
     {
         $namespaceParts = [];
         $parts = explode('\\', $fqcn);

@@ -15,7 +15,7 @@ class MethodCallTree implements ObjectRelationTree
     {
     }
 
-    public function add(ObjectRelationTree $tree)
+    public function add(ObjectRelationTree $tree): void
     {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->childTree[] = $tree;

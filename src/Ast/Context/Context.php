@@ -10,7 +10,7 @@ interface Context
 
     public function fullName(): string;
 
-    public function hasNamespace();
+    public function hasNamespace(): bool;
 
     /**
      * should avoid leaking field

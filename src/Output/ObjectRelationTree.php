@@ -13,7 +13,7 @@ interface ObjectRelationTree
 
     public function replacementTree(): ObjectRelationTree;
 
-    public function add(ObjectRelationTree $tree);
+    public function add(ObjectRelationTree $tree): void;
 
     public function getRootNodeClassName(): string;
 }

@@ -12,7 +12,7 @@ use shmurakami\Elephoot\Parser;
 
 class Runner
 {
-    public function run()
+    public function run(): void
     {
         /**
          * how to use
@@ -46,7 +46,7 @@ class Runner
         echo "file outputted to $filepath\n";
     }
 
-    private function showHelp()
+    private function showHelp(): void
     {
         $currentMethod = __METHOD__;
 

@@ -31,10 +31,7 @@ class ClassAst
      * @var Node
      */
     private $classRootNode;
-    /**
-     * @var string
-     */
-    private $className;
+//    private string $className;
     /**
      * @var Context
      */
@@ -79,13 +76,13 @@ class ClassAst
      */
     public function parseMethod(string $method): MethodAst
     {
-        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
-            $rootMethod = $methodNode->children['name'];
-            if ($rootMethod === $method) {
-                $fqcn = $this->namespace . '\\' . $this->className;
-                return new MethodAst($methodNode, new MethodContext($fqcn, $method), $this->properties, $this->astParser);
-            }
-        }
+//        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
+//            $rootMethod = $methodNode->children['name'];
+//            if ($rootMethod === $method) {
+//                $fqcn = $this->namespace . '\\' . $this->className;
+//                return new MethodAst($methodNode, new MethodContext($fqcn, $method), $this->properties, $this->astParser);
+//            }
+//        }
         throw new MethodNotFoundException();
     }
 
@@ -95,7 +92,7 @@ class ClassAst
     public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
-        $resolver = function (array $contexts) use ($dependentClassAstResolver) {
+        $resolver = function (array $contexts) use ($dependentClassAstResolver): void {
             foreach ($contexts as $context) {
                 $dependentClassAstResolver->send($context);
             }
@@ -132,7 +129,7 @@ class ClassAst
         $currentContextFqcn = $this->context->fqcn();
 
         while (true) {
-            /** @var Context $context */
+            /** @var ?Context $context */
             $context = yield;
             // give null to finish
             if ($context === null) {
@@ -184,9 +181,11 @@ class ClassAst
      * digging class statement
      * TODO refactoring
      *
+     * @param Node $rootNode
+     * @param Context[] $contextList
      * @return Context[]
      */
-    private function parseNewStatement(Node $rootNode, $contextList = []): array
+    private function parseNewStatement(Node $rootNode, array $contextList = []): array
     {
         $kind = $rootNode->kind;
 

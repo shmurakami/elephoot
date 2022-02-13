@@ -13,10 +13,7 @@ class ClassProperty
 {
     use DocCommentParser;
 
-    /**
-     * @var string
-     */
-    private $className;
+//    private string $className;
     /**
      * @var string
      */

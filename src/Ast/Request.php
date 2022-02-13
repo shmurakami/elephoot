@@ -26,7 +26,7 @@ class Request
         $this->configure = $this->parseConfigFile($configFile);
     }
 
-    public function getOutputDirectory()
+    public function getOutputDirectory(): string
     {
         if ($this->output) {
             return $this->output;
@@ -69,15 +69,15 @@ class Request
         return [];
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         $output = $this->getOutputDirectory();
         try {
             $this->getTarget();
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return false;
         }
-        return $output !== '' && $output !== null;
+        return $output !== '';
     }
 
     public function getClassMap(): ClassMap
