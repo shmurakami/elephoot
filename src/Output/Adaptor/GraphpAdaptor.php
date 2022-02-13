@@ -16,7 +16,7 @@ class GraphpAdaptor implements Adaptor
 {
     /**
      * cache as marker of edge already connected
-     * @var <?array<string,string>[]>
+     * @var array<string,array<int|string, true>>
      */
     private $related = [];
 
@@ -78,6 +78,7 @@ class GraphpAdaptor implements Adaptor
         if ($graph->hasVertex($className)) {
             return $graph->getVertex($className);
         }
+        /** @psalm-suppress InvalidScalarArgument */
         return $graph->createVertex($className);
     }
 

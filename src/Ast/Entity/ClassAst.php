@@ -121,7 +121,7 @@ class ClassAst
     }
 
     /**
-     * @return Generator|array
+     * @return Generator
      */
     private function dependentClassAstResolver(ClassAstResolver $classAstResolver): Generator
     {
