@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Test\Ast\Entity;
 
 use shmurakami\Elephoot\Ast\ClassMap;
@@ -16,7 +18,7 @@ class ClassPropertyTest extends TestCase
     {
         $somePropertyClassPath = __DIR__ . '/../../../src/Example/SomeProperty.php';
         $node = \ast\parse_file($somePropertyClassPath, 70);
-        $propertyNodes = $node->children[1]->children['stmts']->children;
+        $propertyNodes = $node->children[2]->children['stmts']->children;
 
         // any way to write these tests more easier?
         $namespace = 'shmurakami\\Elephoot\\Example';

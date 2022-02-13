@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Test\Ast;
 
 use shmurakami\Elephoot\Ast\AstLoader;

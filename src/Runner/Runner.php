@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Runner;
 
 use shmurakami\Elephoot\Ast\Request;

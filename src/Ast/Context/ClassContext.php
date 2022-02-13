@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Context;
 
 // TODO consider about having class import list in context to resolve some dependency
