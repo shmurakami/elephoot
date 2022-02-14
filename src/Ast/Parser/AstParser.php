@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Parser;
 
 use ast\Node;
@@ -10,15 +12,9 @@ use shmurakami\Elephoot\Stub\Kind;
 class AstParser
 {
 
-    /**
-     * @var ClassAstResolver
-     */
-    private $classAstResolver;
-
-    public function __construct(ClassAstResolver $classAstResolver)
+    public function __construct(private ClassAstResolver $classAstResolver)
     {
         // probably this class should not need to depend on ClassAstResolver
-        $this->classAstResolver = $classAstResolver;
     }
 
     public function parseNamespace(Node $node): string
@@ -28,8 +24,7 @@ class AstParser
             return '';
         }
 
-        $namespace = $namespaceNode->children['name'];
-        return $namespace;
+        return $namespaceNode->children['name'];
     }
 
     /**
@@ -83,10 +78,9 @@ class AstParser
     }
 
     /**
-     * @param Node $node
      * @return Node[]
      */
-    public function propertyGroupNodes(Node $node)
+    public function propertyGroupNodes(Node $node): array
     {
         return $this->extractNodes($node, Kind::AST_PROP_GROUP);
     }
@@ -106,10 +100,9 @@ class AstParser
     }
 
     /**
-     * @param Node $node
      * @return Node[]
      */
-    public function extractMethodNodes(Node $node)
+    public function extractMethodNodes(Node $node): array
     {
         return $this->extractNodes($node, Kind::AST_METHOD);
     }
@@ -127,7 +120,7 @@ class AstParser
     /**
      * @return Node[]
      */
-    private function statementNodes(Node $node)
+    private function statementNodes(Node $node): array
     {
         return $node->children['stmts']->children ?? [];
     }
@@ -135,10 +128,11 @@ class AstParser
     /**
      * @return Node[]
      */
-    private function extractNodes(Node $node, int $kind)
+    private function extractNodes(Node $node, int $kind): array
     {
-        return array_filter($this->statementNodes($node), function (Node $node) use ($kind) {
-            return $node->kind === $kind;
-        });
+        return array_filter(
+            $this->statementNodes($node),
+            fn(Node $node) => $node->kind === $kind,
+        );
     }
 }

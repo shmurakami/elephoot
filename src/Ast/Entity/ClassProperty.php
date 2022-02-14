@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
@@ -11,28 +13,16 @@ class ClassProperty
 {
     use DocCommentParser;
 
-    /**
-     * @var string
-     */
-    private $className;
-    /**
-     * @var string
-     */
-    private $docComment;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
+//    private string $className;
 
-    public function __construct(ContextParser $contextParser, Context $context, Node $propertyNode)
+    private string $docComment;
+
+    public function __construct(
+        private ContextParser $contextParser,
+        private Context $context,
+        private Node $propertyNode
+    )
     {
-        $this->contextParser = $contextParser;
-        $this->context = $context;
-
         // retrieve doc comment
 
         /** @var Node $propDeclaration */

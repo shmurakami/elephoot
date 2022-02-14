@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
 use Generator;
 use shmurakami\Elephoot\Ast\Context\ClassContext;
 use shmurakami\Elephoot\Ast\Context\Context;
-use shmurakami\Elephoot\Ast\Context\MethodContext;
 use shmurakami\Elephoot\Ast\Entity\Node\MethodNode;
 use shmurakami\Elephoot\Ast\Parser\AstParser;
 use shmurakami\Elephoot\Ast\Parser\ContextParser;
@@ -20,46 +21,19 @@ class ClassAst
     /**
      * @var ClassProperty[]
      */
-    private $properties = [];
-    /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var Node
-     */
-    private $classRootNode;
-    /**
-     * @var string
-     */
-    private $className;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
-    /**
-     * @var AstParser
-     */
-    private $astParser;
+    private array $properties = [];
 
-    /**
-     * ClassAst constructor.
-     * @param Node $classRootNode
-     * @param Context $context
-     * @param ContextParser $contextParser
-     */
-    public function __construct(Node $classRootNode, Context $context, ContextParser $contextParser, AstParser $astParser)
+    private string $namespace;
+//    private string $className;
+
+    public function __construct(
+        private Node $classRootNode,
+        private Context $context,
+        private ContextParser $contextParser,
+        private AstParser $astParser
+    )
     {
-        $this->context = $context;
-        $this->classRootNode = $classRootNode;
-        $this->contextParser = $contextParser;
-        $this->astParser = $astParser;
         $this->namespace = $context->extractNamespace();
-
         $this->parseProperties($context);
     }
 
@@ -70,20 +44,15 @@ class ClassAst
         }
     }
 
-    /**
-     * @param string $method
-     * @return MethodAst
-     * @throws MethodNotFoundException
-     */
     public function parseMethod(string $method): MethodAst
     {
-        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
-            $rootMethod = $methodNode->children['name'];
-            if ($rootMethod === $method) {
-                $fqcn = $this->namespace . '\\' . $this->className;
-                return new MethodAst($methodNode, new MethodContext($fqcn, $method), $this->properties, $this->astParser);
-            }
-        }
+//        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
+//            $rootMethod = $methodNode->children['name'];
+//            if ($rootMethod === $method) {
+//                $fqcn = $this->namespace . '\\' . $this->className;
+//                return new MethodAst($methodNode, new MethodContext($fqcn, $method), $this->properties, $this->astParser);
+//            }
+//        }
         throw new MethodNotFoundException();
     }
 
@@ -93,7 +62,7 @@ class ClassAst
     public function relatedClasses(ClassAstResolver $classAstResolver): array
     {
         $dependentClassAstResolver = $this->dependentClassAstResolver($classAstResolver);
-        $resolver = function (array $contexts) use ($dependentClassAstResolver) {
+        $resolver = function (array $contexts) use ($dependentClassAstResolver): void {
             foreach ($contexts as $context) {
                 $dependentClassAstResolver->send($context);
             }
@@ -119,7 +88,7 @@ class ClassAst
     }
 
     /**
-     * @return Generator|array
+     * @return Generator
      */
     private function dependentClassAstResolver(ClassAstResolver $classAstResolver): Generator
     {
@@ -130,7 +99,7 @@ class ClassAst
         $currentContextFqcn = $this->context->fqcn();
 
         while (true) {
-            /** @var Context $context */
+            /** @var ?Context $context */
             $context = yield;
             // give null to finish
             if ($context === null) {
@@ -182,9 +151,11 @@ class ClassAst
      * digging class statement
      * TODO refactoring
      *
+     * @param Node $rootNode
+     * @param Context[] $contextList
      * @return Context[]
      */
-    private function parseNewStatement(Node $rootNode, $contextList = []): array
+    private function parseNewStatement(Node $rootNode, array $contextList = []): array
     {
         $kind = $rootNode->kind;
 
@@ -287,10 +258,9 @@ class ClassAst
      */
     private function extractUsingTrait(): array
     {
-        return array_map(function (Node $traitNode) {
-            $traitName = $traitNode->children['name'];
-            return new ClassContext($traitName);
-        }, $this->astParser->extractUsingTrait($this->classRootNode));
+        return array_map(
+            fn(Node $traitNode) => new ClassContext(fqcn: $traitNode->children['name']),
+            $this->astParser->extractUsingTrait($this->classRootNode));
     }
 
     public function treeNode(): ClassTreeNode
@@ -298,9 +268,6 @@ class ClassAst
         return new ClassTreeNode($this->context);
     }
 
-    /**
-     * @return string
-     */
     public function fqcn(): string
     {
         // TODO weird
@@ -310,7 +277,7 @@ class ClassAst
     /**
      * @return Node[]
      */
-    private function statementNodes(Node $rootNode = null)
+    private function statementNodes(Node $rootNode = null): array
     {
         if (!$rootNode) {
             $rootNode = $this->classRootNode;
@@ -318,13 +285,4 @@ class ClassAst
         return $rootNode->children['stmts']->children ?? [];
     }
 
-    /**
-     * @return Node[]
-     */
-    private function extractNodes(int $kind, Node $rootNode = null)
-    {
-        return array_filter($this->statementNodes($rootNode), function (Node $node) use ($kind) {
-            return $node->kind === $kind;
-        });
-    }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast;
 
 use InvalidArgumentException;
@@ -12,39 +14,19 @@ class Request
     const MODE_CLASS = 'CLASS';
     const MODE_METHOD = 'METHOD';
 
-    /**
-     * @var string
-     */
-    private $mode;
-    /**
-     * @var string
-     */
-    private $target;
-    /**
-     * @var string
-     */
-    private $configure;
-    /**
-     * @var string
-     */
-    private $output;
+    private array $configure;
 
-    /**
-     * Request constructor.
-     * @param string $mode
-     * @param string $target
-     * @param string $output
-     * @param string $configFile
-     */
-    public function __construct(string $mode, string $target, string $output, string $configFile)
+    public function __construct(
+        private string $mode,
+        private string $target,
+        private string $output,
+        string $configFile
+    )
     {
-        $this->mode = $mode;
-        $this->target = $target;
-        $this->output = $output;
         $this->configure = $this->parseConfigFile($configFile);
     }
 
-    public function getOutputDirectory()
+    public function getOutputDirectory(): string
     {
         if ($this->output) {
             return $this->output;
@@ -87,15 +69,15 @@ class Request
         return [];
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         $output = $this->getOutputDirectory();
         try {
             $this->getTarget();
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             return false;
         }
-        return $output !== '' && $output !== null;
+        return $output !== '';
     }
 
     public function getClassMap(): ClassMap

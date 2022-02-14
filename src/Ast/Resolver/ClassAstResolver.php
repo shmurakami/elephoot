@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Resolver;
 
 use ReflectionException;
@@ -12,20 +14,12 @@ use shmurakami\Elephoot\Exception\ClassNotFoundException;
 class ClassAstResolver
 {
     /**
-     * @var ClassAst[]
+     * @var array<string, ?ClassAst>
      */
-    private $resolved = [];
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
+    private array $resolved = [];
 
-    /**
-     * ClassAstResolver constructor.
-     */
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     public function resolve(string $className): ?ClassAst

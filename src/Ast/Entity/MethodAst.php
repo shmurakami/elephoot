@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
@@ -9,42 +11,16 @@ use shmurakami\Elephoot\Output\MethodTreeNode;
 
 class MethodAst
 {
-    /**
-     * @var ClassProperty[]
-     */
-    private $classProperties;
-    /**
-     * @var Node
-     */
-    private $methodRootNode;
-    /**
-     * @var array
-     */
-    private $variables = [];
-    /**
-     * @var MethodContext
-     */
-    private $context;
-    /**
-     * @var AstParser
-     */
-    private $astParser;
-
-    /**
-     * MethodAst constructor.
-     * @param Node $methodRootNode
-     * @param MethodContext $context
-     * @param ClassProperty[] $classProperties
-     */
-    public function __construct(Node $methodRootNode, MethodContext $context, array $classProperties, AstParser $astParser)
+    public function __construct(
+        private Node $methodRootNode,
+        private MethodContext $context,
+        private array $classProperties,
+        private AstParser $astParser
+    )
     {
-        $this->methodRootNode = $methodRootNode;
-        $this->context = $context;
-        $this->classProperties = $classProperties;
-        $this->astParser = $astParser;
     }
 
-    public function parse()
+    public function parse(): array
     {
         // what it's required?
         // traverse node

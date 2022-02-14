@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Entity\Node;
 
 use ast\Node;
@@ -12,35 +14,21 @@ class MethodNode
 {
     use DocCommentParser;
 
-    /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var Node
-     */
-    private $node;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
+    private string $namespace;
 
-    public function __construct(ContextParser $contextParser, Context $context, Node $node)
+    public function __construct(
+        private ContextParser $contextParser,
+        private Context $context,
+        private Node $node
+    )
     {
-        $this->contextParser = $contextParser;
-        $this->context = $context;
         $this->namespace = $context->extractNamespace();
-        $this->node = $node;
     }
 
     /**
      * @return Context[]
      */
-    public function parseMethodAttributeToContexts()
+    public function parseMethodAttributeToContexts(): array
     {
         $dependencyContexts = [];
 

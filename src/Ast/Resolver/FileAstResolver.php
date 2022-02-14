@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Resolver;
 
 use ReflectionException;
@@ -11,23 +13,15 @@ use shmurakami\Elephoot\Ast\Entity\FileAst;
 class FileAstResolver
 {
     /**
-     * @var FileAst[]
+     * @var array<string, ?FileAst>
      */
     private $resolved = [];
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
 
-    /**
-     * FileAstResolver constructor.
-     */
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
-    public function resolve(string $className): FileAst
+    public function resolve(string $className): ?FileAst
     {
         // null if parse failed
         if (array_key_exists($className, $this->resolved)) {

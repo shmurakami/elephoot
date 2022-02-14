@@ -1,30 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Output;
 
 class MethodCallTree implements ObjectRelationTree
 {
     /**
-     * @var MethodTreeNode
-     */
-    private $rootNode;
-
-    /**
      * @var MethodCallTree[]
      */
-    private $childTree = [];
+    private array $childTree = [];
 
-    /**
-     * MethodCallTree constructor.
-     * @param MethodTreeNode $rootNode
-     */
-    public function __construct(MethodTreeNode $rootNode)
+    public function __construct(private MethodTreeNode $rootNode)
     {
-        $this->rootNode = $rootNode;
     }
 
-    public function add(ObjectRelationTree $tree)
+    public function add(ObjectRelationTree $tree): void
     {
+        /** @psalm-suppress PropertyTypeCoercion */
         $this->childTree[] = $tree;
     }
 
@@ -37,5 +30,10 @@ class MethodCallTree implements ObjectRelationTree
     {
         // dump child tree i.e. shallow copy
         return new MethodCallTree($this->rootNode);
+    }
+
+    public function getRootNodeClassName(): string
+    {
+        return $this->rootNode->getClassName();
     }
 }

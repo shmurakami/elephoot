@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast;
 
 use ReflectionClass;
@@ -15,17 +17,9 @@ use function ast\parse_file;
 
 class AstLoader
 {
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
 
-    /**
-     * AstLoader constructor.
-     */
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     /**
@@ -52,8 +46,7 @@ class AstLoader
             throw new ClassNotFoundException("class or interface or trait $fqcn not found");
         }
 
-        $fileAst = $this->loadFileAst($context);
-        return $fileAst->toClassAst();
+        return $this->loadFileAst($context)->toClassAst();
     }
 
     /**
@@ -67,6 +60,7 @@ class AstLoader
             return $this->loadFromFilepath($context, $mappedFilepath);
         }
 
+        /** @psalm-suppress ArgumentTypeCoercion */
         $reflector = new ReflectionClass($className);
         $fileName = $reflector->getFileName();
         if (!$fileName) {

@@ -1,19 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Context;
 
 trait ContextBehavior
 {
-    /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var string
-     */
-    private $className;
+    private string $namespace;
 
-    private function extractNamespaceAndClass(string $fqcn)
+    private string $className;
+
+    private function extractNamespaceAndClass(string $fqcn): void
     {
         $namespaceParts = [];
         $parts = explode('\\', $fqcn);

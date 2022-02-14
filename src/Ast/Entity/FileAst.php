@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Entity;
 
 use ast\Node;
@@ -12,34 +14,17 @@ use shmurakami\Elephoot\Stub\Kind;
 
 class FileAst
 {
-    /**
-     * @var Node
-     */
-    private $rootNode;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var ContextParser
-     */
-    private $contextParser;
-    /**
-     * @var AstParser
-     */
-    private $astParser;
 
-    public function __construct(Node $rootNode, Context $context, ContextParser $contextParser, AstParser $astParser)
+    public function __construct(
+        private Node $rootNode,
+        private Context $context,
+        private ContextParser $contextParser,
+        private AstParser $astParser
+    )
     {
-        $this->rootNode = $rootNode;
-        $this->contextParser = $contextParser;
-        $this->context = $context;
-        $this->astParser = $astParser;
     }
 
     /**
-     * @param Node|null $rootNode
-     * @return ClassAst
      * @throws ClassNotFoundException
      */
     public function toClassAst(?Node $rootNode = null): ClassAst
@@ -54,7 +39,7 @@ class FileAst
             }
 
             if ($node->kind === Kind::AST_CLASS) {
-                $nodeClassName =  $node->children['name'];
+                $nodeClassName = $node->children['name'];
                 $nodeClassFqcn = $namespace . '\\' . $nodeClassName;
                 if ($nodeClassFqcn === $this->context->fqcn()) {
                     return new ClassAst($node, $this->context, $this->contextParser, $this->astParser);

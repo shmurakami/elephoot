@@ -1,18 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast;
 
 class ClassMap
 {
 
-    /**
-     * @var array
-     */
-    private $classMap;
-
-    public function __construct(array $classMap)
+    public function __construct(private array $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     public function registered(string $classFqcn): bool

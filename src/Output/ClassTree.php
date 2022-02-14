@@ -1,29 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Output;
 
 class ClassTree implements ObjectRelationTree
 {
     /**
-     * @var ClassTreeNode
-     */
-    private $rootNode;
-    /**
      * @var ClassTree[]
      */
-    private $childTree = [];
+    private array $childTree = [];
 
-    /**
-     * ClassTree constructor.
-     */
-    public function __construct(ClassTreeNode $rootNode)
+    public function __construct(private ClassTreeNode $rootNode)
     {
-        $this->rootNode = $rootNode;
     }
 
-    public function add(ObjectRelationTree $classTree)
+    public function add(ObjectRelationTree $tree): void
     {
-        $this->childTree[] = $classTree;
+        /** @psalm-suppress PropertyTypeCoercion */
+        $this->childTree[] = $tree;
     }
 
     public function getRootNode(): ClassTreeNode

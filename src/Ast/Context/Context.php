@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Context;
 
 interface Context
@@ -8,7 +10,7 @@ interface Context
 
     public function fullName(): string;
 
-    public function hasNamespace();
+    public function hasNamespace(): bool;
 
     /**
      * should avoid leaking field

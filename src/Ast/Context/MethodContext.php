@@ -1,28 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Context;
 
 class MethodContext implements Context
 {
     use ContextBehavior;
 
-    /**
-     * @var string
-     */
-    private $fqcn;
-    /**
-     * @var string
-     */
-    private $method;
-
-    /**
-     * MethodContext constructor.
-     */
-    public function __construct(string $fqcn, string $method)
+    public function __construct(private string $fqcn, private string $method)
     {
-        $this->fqcn = $fqcn;
-        $this->method = $method;
-
         $this->extractNamespaceAndClass($fqcn);
     }
 

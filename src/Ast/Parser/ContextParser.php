@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Parser;
 
 use shmurakami\Elephoot\Ast\ClassMap;
@@ -8,14 +10,8 @@ use shmurakami\Elephoot\Ast\Context\Context;
 
 class ContextParser
 {
-    /**
-     * @var ClassMap
-     */
-    private $classMap;
-
-    public function __construct(ClassMap $classMap)
+    public function __construct(private ClassMap $classMap)
     {
-        $this->classMap = $classMap;
     }
 
     public function toContext(string $contextNamespace, string $className): ?Context
@@ -24,7 +20,7 @@ class ContextParser
             return null;
         }
 
-        if ($this->isFqcn($className) || $context = $this->contextIfValidClass($className)) {
+        if ($this->isFqcn($className) || $this->contextIfValidClass($className)) {
             return new ClassContext($className);
         }
         return $this->contextIfValidClass($contextNamespace . '\\' . $className);
@@ -33,7 +29,7 @@ class ContextParser
     /**
      * @return Context[]
      */
-    public function toContextList(string $contextNamespace, array $classNames)
+    public function toContextList(string $contextNamespace, array $classNames): array
     {
         $contexts = [];
         foreach ($classNames as $className) {
@@ -48,7 +44,7 @@ class ContextParser
     /**
      * @return Context[]
      */
-    public function unique(array $contexts)
+    public function unique(array $contexts): array
     {
         $unique = [];
         foreach ($contexts as $context) {
@@ -63,18 +59,16 @@ class ContextParser
 
     private function contextIfValidClass(string $class): ?Context
     {
-        if (class_exists($class)) {
-            return new ClassContext($class);
-        }
-        if ($this->classMap->registered($class)) {
-            return new ClassContext($class);
-        }
-        return null;
+        return match (true) {
+            class_exists($class) => new ClassContext($class),
+            $this->classMap->registered($class) => new ClassContext($class),
+            default => null,
+        };
     }
 
     private function isFqcn(string $className): bool
     {
-        return strpos($className, '\\') !== false;
+        return str_contains($className, '\\');
     }
 
     private function isNotSupportedPhpBaseType(string $classType): bool

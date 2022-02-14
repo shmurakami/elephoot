@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Output;
 
 interface ObjectRelationTree
@@ -11,5 +13,7 @@ interface ObjectRelationTree
 
     public function replacementTree(): ObjectRelationTree;
 
-    public function add(ObjectRelationTree $classTree);
+    public function add(ObjectRelationTree $tree): void;
+
+    public function getRootNodeClassName(): string;
 }

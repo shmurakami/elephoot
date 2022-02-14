@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot;
 
 use ReflectionException;
@@ -20,17 +22,12 @@ use shmurakami\Elephoot\Output\ObjectRelationTree;
 class Parser
 {
     /**
-     * @var Request
-     */
-    private $request;
-    /**
      * @var ObjectRelationTree[]
      */
-    private $builtTreeCache = [];
+    private array $builtTreeCache = [];
 
-    public function __construct(Request $request)
+    public function __construct(private Request $request)
     {
-        $this->request = $request;
     }
 
     public function parse(): ObjectRelationTree
@@ -53,6 +50,7 @@ class Parser
      */
     public function parseByMethod(MethodContext $context): ObjectRelationTree
     {
+        throw new \LogicException('not implemented');
         /*
          * parse AST for Class and method
          * pool to buffer

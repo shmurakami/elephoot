@@ -1,36 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Output;
 
 class MethodTreeNode
 {
-    /**
-     * @var string
-     */
-    private $className;
-    private $methodName;
-
-    /**
-     * TreeNode constructor.
-     */
-    public function __construct(string $className, $methodName)
+    public function __construct(private string $className, private string $methodName)
     {
-        $this->className = $className;
-        $this->methodName = $methodName;
     }
 
-    /**
-     * @return string
-     */
     public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMethodName()
+    public function getMethodName(): mixed
     {
         return $this->methodName;
     }

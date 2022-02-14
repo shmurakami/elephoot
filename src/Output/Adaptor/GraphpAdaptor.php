@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Output\Adaptor;
 
 use Fhaculty\Graph\Graph;
@@ -13,18 +15,13 @@ use shmurakami\Elephoot\Output\ObjectRelationTree;
 class GraphpAdaptor implements Adaptor
 {
     /**
-     * @var AdaptorConfig
-     */
-    private $adaptorConfig;
-    /**
      * cache as marker of edge already connected
-     * @var array<string,string>[]
+     * @var array<string,array<int|string, true>>
      */
-    private $related = [];
+    private array $related = [];
 
-    public function __construct(AdaptorConfig $adaptorConfig)
+    public function __construct(private AdaptorConfig $adaptorConfig)
     {
-        $this->adaptorConfig = $adaptorConfig;
     }
 
     /**
@@ -41,14 +38,14 @@ class GraphpAdaptor implements Adaptor
         return $destPath;
     }
 
-    private function convert(ClassTree $classTree): string
+    private function convert(ObjectRelationTree $classTree): string
     {
 //        $graphviz = new GraphViz();
 //        $graphviz->display($this->buildGraph($classTree));
         return (new GraphViz())->createImageFile($this->buildGraph($classTree));
     }
 
-    public function buildGraph(ClassTree $classTree): Graph
+    public function buildGraph(ObjectRelationTree $classTree): Graph
     {
         $graph = new Graph();
         $graph->setAttribute('graphviz.node.shape', 'rectangle');
@@ -56,7 +53,7 @@ class GraphpAdaptor implements Adaptor
         return $this->createNodeAndEdge($graph, $classTree);
     }
 
-    private function createNodeAndEdge(Graph $graph, ClassTree $classTree, Vertex $parentNode = null): Graph
+    private function createNodeAndEdge(Graph $graph, ObjectRelationTree $classTree, Vertex $parentNode = null): Graph
     {
         $className = $classTree->getRootNodeClassName();
         $graphNode = $this->retrieveNode($graph, $className);
@@ -81,6 +78,7 @@ class GraphpAdaptor implements Adaptor
         if ($graph->hasVertex($className)) {
             return $graph->getVertex($className);
         }
+        /** @psalm-suppress InvalidScalarArgument */
         return $graph->createVertex($className);
     }
 

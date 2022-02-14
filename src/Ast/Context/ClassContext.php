@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shmurakami\Elephoot\Ast\Context;
 
 // TODO consider about having class import list in context to resolve some dependency
@@ -7,14 +9,8 @@ class ClassContext implements Context
 {
     use ContextBehavior;
 
-    /**
-     * @var string
-     */
-    private $fqcn;
+    private string $fqcn;
 
-    /**
-     * Context constructor.
-     */
     public function __construct(string $fqcn)
     {
         $this->fqcn = $fqcn;
