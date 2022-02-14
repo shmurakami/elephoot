@@ -25,8 +25,6 @@ class FileAst
     }
 
     /**
-     * @param Node|null $rootNode
-     * @return ClassAst
      * @throws ClassNotFoundException
      */
     public function toClassAst(?Node $rootNode = null): ClassAst

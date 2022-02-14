@@ -14,10 +14,8 @@ class ClassProperty
     use DocCommentParser;
 
 //    private string $className;
-    /**
-     * @var string
-     */
-    private $docComment;
+
+    private string $docComment;
 
     public function __construct(
         private ContextParser $contextParser,

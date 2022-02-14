@@ -13,9 +13,6 @@ class ClassTreeNode
     {
     }
 
-    /**
-     * @return string
-     */
     public function getClassName(): string
     {
         return $this->context->fqcn();

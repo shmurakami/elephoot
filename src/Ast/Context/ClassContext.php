@@ -9,14 +9,8 @@ class ClassContext implements Context
 {
     use ContextBehavior;
 
-    /**
-     * @var string
-     */
-    private $fqcn;
+    private string $fqcn;
 
-    /**
-     * Context constructor.
-     */
     public function __construct(string $fqcn)
     {
         $this->fqcn = $fqcn;

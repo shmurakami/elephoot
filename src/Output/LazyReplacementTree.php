@@ -11,9 +11,6 @@ class LazyReplacementTree implements ObjectRelationTree
     {
     }
 
-    /**
-     * @return string
-     */
     public function nameShouldBeReplaced(): string
     {
         return $this->className;

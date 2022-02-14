@@ -18,7 +18,7 @@ class GraphpAdaptor implements Adaptor
      * cache as marker of edge already connected
      * @var array<string,array<int|string, true>>
      */
-    private $related = [];
+    private array $related = [];
 
     public function __construct(private AdaptorConfig $adaptorConfig)
     {

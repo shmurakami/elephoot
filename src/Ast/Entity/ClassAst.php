@@ -21,19 +21,11 @@ class ClassAst
     /**
      * @var ClassProperty[]
      */
-    private $properties = [];
-    /**
-     * @var string
-     */
-    private $namespace;
+    private array $properties = [];
+
+    private string $namespace;
 //    private string $className;
 
-    /**
-     * ClassAst constructor.
-     * @param Node $classRootNode
-     * @param Context $context
-     * @param ContextParser $contextParser
-     */
     public function __construct(
         private Node $classRootNode,
         private Context $context,
@@ -52,11 +44,6 @@ class ClassAst
         }
     }
 
-    /**
-     * @param string $method
-     * @return MethodAst
-     * @throws MethodNotFoundException
-     */
     public function parseMethod(string $method): MethodAst
     {
 //        foreach ($this->extractNodes(Kind::AST_METHOD) as $methodNode) {
@@ -271,10 +258,9 @@ class ClassAst
      */
     private function extractUsingTrait(): array
     {
-        return array_map(function (Node $traitNode) {
-            $traitName = $traitNode->children['name'];
-            return new ClassContext($traitName);
-        }, $this->astParser->extractUsingTrait($this->classRootNode));
+        return array_map(
+            fn(Node $traitNode) => new ClassContext(fqcn: $traitNode->children['name']),
+            $this->astParser->extractUsingTrait($this->classRootNode));
     }
 
     public function treeNode(): ClassTreeNode
@@ -282,9 +268,6 @@ class ClassAst
         return new ClassTreeNode($this->context);
     }
 
-    /**
-     * @return string
-     */
     public function fqcn(): string
     {
         // TODO weird
@@ -294,7 +277,7 @@ class ClassAst
     /**
      * @return Node[]
      */
-    private function statementNodes(Node $rootNode = null)
+    private function statementNodes(Node $rootNode = null): array
     {
         if (!$rootNode) {
             $rootNode = $this->classRootNode;
@@ -302,13 +285,4 @@ class ClassAst
         return $rootNode->children['stmts']->children ?? [];
     }
 
-    /**
-     * @return Node[]
-     */
-    private function extractNodes(int $kind, Node $rootNode = null)
-    {
-        return array_filter($this->statementNodes($rootNode), function (Node $node) use ($kind) {
-            return $node->kind === $kind;
-        });
-    }
 }

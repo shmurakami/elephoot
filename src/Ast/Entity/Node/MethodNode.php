@@ -14,12 +14,13 @@ class MethodNode
 {
     use DocCommentParser;
 
-    /**
-     * @var string
-     */
-    private $namespace;
+    private string $namespace;
 
-    public function __construct(private ContextParser $contextParser, private Context $context, private Node $node)
+    public function __construct(
+        private ContextParser $contextParser,
+        private Context $context,
+        private Node $node
+    )
     {
         $this->namespace = $context->extractNamespace();
     }
@@ -27,7 +28,7 @@ class MethodNode
     /**
      * @return Context[]
      */
-    public function parseMethodAttributeToContexts()
+    public function parseMethodAttributeToContexts(): array
     {
         $dependencyContexts = [];
 

@@ -9,7 +9,7 @@ class ClassTree implements ObjectRelationTree
     /**
      * @var ClassTree[]
      */
-    private $childTree = [];
+    private array $childTree = [];
 
     public function __construct(private ClassTreeNode $rootNode)
     {

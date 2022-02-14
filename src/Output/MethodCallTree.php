@@ -9,7 +9,7 @@ class MethodCallTree implements ObjectRelationTree
     /**
      * @var MethodCallTree[]
      */
-    private $childTree = [];
+    private array $childTree = [];
 
     public function __construct(private MethodTreeNode $rootNode)
     {

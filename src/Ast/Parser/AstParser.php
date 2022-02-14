@@ -24,8 +24,7 @@ class AstParser
             return '';
         }
 
-        $namespace = $namespaceNode->children['name'];
-        return $namespace;
+        return $namespaceNode->children['name'];
     }
 
     /**
@@ -79,10 +78,9 @@ class AstParser
     }
 
     /**
-     * @param Node $node
      * @return Node[]
      */
-    public function propertyGroupNodes(Node $node)
+    public function propertyGroupNodes(Node $node): array
     {
         return $this->extractNodes($node, Kind::AST_PROP_GROUP);
     }
@@ -102,10 +100,9 @@ class AstParser
     }
 
     /**
-     * @param Node $node
      * @return Node[]
      */
-    public function extractMethodNodes(Node $node)
+    public function extractMethodNodes(Node $node): array
     {
         return $this->extractNodes($node, Kind::AST_METHOD);
     }
@@ -123,7 +120,7 @@ class AstParser
     /**
      * @return Node[]
      */
-    private function statementNodes(Node $node)
+    private function statementNodes(Node $node): array
     {
         return $node->children['stmts']->children ?? [];
     }
@@ -131,10 +128,11 @@ class AstParser
     /**
      * @return Node[]
      */
-    private function extractNodes(Node $node, int $kind)
+    private function extractNodes(Node $node, int $kind): array
     {
-        return array_filter($this->statementNodes($node), function (Node $node) use ($kind) {
-            return $node->kind === $kind;
-        });
+        return array_filter(
+            $this->statementNodes($node),
+            fn(Node $node) => $node->kind === $kind,
+        );
     }
 }

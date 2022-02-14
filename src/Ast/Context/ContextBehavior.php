@@ -6,14 +6,9 @@ namespace shmurakami\Elephoot\Ast\Context;
 
 trait ContextBehavior
 {
-    /**
-     * @var string
-     */
-    private $namespace;
-    /**
-     * @var string
-     */
-    private $className;
+    private string $namespace;
+
+    private string $className;
 
     private function extractNamespaceAndClass(string $fqcn): void
     {

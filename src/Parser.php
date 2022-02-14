@@ -24,7 +24,7 @@ class Parser
     /**
      * @var ObjectRelationTree[]
      */
-    private $builtTreeCache = [];
+    private array $builtTreeCache = [];
 
     public function __construct(private Request $request)
     {

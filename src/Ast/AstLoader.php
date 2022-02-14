@@ -46,8 +46,7 @@ class AstLoader
             throw new ClassNotFoundException("class or interface or trait $fqcn not found");
         }
 
-        $fileAst = $this->loadFileAst($context);
-        return $fileAst->toClassAst();
+        return $this->loadFileAst($context)->toClassAst();
     }
 
     /**
