@@ -13,7 +13,7 @@ COPY . /app
 COPY ./conf/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 RUN apt update && \
-  apt-get -y install git libzip-dev
+  apt-get -y install git libzip-dev graphviz
 
 RUN pecl install ast && \
   pecl install xdebug && \
