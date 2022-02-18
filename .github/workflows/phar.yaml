@@ -28,14 +28,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-
 
-      - name: check ini
-        run: php --ini
-
-      - name: check phar
-        run: php -i |grep -i phar
-
       - name: Enable creating phar file
-        run: sed -i 's/;phar.readonly = On/phar.readonly = Off/g' /usr/local/etc/php/php.ini
+        run: sed -i 's/;phar.readonly = On/phar.readonly = Off/g' /etc/php/8.1/cli/php.ini
 
       # mandatory using --ignore-platform-reqs option
       # because required ast extension is not installed
