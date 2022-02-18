@@ -1,0 +1,49 @@
+name: Update Phar
+
+on:
+  push:
+    branches: [ $default-branch, phar ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP with Phar extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: phar
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: check ini
+        run: php --ini
+
+      - name: check phar
+        run: php -i |grep -i phar
+
+      - name: Enable creating phar file
+        run: sed -i 's/;phar.readonly = On/phar.readonly = Off/g' /usr/local/etc/php/php.ini
+
+      # mandatory using --ignore-platform-reqs option
+      # because required ast extension is not installed
+      - name: Install dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --ignore-platform-reqs
+
+      - name: Download phar-composer.phar
+        run: curl -sLo /usr/local/bin/phar_composer.phar "https://github.com/clue/phar-composer/releases/download/v1.4.0/phar-composer-1.4.0.phar"
+
+      - name: Update Phar file
+        run: php /usr/local/bin/phar_composer.phar build
