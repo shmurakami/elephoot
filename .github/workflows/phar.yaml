@@ -39,3 +39,10 @@ jobs:
 
       - name: Update Phar file
         run: php /usr/local/bin/phar_composer.phar build
+
+      - name: Push updated Phar file
+        uses: EndBug/add-and-commit@v8
+        with:
+          add: elephoot.phar
+          author_name: GitHub Actions
+          message: Update Phar
