@@ -67,6 +67,8 @@ class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
             new \shmurakami\Elephoot\Example\NewStatement\NewInClosure();
         });
 
+        $_ = fn () => new \shmurakami\Elephoot\Example\NewStatement\NewInShorthandClosure();
+
         $foo = new \shmurakami\Elephoot\Example\NewStatement\NewStatement();
         return $foo->foo(new \shmurakami\Elephoot\Example\NewStatement\NewStatementArgument(
             new \shmurakami\Elephoot\Example\NewStatement\NewStatementArgumentArgument()

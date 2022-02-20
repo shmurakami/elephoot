@@ -23,6 +23,7 @@ use shmurakami\Elephoot\Example\Interfaces\Implement2;
 use shmurakami\Elephoot\Example\Method\DocComment;
 use shmurakami\Elephoot\Example\Method\TypeHinting;
 use shmurakami\Elephoot\Example\NewStatement\NewInClosure;
+use shmurakami\Elephoot\Example\NewStatement\NewInShorthandClosure;
 use shmurakami\Elephoot\Example\NewStatement\NewStatement;
 use shmurakami\Elephoot\Example\NewStatement\NewStatementArgument;
 use shmurakami\Elephoot\Example\NewStatement\NewStatementArgumentArgument;
@@ -85,6 +86,9 @@ class ParserTest extends TestCase
 
         $newInClosureTree = new ClassTree(new ClassTreeNode(new ClassContext(NewInClosure::class)));
         $applicationTree->add($newInClosureTree);
+
+        $newInShorthandClosureTree = new ClassTree(new ClassTreeNode(new ClassContext(NewInShorthandClosure::class)));
+        $applicationTree->add($newInShorthandClosureTree);
 
         // new statement has nested dependencies
         $newStatementTree = new ClassTree(new ClassTreeNode(new ClassContext(NewStatement::class)));
