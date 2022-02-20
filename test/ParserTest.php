@@ -13,6 +13,7 @@ use shmurakami\Elephoot\Example\Application;
 use shmurakami\Elephoot\Example\CircularReference\CircularReference1;
 use shmurakami\Elephoot\Example\CircularReference\CircularReference2;
 use shmurakami\Elephoot\Example\Client;
+use shmurakami\Elephoot\Example\Enum\Animal;
 use shmurakami\Elephoot\Example\ExtendApplication;
 use shmurakami\Elephoot\Example\Import\ByImport;
 use shmurakami\Elephoot\Example\Inherit\InheritClass;
@@ -108,6 +109,10 @@ class ParserTest extends TestCase
         $breakingPsrClassTree = new ClassTree(new ClassTreeNode(new ClassContext('\\' . BreakingPsr::class)));
         $applicationTree->add($breakingPsrClassTree);
 
+        // PHP Native Enum
+        $enumTree = new ClassTree(new ClassTreeNode(new ClassContext(Animal::class)));
+        $applicationTree->add($enumTree);
+
         // root client tree
         $clientTree = new ClassTree(new ClassTreeNode(new ClassContext(Client::class)));
         $clientTree->add($applicationTree);
@@ -122,7 +127,6 @@ class ParserTest extends TestCase
         $secondCircularReferenceTree->add(new ClassTree(new ClassTreeNode(new ClassContext(CircularReference1::class))));
         $circularReferenceTree = new ClassTree(new ClassTreeNode(new ClassContext(CircularReference1::class)));
         $circularReferenceTree->add($secondCircularReferenceTree);
-
         $clientTree->add($circularReferenceTree);
 
         $expect = $clientTree;
