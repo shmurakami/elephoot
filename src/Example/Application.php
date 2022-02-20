@@ -98,4 +98,9 @@ class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
         };
         return $f();
     }
+
+    public function animal(): \shmurakami\Elephoot\Example\Enum\Animal
+    {
+        return \shmurakami\Elephoot\Example\Enum\Animal::fromName('cat');
+    }
 }
