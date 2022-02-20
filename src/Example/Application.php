@@ -53,6 +53,11 @@ class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
         return null;
     }
 
+    private function byUnionReturn(): null|\shmurakami\Elephoot\Example\ReturnType\ReturnType|\shmurakami\Elephoot\Example\ReturnType\UnionReturnType
+    {
+        return null;
+    }
+
     /**
      * @return \shmurakami\Elephoot\Example\ReturnType\ReturnInDocComment|null
      */
@@ -101,7 +106,7 @@ class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
         return $f();
     }
 
-    public function animal(): \shmurakami\Elephoot\Example\Enum\Animal
+    public function animal()
     {
         return \shmurakami\Elephoot\Example\Enum\Animal::fromName('cat');
     }

@@ -56,11 +56,18 @@ class MethodNode
         // return statement
         // return type
         $returnTypeNode = $this->node->children['returnType'] ?? null;
-        if ($returnTypeNode
-            && ($returnTypeNode->kind === Kind::AST_TYPE || $returnTypeNode->kind === Kind::AST_NULLABLE_TYPE)
-        ) {
-            $typeName = $returnTypeNode->children['type']->children['name'] ?? '';
-            if ($typeName) {
+        if ($returnTypeNode) {
+            $returnTypeKind = $returnTypeNode->kind;
+            $typeNames = match ($returnTypeKind) {
+                Kind::AST_NAME => $returnTypeNode->children['name'],
+                Kind::AST_NULLABLE_TYPE => $returnTypeNode->children['type']->children['name'],
+                Kind::AST_TYPE_UNION, Kind::AST_TYPE_INTERSECTION => array_map(
+                    fn(Node $node) => $node->children['name'] ?? '',
+                    $returnTypeNode->children),
+                default => [],
+            };
+
+            foreach ((array)$typeNames as $typeName) {
                 $context = $this->contextParser->toContext($this->namespace, $typeName);
                 if ($context) {
                     $dependencyContexts[] = $context;
