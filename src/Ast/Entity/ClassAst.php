@@ -160,7 +160,7 @@ class ClassAst
         $kind = $rootNode->kind;
 
         // has child statements
-        if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE], true)) {
+        if (in_array($kind, [Kind::AST_CLASS, Kind::AST_METHOD, Kind::AST_CLOSURE, Kind::AST_ARROW_FUNC], true)) {
             $statementNodes = $this->statementNodes($rootNode);
             foreach ($statementNodes as $statementNode) {
                 $contextList = $this->parseNewStatement($statementNode, $contextList);
@@ -174,7 +174,10 @@ class ClassAst
             if (!($rightStatementNode instanceof Node)) {
                 return $contextList;
             }
-            if ($rightStatementNode->kind === Kind::AST_NEW || $kind === Kind::AST_RETURN) {
+            if ($kind === Kind::AST_RETURN) {
+                return $this->parseNewStatement($rightStatementNode, $contextList);
+            }
+            if (in_array($rightStatementNode->kind, [Kind::AST_NEW, Kind::AST_ARROW_FUNC], true)) {
                 return $this->parseNewStatement($rightStatementNode, $contextList);
             }
             return $contextList;
