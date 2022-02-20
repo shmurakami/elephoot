@@ -30,6 +30,7 @@ use shmurakami\Elephoot\Example\NewStatement\NewStatementArgumentArgument;
 use shmurakami\Elephoot\Example\NewStatement\SimplyNew;
 use shmurakami\Elephoot\Example\ReturnType\ReturnInDocComment;
 use shmurakami\Elephoot\Example\ReturnType\ReturnType;
+use shmurakami\Elephoot\Example\ReturnType\UnionReturnType;
 use shmurakami\Elephoot\Example\StaticMethod\StaticMethodCall;
 use shmurakami\Elephoot\Example\StaticMethod\StaticMethodCallArgument;
 use shmurakami\Elephoot\Example\Traits\UsingTrait;
@@ -76,8 +77,10 @@ class ParserTest extends TestCase
         $applicationTree->add($methodTypeHintingTree);
 
         $returnTypeTree = new ClassTree(new ClassTreeNode(new ClassContext(ReturnType::class)));
+        $unionReturnTypeTree = new ClassTree(new ClassTreeNode(new ClassContext(UnionReturnType::class)));
         $returnInDocCommentTree = new ClassTree(new ClassTreeNode(new ClassContext(ReturnInDocComment::class)));
         $applicationTree->add($returnTypeTree);
+        $applicationTree->add($unionReturnTypeTree);
         $applicationTree->add($returnInDocCommentTree);
 
 

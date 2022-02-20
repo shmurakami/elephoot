@@ -53,6 +53,11 @@ class Application extends \shmurakami\Elephoot\Example\Inherit\InheritClass
         return null;
     }
 
+    private function byUnionReturn(): null|\shmurakami\Elephoot\Example\ReturnType\ReturnType|\shmurakami\Elephoot\Example\ReturnType\UnionReturnType
+    {
+        return null;
+    }
+
     /**
      * @return \shmurakami\Elephoot\Example\ReturnType\ReturnInDocComment|null
      */
