@@ -214,6 +214,16 @@ class ClassAst
             return $this->parseNewStatementContextList($rootNode, $contextList);
         }
 
+        // enum
+        // enum is same as const value
+        if ($kind === Kind::AST_CLASS_CONST) {
+            $context = $this->contextParser->toContext($this->namespace, $rootNode->children['class']?->children['name'] ?? '');
+            if ($context) {
+                $contextList[] = $context;
+            }
+            return $contextList;
+        }
+
         // nothing to do
         if (in_array($kind, [Kind::AST_PROP_GROUP])) {
             return $contextList;
